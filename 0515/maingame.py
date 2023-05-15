@@ -57,6 +57,7 @@ class WindowClass(QMainWindow, form_class):
         self.Status1_1_Class.setText("close")
 
     #캐릭터 방향키로 움직이기===============================================================================================
+    # 다른키를 눌러도 입력값을 받는 문제가 있음 => 어떻게 수정해야 하지?
     def keyPressEvent(self, event):
         rand_event = random.randrange(4)
         if event.key() == Qt.Key_A and self.label.x() > 0:
@@ -75,9 +76,9 @@ class WindowClass(QMainWindow, form_class):
         lab_y_ = self.label.pos().y()
 
         #랜덤 값에 따라 이동 / 적 만남 / 수호대 만남 / 아이템 획득
-        if rand_event == 1 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760:
+        if rand_event == 1 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760: #캐릭터 창 밖으로 넘어가지 못하게 하기
             self.Log_textEdit.append("1칸 이동하였습니다.")
-        elif rand_event == 2 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760:
+        elif rand_event == 2 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760: #캐릭터 창 밖으로 넘어가지 못하게 하기
             enemy_rand = random.randrange(4)
             if enemy_rand >= 3:
                 self.Log_textEdit.append("적을 만났습니다.") #전투 함수로 이동
