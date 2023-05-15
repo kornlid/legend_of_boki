@@ -18,11 +18,22 @@ form_class = uic.loadUiType(form)[0]
 
 
 class WindowClass(QMainWindow, form_class):
+
+
     def __init__(self):
         super( ).__init__( )
         self.setupUi(self)
-        self.setWindowFlag(Qt.FramelessWindowHint) # 프레임 지우기
-        self.showFullScreen() #풀스크린 화면 만들기
+
+        # label_list = self.Page_Dungeon_Field.findChildren(QLabel)
+        #
+        # for label in label_list:
+        #     print(label.objectName())
+
+        # label_list = self.StackWidget_Field.setCurrentIndex(1).findChildren(QLabel)
+
+
+        # self.setWindowFlag(Qt.FramelessWindowHint) # 프레임 지우기
+        # self.showFullScreen() #풀스크린 화면 만들기
         # self.exitAction.triggered.connect(qApp.closeAllWindows) # 게임 종료 이벤트
 
         # TODO 처음 게임 시작했을 때 시작 화면 보여주기
@@ -47,45 +58,74 @@ class WindowClass(QMainWindow, form_class):
         # 일반필드에서 LCD에 포션 나타내주는 값
         # setText() 는 레이블 내 텍스트 설정 / setNum() 레이블 내 정수를 설정
 
-
+        # self.label_5 = MyLabel(self.Page_Dungeon_Field)
         # TODO 캐릭터 움직일 때 마다 x, y 좌표 반영하기
-        self.character_left_img = QPixmap('character_left.png')
-        self.character_right_img = QPixmap('character_right.png')
-        self.back_ground_label.setPixmap(QtGui.QPixmap("용암.png"))
-        self.widget.move(826,-1)
-        self.back_ground_label.move(0,-1)
-        self.Status1_1_Class.setText("close")
-
+        # self.character_left_img = QPixmap('character_left.png')
+        # self.character_right_img = QPixmap('character_right.png')
+        # self.back_ground_label.setPixmap(QtGui.QPixmap("용암.png"))
+        # self.widget.move(826,-1)
+        # self.back_ground_label.move(0,-1)
+        # self.Status1_1_Class.setText("close")
+        # Show_Dungeon_Entrance()
     #캐릭터 방향키로 움직이기===============================================================================================
-    # 다른키를 눌러도 입력값을 받는 문제가 있음 => 어떻게 수정해야 하지?
+    # 다른키를 눌러도 입력값을 받는 문제가 있음 => 어떻게 수정해야 하지? return 으로 해결
+        self.label_list = self.Page_Dungeon_Field.findChildren(QLabel)  # {던전 필드}에 있는 라벨 정보 가져와서 리스트에 저장
     def keyPressEvent(self, event):
-        rand_event = random.randrange(4)
-        if event.key() == Qt.Key_A and self.label.x() > 0:
-            self.label.setPixmap(self.character_left_img)
-            self.label.move(self.label.x() - 20, self.label.y())
-        elif event.key() == Qt.Key_D and self.label.x() < 1580:
-            self.label.setPixmap(self.character_right_img)
-            self.label.move(self.label.x() + 20, self.label.y())
-        elif event.key() == Qt.Key_W and self.label.y() > 0:
-            self.label.move(self.label.x(), self.label.y() - 20)
-        elif event.key() == Qt.Key_S and self.label.y() < 760:
-            self.label.move(self.label.x(), self.label.y() + 20)
+        """키값 입력받아 라벨 움직이는 함수"""
+
+        previous_position = self.label_5.geometry() # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
+        if event.key() == Qt.Key_A : # A 눌렀을 때
+            new_position = self.label_5.geometry().translated(-20, 0) # 새 포지션 값 저장
+            self.label_5.move(self.label_5.x() - 20, self.label_5.y()) # 왼쪽으로 20  이동
+        elif event.key() == Qt.Key_D : # D 눌렀을 때
+            new_position = self.label_5.geometry().translated(20, 0) # 이하동일
+            self.label_5.move(self.label_5.x() + 20, self.label_5.y()) # 오른쪽으로 20 이동
+        elif event.key() == Qt.Key_W : # W눌렀을 때
+            new_position = self.label_5.geometry().translated(0, -20)
+            self.label_5.move(self.label_5.x(), self.label_5.y() - 20) # 위로 20 이동
+        elif event.key() == Qt.Key_S: # S눌렀을 때
+            new_position = self.label_5.geometry().translated(0, 20)
+            self.label_5.move(self.label_5.x(), self.label_5.y() + 20) # 아래로 20 이동
+        else:
+            return
+
+        for label in self.label_list: #라벨 정보 리스트 가져옴
+            if label != self.label_5 and new_position.intersects(label.geometry()): #만약 겹치면 break
+                print(f'{label.objectName()}와 겹침')
+                self.label_5.setGeometry(previous_position)
+                break
+
+
+    def Show_Dungeon_Entrance(self):
+        """던전 입구 보여주기"""
+        label_location = []
+        for label in self.label_list:
+            label_location.append(label.geometry())
+        print(label_location)
+
+
+
+
+
+
+
+
 
         #캐릭터의 x, y 좌표 받아오기
-        lab_x_ = self.label.pos().x()
-        lab_y_ = self.label.pos().y()
+        lab_x_ = self.label_5.pos().x()
+        lab_y_ = self.label_5.pos().y()
 
         #랜덤 값에 따라 이동 / 적 만남 / 수호대 만남 / 아이템 획득
-        if rand_event == 1 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760: #캐릭터 창 밖으로 넘어가지 못하게 하기
-            self.Log_textEdit.append("1칸 이동하였습니다.")
-        elif rand_event == 2 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760: #캐릭터 창 밖으로 넘어가지 못하게 하기
-            enemy_rand = random.randrange(4)
-            if enemy_rand >= 3:
-                self.Log_textEdit.append("적을 만났습니다.") #전투 함수로 이동
-            elif enemy_rand == 4:
-                self.Log_textEdit.append("타 수호대를 만났습니다.") # 전투 함수로 이동
-        elif rand_event == 3 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760:
-            self.Log_textEdit.append("아이템을 획득하였습니다.")
+        # if rand_event == 1 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760: #캐릭터 창 밖으로 넘어가지 못하게 하기
+        #     self.Log_textEdit.append("1칸 이동하였습니다.")
+        # elif rand_event == 2 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760: #캐릭터 창 밖으로 넘어가지 못하게 하기
+        #     enemy_rand = random.randrange(4)
+        #     if enemy_rand >= 3:
+        #         self.Log_textEdit.append("적을 만났습니다.") #전투 함수로 이동
+        #     elif enemy_rand == 4:
+        #         self.Log_textEdit.append("타 수호대를 만났습니다.") # 전투 함수로 이동
+        # elif rand_event == 3 and self.label.x() > 0 and self.label.x() < 1580 and self.label.y() > 0 and self.label.y() < 760:
+        #     self.Log_textEdit.append("아이템을 획득하였습니다.")
             # 아이템 획득하면 아이템 라벨 변경해주기
             # 아이템 얻는 함수
             # setText() 는 레이블 내 텍스트 설정 / setNum() 레이블 내 정수를 설정
@@ -98,6 +138,18 @@ class WindowClass(QMainWindow, form_class):
 
         #왼쪽 상단에 좌표 확인시켜주기
         self.TopUI_Coordinate_Label.setText(f"x좌표: {lab_x_} y좌표: {lab_y_}")
+
+
+    # def moveLabel(self):
+    #     label_list = self.Page_Dungeon_Field.findChildren(QLabel)
+    #     label_list.remove(self.label_5)
+    #     for i in label_list:
+    #         rect1 = self.label_5.geometry()
+    #         rect2 = i.geometry()
+    #         if rect1.intersects(rect2):
+    #             print(f"{i.text()}와 겹침")
+    #         else:
+    #             print("pass")
 
     #def 아이템 얻는 함수(self):
         # 3. 아이템 얻기
@@ -119,7 +171,7 @@ class WindowClass(QMainWindow, form_class):
 
     #def 전투함수(self):
         #전투로 창이동시키기
-        # self.변경할_스택위젯이름.setCurrentIndex(변경할_페이지)
+        # self.StackWidget_Field.setCurrentIndex(2) #배틀필드 페이지 2
 
         ## 일반몬스터 만났을 때
         ### 몬스터, 캐릭터 정보 들어가게 하기 (+ hp, mp 정보도) <- 혜빈이 오늘 한거 붙여넣기하기
@@ -144,6 +196,7 @@ class WindowClass(QMainWindow, form_class):
 
     #def 승리함수(self, 이긴위치):
         #승리했을 때 어떤 상황에 따라 어떤 보상을 줄 지 선택하기
+        #
 
 
 
