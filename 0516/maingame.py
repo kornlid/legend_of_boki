@@ -63,6 +63,7 @@ class WindowClass(QMainWindow, form_class):
         # 1, 2, 3 중 하나의 값이 나오면 스택드 위젯 값 가져오기
 
         self.label_list = self.Page_Dungeon_Field.findChildren(QLabel)  # {던전 필드}에 있는 라벨 정보 가져와서 리스트에 저장
+        self.label_list_battlefield_2 = self.Page_Dungeon_Field_1.findChildren(QLabel)  # {던전 필드2}에 있는 라벨 정보 가져와서 리스트에 저장
         # for i in self.label_list:
         #     print(i.objectName()) #오브젝트 확인용
         print(self.label.geometry(), self.label.geometry().x(), self.label.geometry().y())
@@ -97,7 +98,7 @@ class WindowClass(QMainWindow, form_class):
                 self.StackWidget_Field.setCurrentIndex(1)  # 던전 필드로 이동
                 self.Show_Dungeon_Entrance()  # 던전 입구 만들기
 
-        # 던전입구일 때
+        # 던전입구1일 때
         elif current_index == 1:
             previous_position = self.label_5.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
             if event.key() == Qt.Key_A:  # A 눌렀을 때
@@ -125,6 +126,7 @@ class WindowClass(QMainWindow, form_class):
                 reply = QMessageBox()
                 reply.setText("미궁을 만났습니다!")
                 reply.exec_()
+                self.StackWidget_Field.setCurrentIndex(2)  # 던전 필드2로 이동
 
             # 라벨(벽과)겹치면 이전 위치로 이동하도록 함
             for label in self.label_list:  # 라벨 정보 리스트 가져옴
@@ -134,6 +136,44 @@ class WindowClass(QMainWindow, form_class):
                     break
             if not ((558 <= new_position.x() <= 1054) and (168 < new_position.y() < 662)):
                 self.label_5.setGeometry(previous_position)
+
+        #던전필드 2일때
+        elif current_index == 2:
+            previous_position_ = self.label_63.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
+            if event.key() == Qt.Key_A:  # A 눌렀을 때
+                self.label_63.setPixmap(self.character_left_img)
+                new_position = self.label_63.geometry().translated(-20, 0)  # 새 포지션 값 저장
+                self.label_63.move(self.label_63.x() - 20, self.label_63.y())  # 왼쪽으로 20  이동
+            elif event.key() == Qt.Key_D:  # D 눌렀을 때
+                self.label_63.setPixmap(self.character_right_img)
+                new_position = self.label_63.geometry().translated(20, 0)  # 이하동일
+                self.label_63.move(self.label_63.x() + 20, self.label_63.y())  # 오른쪽으로 20 이동
+            elif event.key() == Qt.Key_W:  # W눌렀을 때
+                new_position = self.label_63.geometry().translated(0, -20)
+                self.label_63.move(self.label_63.x(), self.label_63.y() - 20)  # 위로 20 이동
+            elif event.key() == Qt.Key_S:  # S눌렀을 때
+                new_position = self.label_63.geometry().translated(0, 20)
+                self.label_63.move(self.label_63.x(), self.label_63.y() + 20)  # 아래로 20 이동
+            else:
+                return
+
+            # 현재위치 왼쪽 상단에 출력
+            self.TopUI_Coordinate_Label.setText(f"x좌표: {self.label_63.pos().x()}, y좌표:{self.label_63.pos().y()}")
+
+            # # 던전에서 미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
+            # if self.label_5.geometry().intersects(self.entrance.geometry()):
+            #     reply = QMessageBox()
+            #     reply.setText("미궁을 만났습니다!")
+            #     reply.exec_()
+
+            # 라벨(벽과)겹치면 이전 위치로 이동하도록 함
+            for label in self.label_list_battlefield_2:  # 라벨 정보 리스트 가져옴
+                if label != self.label_63 and label != self.label_26 and new_position.intersects(label.geometry()):  # 캐릭터 라벨, 배경 라벨은 제외.
+                    print(f'{label.objectName()}와 겹침')  # 확인용
+                    self.label_63.setGeometry(previous_position_) # 겹치면 이전 위치로 이동
+                    break # for문 break
+            # if not ((558 <= new_position.x() <= 1054) and (168 < new_position.y() < 662)):
+            #     self.label_5.setGeometry(previous_position)
 
     def Show_Dungeon_Entrance(self):
         """던전 입구 랜덤으로 만들어주는 함수"""
