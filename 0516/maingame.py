@@ -116,6 +116,14 @@ class WindowClass(QMainWindow, form_class):
         self.check_collision(self.entrance)
         self.entrance.show()
 
+        #검은 라벨 만들어서 위에 덮기
+        black_label = QLabel(self)
+        black_label.move(0, 30)
+        black_label.setStyleSheet('background-color: rgba(0, 0, 0, 230)')
+        black_label.setFixedSize(1615, 834)
+        black_label.show()
+
+
     def check_collision(self, label):
         """새로 미궁 만들어지는 곳 중복체크 하는 함수"""
         for other_label in self.label_list:
@@ -123,6 +131,7 @@ class WindowClass(QMainWindow, form_class):
                 label.move(random.randint(1, 1580), random.randint(1, 760))
                 self.check_collision(label)
                 break
+
 
 
 
