@@ -23,13 +23,6 @@ class WindowClass(QMainWindow, form_class):
         super( ).__init__( )
         self.setupUi(self)
 
-        # label_list = self.Page_Dungeon_Field.findChildren(QLabel)
-        #
-        # for label in label_list:
-        #     print(label.objectName())
-
-        # label_list = self.StackWidget_Field.setCurrentIndex(1).findChildren(QLabel)
-
 
         self.setWindowFlag(Qt.FramelessWindowHint) # 프레임 지우기
         self.showFullScreen() #풀스크린 화면 만들기
@@ -69,8 +62,6 @@ class WindowClass(QMainWindow, form_class):
         #1, 2, 3 중 하나의 값이 나오면 스택드 위젯 값 가져오기
 
         self.label_list = self.Page_Dungeon_Field.findChildren(QLabel)  # {던전 필드}에 있는 라벨 정보 가져와서 리스트에 저장
-
-
 
     def keyPressEvent(self, event):
         """키값 입력받아 라벨 움직이는 함수"""
