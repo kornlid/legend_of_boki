@@ -33,6 +33,7 @@ class WindowClass(QMainWindow, form_class):
 
         # TODO 랜덤확률로 수호대 위치 4군데 중 1군데로 설정시키기 (왼, 오, 위, 아래)
         # 포탈 생성하기
+
         self.portal_sample = QLabel(self)
         self.portal_sample.setFixedSize(40, 40)
         self.portal_sample.setText("포탈")
