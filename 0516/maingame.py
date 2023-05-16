@@ -7,7 +7,6 @@ from PyQt5 import uic, Qt
 from PyQt5 import QtGui
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-
 sys.setrecursionlimit(10 ** 7)  # 재귀함수 제한
 
 
