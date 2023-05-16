@@ -43,17 +43,17 @@ class WindowClass(QMainWindow, form_class):
         # 캐릭터의 위치에 따라 포탈 위치 변경
         random_spot = random.randrange(1, 4)
         if random_spot == 1:
-            self.label.move(10, 190)
-            self.portal_sample.move(random.randint(340, 620), random.randint(10, 460))
+            self.label.move(790, 0)
+            self.portal_sample.move(random.randint(0, 1580), random.randint(390, 780))
         elif random_spot == 2:
-            self.label.move(340, 10)
-            self.portal_sample.move(random.randint(10, 620), random.randint(190, 460))
+            self.label.move(0, 390)
+            self.portal_sample.move(random.randint(790, 1580), random.randint(0, 780))
         elif random_spot == 3:
-            self.label.move(340, 460)
-            self.portal_sample.move(random.randint(10, 620), random.randint(10, 190))
+            self.label.move(790, 780)
+            self.portal_sample.move(random.randint(0, 1580), random.randint(0, 390))
         elif random_spot == 4:
-            self.label.move(620, 190)
-            self.portal_sample.move(random.randint(10, 340), random.randint(10, 460))
+            self.label.move(1580, 390)
+            self.portal_sample.move(random.randint(0, 790), random.randint(0, 780))
 
         # 캐릭터 이미지 가져오기
         self.character_right_img = QPixmap('character_right.png')
@@ -64,9 +64,7 @@ class WindowClass(QMainWindow, form_class):
 
         self.label_list = self.Page_Dungeon_Field.findChildren(QLabel)  # {던전 필드}에 있는 라벨 정보 가져와서 리스트에 저장
         self.label_list_battlefield_2 = self.Page_Dungeon_Field_1.findChildren(QLabel)  # {던전 필드2}에 있는 라벨 정보 가져와서 리스트에 저장
-        # for i in self.label_list:
-        #     print(i.objectName()) #오브젝트 확인용
-        print(self.label.geometry(), self.label.geometry().x(), self.label.geometry().y())
+
     def keyPressEvent(self, event):
         """키값 입력받아 라벨 움직이는 함수"""
 
@@ -88,15 +86,21 @@ class WindowClass(QMainWindow, form_class):
                 self.label.move(self.label.x(), self.label.y() + 20)  # 위로 20 이동
             else:
                 return
+
             # 현재위치 왼쪽 상단에 출력
             self.TopUI_Coordinate_Label.setText(f"x좌표: {self.label.pos().x()}, y좌표:{self.label.pos().y()}")
+
             # 일반필드에서 포탈 만났을 때
             if self.label.geometry().intersects(self.portal_sample.geometry()):  # 포탈 만나면
                 # last_position = self.label.geometry()  # 마지막 좌표 기억
                 # self.label_5.setGeometry(last_position) # 마지막 좌표로 이동한 후 다음 필드에서 동일한 곳에 떨어지게 함 -> 던전 크기 수정으로 취소
                 self.portal_sample.hide()  # 던전 필드로 이동할 때 포탈 숨겨주기
-                self.StackWidget_Field.setCurrentIndex(1)  # 던전 필드로 이동
-                self.Show_Dungeon_Entrance()  # 던전 입구 만들기
+                random_dungeon_num = random.randint(1,2) # 던전 랜덤으로 가는 값 추가(4까지 추가 예정)
+                if random_dungeon_num == 1:
+                    self.StackWidget_Field.setCurrentIndex(1)  # 1번 던전 필드로 이동
+                    self.Show_Dungeon_Entrance()  # 던전 입구 만들기
+                elif random_dungeon_num == 2:
+                    self.StackWidget_Field.setCurrentIndex(2) #2번 던전 필드로 이동
 
         # 던전입구1일 때
         elif current_index == 1:
@@ -126,7 +130,6 @@ class WindowClass(QMainWindow, form_class):
                 reply = QMessageBox()
                 reply.setText("미궁을 만났습니다!")
                 reply.exec_()
-                self.StackWidget_Field.setCurrentIndex(2)  # 던전 필드2로 이동
 
             # 라벨(벽과)겹치면 이전 위치로 이동하도록 함
             for label in self.label_list:  # 라벨 정보 리스트 가져옴
@@ -134,7 +137,7 @@ class WindowClass(QMainWindow, form_class):
                     print(f'{label.objectName()}와 겹침')  # 확인용
                     self.label_5.setGeometry(previous_position)
                     break
-            if not ((558 <= new_position.x() <= 1054) and (168 < new_position.y() < 662)):
+            if not ((558 <= new_position.x() <= 1054) and (168 < new_position.y() < 662)): #캐릭터가 벗어나지 않게 하는 부분
                 self.label_5.setGeometry(previous_position)
 
         #던전필드 2일때
@@ -159,12 +162,6 @@ class WindowClass(QMainWindow, form_class):
 
             # 현재위치 왼쪽 상단에 출력
             self.TopUI_Coordinate_Label.setText(f"x좌표: {self.label_63.pos().x()}, y좌표:{self.label_63.pos().y()}")
-
-            # # 던전에서 미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
-            # if self.label_5.geometry().intersects(self.entrance.geometry()):
-            #     reply = QMessageBox()
-            #     reply.setText("미궁을 만났습니다!")
-            #     reply.exec_()
 
             # 라벨(벽과)겹치면 이전 위치로 이동하도록 함
             for label in self.label_list_battlefield_2:  # 라벨 정보 리스트 가져옴
