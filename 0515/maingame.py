@@ -77,9 +77,13 @@ class WindowClass(QMainWindow, form_class):
         if event.key() == Qt.Key_A : # A 눌렀을 때
             new_position = self.label_5.geometry().translated(-20, 0) # 새 포지션 값 저장
             self.label_5.move(self.label_5.x() - 20, self.label_5.y()) # 왼쪽으로 20  이동
+            self.label.setPixmap(self.character_left_img)
+            self.label_5.setPixmap(self.character_left_img)
         elif event.key() == Qt.Key_D : # D 눌렀을 때
             new_position = self.label_5.geometry().translated(20, 0) # 이하동일
             self.label_5.move(self.label_5.x() + 20, self.label_5.y()) # 오른쪽으로 20 이동
+            self.label.setPixmap(self.character_left_img)
+            self.label_5.setPixmap(self.character_left_img)
         elif event.key() == Qt.Key_W : # W눌렀을 때
             new_position = self.label_5.geometry().translated(0, -20)
             self.label_5.move(self.label_5.x(), self.label_5.y() - 20) # 위로 20 이동
