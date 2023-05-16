@@ -80,27 +80,33 @@ class WindowClass(QMainWindow, form_class):
 
         previous_position = self.label_5.geometry() # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
         if event.key() == Qt.Key_A : # A 눌렀을 때
-            new_position = self.label_5.geometry().translated(-10, 0) # 새 포지션 값 저장
-            self.label_5.move(self.label_5.x() - 10, self.label_5.y()) # 왼쪽으로 20  이동
+            new_position = self.label_5.geometry().translated(-20, 0) # 새 포지션 값 저장
+            self.label_5.move(self.label_5.x() - 20, self.label_5.y()) # 왼쪽으로 20  이동
         elif event.key() == Qt.Key_D : # D 눌렀을 때
-            new_position = self.label_5.geometry().translated(10, 0) # 이하동일
-            self.label_5.move(self.label_5.x() + 10, self.label_5.y()) # 오른쪽으로 20 이동
+            new_position = self.label_5.geometry().translated(20, 0) # 이하동일
+            self.label_5.move(self.label_5.x() + 20, self.label_5.y()) # 오른쪽으로 20 이동
         elif event.key() == Qt.Key_W : # W눌렀을 때
-            new_position = self.label_5.geometry().translated(0, -10)
-            self.label_5.move(self.label_5.x(), self.label_5.y() - 10) # 위로 20 이동
+            new_position = self.label_5.geometry().translated(0, -20)
+            self.label_5.move(self.label_5.x(), self.label_5.y() - 20) # 위로 20 이동
         elif event.key() == Qt.Key_S: # S눌렀을 때
-            new_position = self.label_5.geometry().translated(0, 10)
-            self.label_5.move(self.label_5.x(), self.label_5.y() + 10) # 아래로 20 이동
+            new_position = self.label_5.geometry().translated(0, 20)
+            self.label_5.move(self.label_5.x(), self.label_5.y() + 20) # 아래로 20 이동
         else:
             return
+
+        #왼쪽 상단 좌표 추가해주기
+        self.TopUI_Coordinate_Label.setText(f"x좌표: {self.label_5.pos().x()}, y좌표:{self.label_5.pos().x()}")
+
+        #미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
         if self.label_5.geometry().intersects(self.entrance.geometry()):
             reply = QMessageBox()
             reply.setText("미궁을 만났습니다!")
             reply.exec_()
 
+        #라벨(벽과)겹치면 이전 위치로 이동하도록 함
         for label in self.label_list: #라벨 정보 리스트 가져옴
             if label != self.label_5 and new_position.intersects(label.geometry()): #만약 겹치면 break
-                print(f'{label.objectName()}와 겹침')
+                print(f'{label.objectName()}와 겹침') # 확인용
                 self.label_5.setGeometry(previous_position)
                 break
 
@@ -108,15 +114,17 @@ class WindowClass(QMainWindow, form_class):
 
     def Show_Dungeon_Entrance(self):
         """던전 입구 랜덤으로 만들어주는 함수"""
+
+        #미궁 버튼 임시로 만들어주기
         self.entrance = QLabel(self)
         self.entrance.setText("미궁")
         self.entrance.setFixedSize(50, 50) #임시 라벨지정
         self.entrance.setStyleSheet('background-color: blue')
         self.entrance.move(random.randint(1, 1580), random.randint(1, 760))
-        self.check_collision(self.entrance)
+        self.check_collision(self.entrance) # 미궁 만들어지는 곳 중복체크 하는 함수로 이동하기
         self.entrance.show()
 
-        #검은 라벨 만들어서 위에 덮기
+        #검은 라벨 만들어서 위에 덮기(유저가 플레이할 때 던전이 안보이게)
         black_label = QLabel(self)
         black_label.move(0, 30)
         black_label.setStyleSheet('background-color: rgba(0, 0, 0, 230)')
@@ -126,10 +134,10 @@ class WindowClass(QMainWindow, form_class):
 
     def check_collision(self, label):
         """새로 미궁 만들어지는 곳 중복체크 하는 함수"""
-        for other_label in self.label_list:
+        for other_label in self.label_list: #라벨이 겹치면 값 재설정
             if label.geometry().intersects(other_label.geometry()):
                 label.move(random.randint(1, 1580), random.randint(1, 760))
-                self.check_collision(label)
+                self.check_collision(label) #재귀함수로 이 함수 다시 사용
                 break
 
 
