@@ -135,30 +135,33 @@ class MainGame(QMainWindow, form_class):
             getattr(self, f'Status{btn + 1}_Action4_Run').clicked.connect(self.Run_btn)
 
         # 몬스터 버튼 선택에 대한 시그널 연결
-        for mon in range(10):
-            if getattr(self, f'Monster_{mon + 1}_QButton').clicked.connect(self.Turn):
-                break
-            else:
-                pass
+        # for mon in range(10):
+        #     if getattr(self, f'Monster_{mon + 1}_QButton').clicked.connect(self.Turn):
+        #         break
+        #     else:
+        #         pass
 
+
+        for button in [self.Monster_1_QButton, self.Monster_2_QButton, self.Monster_3_QButton, self.Monster_4_QButton,
+                       self.Monster_5_QButton, self.Monster_6_QButton, self.Monster_7_QButton, self.Monster_8_QButton,
+                       self.Monster_9_QButton, self.Monster_10_QButton]:
+            button.clicked.connect(self.Turn)
 
         #### 여기가 문제 입니다 #### =============================================================
 
         name_text = self.Status1_1_Name.text()
-        skills = {
-            '미하일': 1,
-            '루미너스': 2,
-            '알렉스': 3,
-            '샐러맨더': 4,
-            '메르데스': 5,
-            '랜슬롯': 6
-        }
+        name_text2 = self.Status2_1_Name.text()
+        name_text3 = self.Status3_1_Name.text()
+        name_text4 = self.Status4_1_Name.text()
+        name_text5 = self.Status5_1_Name.text()
 
-        for name, index in skills.items():
-            if name == name_text:
-                print(name)
-                self.Status1_Action2_Skill.clicked.connect(lambda x, index_=index: self.skill_btn(index_))
-                break
+        skills = {'미하일': 1, '루미너스': 2, '알렉스': 3, '샐러맨더': 4, '메르데스': 5,'랜슬롯': 6}  # 각 이름에 대한 인덱스를 찾아서 람다 함수 내에서 스킬 버튼을 연결
+
+        self.Status1_Action2_Skill.clicked.connect(lambda x, index=skills.get(name_text): self.skill_btn(index))
+        self.Status2_Action2_Skill.clicked.connect(lambda x, index=skills.get(name_text2): self.skill_btn(index))
+        self.Status3_Action2_Skill.clicked.connect(lambda x, index=skills.get(name_text3): self.skill_btn(index))
+        self.Status4_Action2_Skill.clicked.connect(lambda x, index=skills.get(name_text4): self.skill_btn(index))
+        self.Status5_Action2_Skill.clicked.connect(lambda x, index=skills.get(name_text5): self.skill_btn(index))
 
         # if '미하일' in self.Status1_1_Name.text():
         #     print(self.Status1_1_Name.text())
@@ -216,7 +219,8 @@ class MainGame(QMainWindow, form_class):
             self.Frame_Class2,
             self.Frame_Class3,
             self.Frame_Class4,
-            self.Frame_Class5
+            self.Frame_Class5,
+            self.Frame_Class6
         ]
         for idx, frame in enumerate(frames):
             if idx == index_ - 1:
