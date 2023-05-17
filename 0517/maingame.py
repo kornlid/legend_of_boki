@@ -16,10 +16,10 @@ def resource_path(relative_path):
 
 
 form = resource_path('maingame.ui')
-form_class = uic.loadUiType(form)[0]
+main_game = uic.loadUiType(form)[0]
 
 
-class WindowClass(QMainWindow, form_class):
+class WindowClass(QMainWindow, main_game):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -31,31 +31,27 @@ class WindowClass(QMainWindow, form_class):
         self.user_can_enter_dungeon = False  # 유저는 보스를 이길 때까지 던전에 입장하지 못함
 
         # TODO 처음 게임 시작했을 때 시작 화면 보여주기
-        self.StackWidget_Field.setCurrentIndex(0)  # 일반필드용
+        self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
 
         # TODO 랜덤확률로 수호대 위치 4군데 중 1군데로 설정시키기 (왼, 오, 위, 아래)
-        # 포탈 생성하기
+        # 포                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     탈 생성하기
         self.portal_sample = QLabel(self)
         self.portal_sample.setFixedSize(40, 40)
         self.portal_sample.setText("포탈")
         self.portal_sample.setStyleSheet('background-color: blue')
         self.portal_sample.show()
 
-        # 캐릭터의 위치에 따라 포탈 위치 변경
+        # 캐릭터의 위치에 따라 포탈 위치 변경 / 유저의 x, y값 지정하기
+        positions = {
+            1: (790, 0), #상단
+            2: (0, 390), #왼쪽 중앙
+            3: (790, 780), #하단
+            4: (1580, 390) #오른쪽 중앙
+        }
 
-        random_spot = random.randrange(1, 4)
-        if random_spot == 1:
-            self.label.move(790, 0)  # 캐릭터가 상단에 위치할 때
-            self.portal_sample.move(random.randint(0, 1580), random.randint(390, 780))
-        elif random_spot == 2:
-            self.label.move(0, 390)  # 캐릭터가 왼쪽 중앙에 위치할 때
-            self.portal_sample.move(random.randint(790, 1580), random.randint(0, 780))
-        elif random_spot == 3:
-            self.label.move(790, 780)  # 캐릭터가 하단에 위치할 때
-            self.portal_sample.move(random.randint(0, 1580), random.randint(0, 390))
-        elif random_spot == 4:
-            self.label.move(1580, 390)  # 캐릭터가 오른쪽 중앙에 위치할 때ㅑ
-            self.portal_sample.move(random.randint(0, 790), random.randint(0, 780))
+        random_spot = random.randint(1, 4) #시작 캐릭터 위치 랜덤으로 위치시키기
+        self.label.move(positions[random_spot][0], positions[random_spot][1]) #캐릭터를 상하좌우로 위치시키기
+        self.portal_sample.move(random.randint(1, 1580), random.randint(1, 780)) #포탈 위치 랜덤으로 배정
 
         # 캐릭터 이미지 가져오기
         self.character_right_img = QPixmap('character_right.png')
@@ -68,18 +64,17 @@ class WindowClass(QMainWindow, form_class):
         self.label_list_battlefield_2 = self.Page_Dungeon_Field_1.findChildren(QLabel)  # {던전 필드2}에 있는 라벨 정보 가져와서 리스트에 저장
 
         for i in self.label_list:
-            print(i.objectName()) # 확인용
-
-
-
+            print(i.objectName()) # 던전에 있는 라벨 객체이름 확인용
 
     def keyPressEvent(self, event):
         """키값 입력받아 라벨 움직이는 함수"""
 
-        current_index = self.StackWidget_Field.currentIndex()  # 현재 스택위젯 값 가져오기
+        # 현재 스택위젯 값 가져오기
+        current_index = self.StackWidget_Field.currentIndex()
 
         # 노말필드일 때
         if current_index == 0:
+            # 노말필드일때 랜덤값에 따라 이동하기
             # 랜덤 값에 따라 이동 / 적 만남 / 수호대 만남 / 아이템 획득 (추가해야 함)
             previous_position = self.label_5.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
             if event.key() == Qt.Key_A:  # A 눌렀을 때
@@ -140,11 +135,6 @@ class WindowClass(QMainWindow, form_class):
                 self.show_messagebox("미궁을 만났습니다!")
                 #이후 던전으로
 
-
-
-
-
-
             # 라벨(벽과)겹치면 이전 위치로 이동하도록 함
             for label in self.label_list:  # 라벨 정보 리스트 가져옴
                 if label != self.label_5 and label != self.label_2 and new_position.intersects(label.geometry()):  # 만약 겹치면 break
@@ -204,7 +194,7 @@ class WindowClass(QMainWindow, form_class):
     #     elif direction == 'down':
     #         label.setPixmap(self.character_left_img)
     #         label.move(label.x(), label.y() + distance)
-    # 
+    #
     #     self.TopUI_Coordinate_Label.setText(f"x좌표: {label.pos().x()}, y좌표:{label.pos().y()}") #왼쪽상단에 현재위치 표시
 
     def show_messagebox(self, text):
@@ -238,11 +228,11 @@ class WindowClass(QMainWindow, form_class):
         self.entrance.move(random.randint(558, 1054), random.randint(168, 662)) #던전 15*15 사이즈
 
         #몬스터 위치 임시로 만들어주기
-        self.boss_monster = QLabel(self)
+        self.boss_monster = QLabel(self) # 보스 몬스터 나타날 포탈 임시
         self.boss_monster.setText("몬스터")
         self.boss_monster.setFixedSize(30, 30)  # 임시 라벨지정
-        self.boss_monster.setStyleSheet('background-color: red')
-        self.boss_monster.move(random.randint(558, 1054), random.randint(168, 662))
+        self.boss_monster.setStyleSheet('background-color: red') #임시로 빨간색으로
+        self.boss_monster.move(random.randint(558, 1054), random.randint(168, 662)) # 보스 몬스터 랜덤으로 등장
 
         self.check_collision(self.entrance)  # 미궁 만들어지는 곳 중복체크 하는 함수로 이동하기
         self.check_collision(self.boss_monster)  # 미궁 만들어지는 곳 중복체크 하는 함수로 이동하기
@@ -321,16 +311,16 @@ class WindowClass(QMainWindow, form_class):
     #
 
 
-# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-# 게임 종료 이벤트
-# def closeEvent(self, event):
-#     reply = QMessageBox.question(self, 'EXIT', '정말 게임을 종료하시겠습니까?',
-#                                  QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-#     if reply == QMessageBox.Yes:
-#         event.accept()
-#     else:
-#         event.ignore()
-# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # 게임 종료 이벤트
+    # def closeEvent(self, event):
+    #     reply = QMessageBox.question(self, 'EXIT', '정말 게임을 종료하시겠습니까?',
+    #                                  QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+    #     if reply == QMessageBox.Yes:
+    #         event.accept()
+    #     else:
+    #         event.ignore()
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
 
 if __name__ == '__main__':
