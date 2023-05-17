@@ -834,6 +834,9 @@
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
+                     <property name="maximum">
+                      <number>10000</number>
+                     </property>
                      <property name="value">
                       <number>100</number>
                      </property>

@@ -341,7 +341,16 @@ class WindowClass(QMainWindow, main_game):
             ### 전투 시작하면 캐릭터 장비를 각각의 스택위젯 창에 업데이트 시키기 -> 이건 해야함
 
             #### 일반공격 선택시 -> 다른 버튼들 비활성화 -> hp 가 0초과인 몬스터 버튼 활성화 -> 공격력 25%로 먹이기 -> 상태창에 얼마나 데미지 입혔는지 띄우기 ->  몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> 아군 중 전투가능이 없으면(hp 가 모두 없다면 전투 실패)
-            self.Status1_Action1_Attack.clicked(self, btn_false(1)) #선택한 버튼 객체 보내주기
+
+            #다른 버튼들 비활성화
+            self.Status1_Action1_Attack.clicked.connect(lambda: self.btn_false(1)) # 공격 버튼 누르면 다른 버튼 비활성화
+            self.Status1_Action2_Skill.clicked.connect(lambda: self.btn_false(2)) # 스킬 버튼 누르면 다른 버튼 비활성화
+            self.Status1_Action3_Item.clicked.connect(lambda: self.btn_false(3)) # 아이템 버튼 누르면 다른 버튼 비활성화
+            self.Status1_Action4_Run.clicked.connect(lambda: self.btn_false(4)) # 도망 버튼 누르면 다른 버튼 비활성화
+
+            #
+
+
 
             #### 스킬 선택시 -> 위젯 띄우기 -> 캐릭터의 정보가 불러와져서 캐릭터의 스킬만 활성화 -> 클릭하면 몬스터에 공격 데미지 상태창에 표시 -> 몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> hp가 모두 없다면 전투 실패
             #### 아이템 선택시 -> 장비 및 소비 창 활성화
@@ -367,12 +376,36 @@ class WindowClass(QMainWindow, main_game):
         self.Widget_Skill.hide()  # 위젯 스킬 창 투명화
 
     def btn_false(self, idx):
-        btn_info = self.sender()
-        if btn_info == '1. 공격'
-        if Status1_Action1_Attack
-            Status1_Action2_Skill
-            Status1_Action3_Item
-            Status1_Action4_Run
+        """선택한 버튼 이외에 다른 버튼 비활성화"""
+        if idx == 1:
+            # Status1_Action1_Attack
+            self.Status1_Action2_Skill.setEnabled(False)
+            self.Status1_Action3_Item.setEnabled(False)
+            self.Status1_Action4_Run.setEnabled(False)
+            self.monster_status_active() #몬스터들의 공격 버튼 활성화
+        elif idx == 2:
+            self.Status1_Action1_Attack.setEnabled(False)
+            # self.Status1_Action2_Skill.setEnabled(False)
+            self.Status1_Action3_Item.setEnabled(False)
+            self.Status1_Action4_Run.setEnabled(False)
+            self.monster_status_active()
+        elif idx == 3:
+            self.Status1_Action1_Attack.setEnabled(False)
+            self.Status1_Action2_Skill.setEnabled(False)
+            # self.Status1_Action3_Item.setEnabled(False)
+            self.Status1_Action4_Run.setEnabled(False)
+            #아이템 창 활성화하하기
+        elif idx == 4:
+            self.Status1_Action1_Attack.setEnabled(False)
+            self.Status1_Action2_Skill.setEnabled(False)
+            self.Status1_Action3_Item.setEnabled(False)
+            # self.Status1_Action4_Run.setEnabled(False)
+
+    def monster_status_active(self):
+        """모든 몬스터들의 공격 버튼 활성화"""
+        for i in range(1, 10+1): # 몬스터들 hp가 0 이상이면 활성화하게 하기(나중에 수정)
+            getattr(self, f"Monster_{i}_QButton").setEnabled(True)
+
 
     def show_messagebox(self, text):
         """특정 문구 메세지박스 띄워주기"""
