@@ -75,9 +75,7 @@ class WindowClass(QMainWindow, main_game):
         # 스킬 레이아웃 가져오기
         self.Widget_Skill_set = self.Widget_Skill.findChildren(QGraphicsWidget)
 
-        # 유저턴 / 몬스터턴 턴 지정
-        self.user_turn = 0  # 유저
-        self.mon_turn = 0  # 몬스터
+
 
         # 캐릭터 이름 리스트
         self.character_name = ['미하일', '루미너스', '알렉스', '샐러맨더', '메르데스', '랜슬롯']
@@ -92,6 +90,14 @@ class WindowClass(QMainWindow, main_game):
 
         # 유저는 보스를 이길 때까지 던전에 입장하지 못함
         self.user_can_enter_dungeon = False
+
+        # 유저턴 / 몬스터턴 턴 지정
+        self.user_turn = 0  # 유저
+        self.mon_turn = 0  # 몬스터
+        self.battle_turn = 0 #배틀턴
+
+        # 몬스터 초기설정 해주기
+        self.monster_info()
 
         # 처음 게임 시작했을 때 시작 화면 보여주기
         self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
@@ -158,6 +164,8 @@ class WindowClass(QMainWindow, main_game):
 
             if user_motion_random_val == 2:  # 전투할 경우
                 self.battle_ground() #전투 함수로 이동
+
+
 
             self.Log_textEdit.append(f"{user_item_get}{user_random_get[user_motion_random_val]} ")  # 상태창에 추가하기
 
@@ -274,16 +282,12 @@ class WindowClass(QMainWindow, main_game):
 
 
 
+    # 공격함수===================================================================================================================
     def battle_ground(self):
-        """일반 공격필드 메인함수"""
+        """일반 공격필드 메인함수(기본세팅)"""
 
         self.portal_sample.hide()  # 포탈 숨겨주고
         self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
-
-        # 캐릭터 별 프레임
-        frame_class_list = []
-        for frame in range(1, 5+1):
-            frame_class_list.append(f'self.Frame_Class{frame}_Status')
 
         #첫번째 프레임 제외하고 False
         for FCS in self.frame_class_list[1:]:
@@ -292,7 +296,8 @@ class WindowClass(QMainWindow, main_game):
         what_enemy_will_user_encounter = 1#random.randint(1, 100) #어떤 적을 만날지 랜덤 설정
         if what_enemy_will_user_encounter <= 75: #75%의 확률로 일반 적을 만난다
             self.Log_textEdit.append("일반몬스터를 만났습니다.") #상태창에 표시해주기
-            ## 일반몬스터 만났을 때
+
+            ## 일반몬스터 만났을 때 몬스터 라벨 다르게 해주기
 
             random.shuffle(self.list_class)  # 클래스 리스트 랜덤으로 섞기
 
@@ -322,33 +327,17 @@ class WindowClass(QMainWindow, main_game):
             self.Class_4_QLabel.setPixmap(class_images[class_index4])
             self.Class_5_QLabel.setPixmap(class_images[class_index5])
 
-            ### 몬스터, 캐릭터 정보 들어가게 하기 (+ hp, mp 정보도)
-            monster_num = random.randint(1, 10) #몬스터 등장 개체수 랜덤 지정
-            monster_hp_dit = {} #몬스터 hp 들어갈 딕셔너리
-            for i in range(1, monster_num + 1):
-                monster_hp = random.randint(200, 1000)
-                getattr(self, f"Monster_{i}_QLabel").setText(f"몬스터 등장\n체력은{monster_hp}")  # 라벨에는 사진 넣기(이후에), 체력은 프로그래스 바로 연결
-                monster_hp_dit[i] = monster_hp
-                getattr(self, f"Monster_{i}_QProgressBar").setRange(0, 1000)  # 프로그래스바 최솟값 / 최댓값 설정
-                getattr(self, f"Monster_{i}_QProgressBar").setValue(monster_hp)  # 몬스터 체력 프로그래스바에 설정
-                getattr(self, f"Monster_{i}_QButton").setEnabled(False) # 몬스터 공격버튼 선택 안되게 하기
 
-            for j in range(monster_num + 1, 10 + 1): #나온 몬스터 이외의 창은 숨기기
-                getattr(self, f"Monster_{j}_QProgressBar").hide()
-                getattr(self, f"Monster_{j}_QButton").hide()
-                getattr(self, f"Monster_{j}_Name").hide()
 
             ### 전투 시작하면 캐릭터 장비를 각각의 스택위젯 창에 업데이트 시키기 -> 이건 해야함
 
             #### 일반공격 선택시 -> 다른 버튼들 비활성화 -> hp 가 0초과인 몬스터 버튼 활성화 -> 공격력 25%로 먹이기 -> 상태창에 얼마나 데미지 입혔는지 띄우기 ->  몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> 아군 중 전투가능이 없으면(hp 가 모두 없다면 전투 실패)
 
-            #다른 버튼들 비활성화
-            self.Status1_Action1_Attack.clicked.connect(lambda: self.btn_false(1)) # 공격 버튼 누르면 다른 버튼 비활성화
-            self.Status1_Action2_Skill.clicked.connect(lambda: self.btn_false(2)) # 스킬 버튼 누르면 다른 버튼 비활성화
-            self.Status1_Action3_Item.clicked.connect(lambda: self.btn_false(3)) # 아이템 버튼 누르면 다른 버튼 비활성화
-            self.Status1_Action4_Run.clicked.connect(lambda: self.btn_false(4)) # 도망 버튼 누르면 다른 버튼 비활성화
+            self.Widget_Skill.hide()  # 위젯 스킬 창 숨기기
 
-            #
+            # 전투로직 함수로 이동
+            self.Turn() # 전투로직 함수로 이동
+
 
 
 
@@ -373,38 +362,102 @@ class WindowClass(QMainWindow, main_game):
             ##### 장비창 버튼 클릭하면 각 캐릭터 콤보박스 이동 -> 강화석 있다면 +버튼 활성화 ->[ 장비가 노발 장비라면 하급 강화석 필요, 레어 장비라면 상급 강화석 필요. ]->(+)버튼 누르면 장비 업그레이드, 상태창에 정보 띄우기
             #### 회피 선택시 - 몇 프로의 확률로 회피 성공. -> 몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴이동. 마지막 캐릭터일시 1번 캐릭터로 -> hpmp가 모두 없다면 전투 실패
 
-        self.Widget_Skill.hide()  # 위젯 스킬 창 투명화
+    def monster_info(self):
+        ### 몬스터, 캐릭터 정보 들어가게 하기 (+ hp, mp 정보도)
+        self.monster_num = random.randint(1, 10)  # 몬스터 등장 개체수 랜덤 지정
+        self.monster_hp_dict = {}  # 몬스터 hp 들어갈 딕셔너리
+
+        # 몬스터 정보 라벨/프로그래스바에 넣어주기
+        for i in range(1, self.monster_num + 1):
+            monster_hp = random.randint(200, 1000)
+            getattr(self, f"Monster_{i}_QLabel").setText(f"몬스터 등장\n체력은{monster_hp}")  # 라벨에는 사진 넣기(이후에), 체력은 프로그래스 바로 연결
+            self.monster_hp_dict[i] = monster_hp  # 몬스터 hp 딕셔너리에 담아주기
+            getattr(self, f"Monster_{i}_QProgressBar").setRange(0, monster_hp)  # 프로그래스바 최솟값(=0) / 최댓값(=몬스터 hp) 설정
+            getattr(self, f"Monster_{i}_QProgressBar").setValue(monster_hp)  # 몬스터 체력 프로그래스바에 설정
+            getattr(self, f"Monster_{i}_QButton").setEnabled(False)  # 몬스터 공격버튼 선택 안되게 하기
+
+        for j in range(self.monster_num + 1, 10 + 1):  # 나온 몬스터 이외의 창은 숨기기
+            getattr(self, f"Monster_{j}_QProgressBar").hide()
+            getattr(self, f"Monster_{j}_QButton").hide()
+            getattr(self, f"Monster_{j}_Name").hide()
+
+    def Turn(self):
+        """유저의 공격 - 몬스터 공격 턴 변하는 부분"""
+
+        self.user_turn += 1
+
+        # 유저 턴 프레임 활성화
+        self.frame_class_list[self.user_turn - 1].setEnabled(True)
+
+        #그 외 프레임 비활성화
+        for i in range(1, 6):
+            if i != self.user_turn:
+                self.frame_class_list[i - 1].setEnabled(False)
+
+        # 1번 캐릭터 선택 이외 다른 버튼들 비활성화
+
+        self.Status1_Action1_Attack.clicked.connect(lambda: self.btn_false(1))  # 공격 버튼 누르면 다른 버튼 비활성화
+        self.Status1_Action2_Skill.clicked.connect(lambda: self.btn_false(2))  # 스킬 버튼 누르면 다른 버튼 비활성화
+        self.Status1_Action3_Item.clicked.connect(lambda: self.btn_false(3))  # 아이템 버튼 누르면 다른 버튼 비활성화
+        self.Status1_Action4_Run.clicked.connect(lambda: self.btn_false(4))  # 도망 버튼 누르면 다른 버튼 비활성화
+
+
+
+
+
+    def monster_attack(self, num):
+        """몬스터에게 데미지 입히는 부분"""
+        attack_power = 100 #일단 공격력은 -1
+        self.monster_hp_dict[num] -= attack_power #선택한 몬스터에 공격력 1 먹이기
+        print(self.monster_hp_dict[num])
+        self.Log_textEdit.append(f'{num}번 몬스터에 데미지 {attack_power}를 입혔습니다.')  # 상태창에 추가하기
+
+
+        #몬스터 프로그래스바 리스트 만들어놓기(단순화는 나중에)
+        Monster_QProgressBar_list = [self.Monster_1_QProgressBar, self.Monster_2_QProgressBar, self.Monster_3_QProgressBar,
+                                     self.Monster_4_QProgressBar, self.Monster_5_QProgressBar, self.Monster_6_QProgressBar,
+                                     self.Monster_7_QProgressBar, self.Monster_8_QProgressBar, self.Monster_9_QProgressBar,
+                                     self.Monster_10_QProgressBar]
+
+        Monster_QProgressBar_list[num-1].setValue(self.monster_hp_dict[num])  # 변경된 몬스터 체력 프로그래스바에 설정
+        self.monster_status_inactive() #몬스터 공격버튼 비활성화 시키기
+
+        print(self.user_turn, '번 턴 끝남')
+        self.battle_turn += 1
+        print('배틀턴', self.battle_turn)
+
+
+
+
+
 
     def btn_false(self, idx):
         """선택한 버튼 이외에 다른 버튼 비활성화"""
-        if idx == 1:
-            # Status1_Action1_Attack
-            self.Status1_Action2_Skill.setEnabled(False)
-            self.Status1_Action3_Item.setEnabled(False)
-            self.Status1_Action4_Run.setEnabled(False)
-            self.monster_status_active() #몬스터들의 공격 버튼 활성화
-        elif idx == 2:
-            self.Status1_Action1_Attack.setEnabled(False)
-            # self.Status1_Action2_Skill.setEnabled(False)
-            self.Status1_Action3_Item.setEnabled(False)
-            self.Status1_Action4_Run.setEnabled(False)
-            self.monster_status_active()
-        elif idx == 3:
-            self.Status1_Action1_Attack.setEnabled(False)
-            self.Status1_Action2_Skill.setEnabled(False)
-            # self.Status1_Action3_Item.setEnabled(False)
-            self.Status1_Action4_Run.setEnabled(False)
-            #아이템 창 활성화하하기
-        elif idx == 4:
-            self.Status1_Action1_Attack.setEnabled(False)
-            self.Status1_Action2_Skill.setEnabled(False)
-            self.Status1_Action3_Item.setEnabled(False)
-            # self.Status1_Action4_Run.setEnabled(False)
+
+        user_number = f"Status{self.user_turn}" #유저 턴 가져오기
+
+        buttons_to_disable = [
+            getattr(self, f"{user_number}_Action1_Attack"),
+            getattr(self, f"{user_number}_Action2_Skill"),
+            getattr(self, f"{user_number}_Action3_Item"),
+            getattr(self, f"{user_number}_Action4_Run")
+        ]
+
+        for index, button in enumerate(buttons_to_disable, start=1):
+            if idx != index:
+                button.setEnabled(False)
+
+        self.monster_status_active()
+
 
     def monster_status_active(self):
         """모든 몬스터들의 공격 버튼 활성화"""
         for i in range(1, 10+1): # 몬스터들 hp가 0 이상이면 활성화하게 하기(나중에 수정)
             getattr(self, f"Monster_{i}_QButton").setEnabled(True)
+    def monster_status_inactive(self):
+        """모든 몬스터들의 공격 버튼 비활성화"""
+        for i in range(1, 10+1): # 몬스터들 버튼 모두 비활성화
+            getattr(self, f"Monster_{i}_QButton").setEnabled(False)
 
 
     def show_messagebox(self, text):
