@@ -251,7 +251,7 @@
                 <enum>QFrame::NoFrame</enum>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="Page_Nomal_Field">
                 <layout class="QGridLayout" name="gridLayout">
@@ -330,17 +330,20 @@
                 </widget>
                </widget>
                <widget class="QWidget" name="Page_Dungeon_Field">
-                <widget class="QLabel" name="label_2">
+                <widget class="QLabel" name="dungeon_img_label">
                  <property name="geometry">
                   <rect>
-                   <x>290</x>
-                   <y>200</y>
-                   <width>64</width>
-                   <height>15</height>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>1615</width>
+                   <height>834</height>
                   </rect>
                  </property>
                  <property name="text">
-                  <string>던전</string>
+                  <string/>
+                 </property>
+                 <property name="pixmap">
+                  <pixmap>배경/던전_1.png</pixmap>
                  </property>
                 </widget>
                </widget>
@@ -732,6 +735,9 @@
                      </property>
                     </widget>
                     <widget class="QPushButton" name="Monster_2_QButton">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
                      <property name="geometry">
                       <rect>
                        <x>0</x>
@@ -742,6 +748,9 @@
                      </property>
                      <property name="text">
                       <string>Atack</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>false</bool>
                      </property>
                     </widget>
                     <widget class="QPushButton" name="Monster_8_QButton">
