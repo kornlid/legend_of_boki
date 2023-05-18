@@ -6,8 +6,8 @@ import time
 from PyQt5.QtWidgets import *
 from PyQt5 import uic, Qt
 from PyQt5 import QtGui
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 sys.setrecursionlimit(10 ** 7)  # 재귀함수 제한
 
@@ -16,34 +16,9 @@ def resource_path(relative_path):
     base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
+
 form = resource_path('maingame_final.ui')
 main_game = uic.loadUiType(form)[0]
-
-
-class Status:
-    """각 캐릭터 정보 만들어주는 클래스"""
-
-    def __init__(self, class_name, character_name, hp, mp, level):
-        self.class_name = class_name
-        self.character_name = character_name
-        self.hp = hp
-        self.mp = mp
-        self.level = level
-
-    def get_classname(self):  # 클래스이름
-        return self.class_name
-
-    def get_charactername(self):  # 캐릭터이름
-        return self.character_name
-
-    def get_hp(self):  # hp 반환
-        return self.hp * self.level
-
-    def get_level(self):  # 레벨 반환
-        return self.level
-
-    def get_mp(self):  # mp 반환
-        return self.mp
 
 
 class WindowClass(QMainWindow, main_game):
@@ -59,45 +34,11 @@ class WindowClass(QMainWindow, main_game):
         ## 일반필드에서 움직일 캐릭터
         self.character_right_img = QPixmap('character_right.png')
         self.character_left_img = QPixmap('character_left.png')
-        ## 배틀필드에서 들어갈 유저 캐릭터
-        self.archer = QPixmap('./캐릭터/궁수.png')
-        self.white_wizard = QPixmap('./캐릭터/백법사.png')
-        self.black_wizard = QPixmap('./캐릭터/흑법사.png')
-        self.red_wizard = QPixmap('./캐릭터/적법사.png')
-        self.sword_man = QPixmap('./캐릭터/검사.png')
-        self.warrior= QPixmap('./캐릭터/전사.png')
-        # 캐릭터 별 프레임
-        self.frame_class_list = [self.Frame_Class1_Status, self.Frame_Class2_Status,
-                                 self.Frame_Class3_Status, self.Frame_Class4_Status, self.Frame_Class5_Status]
-
-        # 스킬 버튼 가져오기
-        self.skill_btn_set = self.Widget_Skill.findChildren(QPushButton)
-        # 스킬 레이아웃 가져오기
-        self.Widget_Skill_set = self.Widget_Skill.findChildren(QGraphicsWidget)
-
-
-
-        # 캐릭터 이름 리스트
-        self.character_name = ['미하일', '루미너스', '알렉스', '샐러맨더', '메르데스', '랜슬롯']
-        class_1 = Status('전사', '미하일', 300, 0, 1)
-        class_2 = Status('백법사', '루미너스', 200, 150, 1)
-        class_3 = Status('흑법사', '알렉스', 200, 150, 1)
-        class_4 = Status('적법사', '샐러맨더', 150, 150, 1)
-        class_5 = Status('궁수', '메르데스', 150, 150, 1)
-        class_6 = Status('검사', '랜슬롯', 150, 150, 1)
-        self.list_class = [class_1, class_2, class_3, class_4, class_5, class_6]  # 클래스들 리스트에 담기
-
 
         # 유저는 보스를 이길 때까지 던전에 입장하지 못함
         self.user_can_enter_dungeon = False
-
-        # 유저턴 / 몬스터턴 턴 지정
-        self.user_turn = 0  # 유저
-        self.mon_turn = 0  # 몬스터
-        self.battle_turn = 0 #배틀턴
-
-        # 몬스터 초기설정 해주기
-        self.monster_info()
+        # 랜덤 던전 스팟 번호
+        self.dungeon_number = 0
 
         # 처음 게임 시작했을 때 시작 화면 보여주기
         self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
@@ -122,21 +63,24 @@ class WindowClass(QMainWindow, main_game):
             4: (1580, 390)  # 오른쪽 중앙
         }
 
-        random_spot = random.randint(1, 4) #시작 캐릭터 위치 랜덤으로 위치시키기
-        self.Character_QLabel.move(positions[random_spot][0], positions[random_spot][1]) #캐릭터를 상하좌우로 위치시키기
-        self.portal_sample.move(random.randint(1, 1580), random.randint(1, 780)) #포탈 위치 랜덤으로 배정
+        random_spot = random.randint(1, 4)  # 시작 캐릭터 위치 랜덤으로 위치시키기
+        self.Character_QLabel.move(positions[random_spot][0], positions[random_spot][1])  # 캐릭터를 상하좌우로 위치시키기
+        self.portal_sample.move(random.randint(1, 1580), random.randint(1, 780))  # 포탈 위치 랜덤으로 배정
 
-
-
-
+        # 던전 맵 사이즈(크기별)
+        self.map_size = {
+            1: [529, 1087, 136, 695],  # 맵 1번 x시작, x끝, y시작, y끝
+            2: [510, 1106, 120, 713],  # 맵 2번 x시작, x끝, y시작, y끝
+            3: [488, 1127, 97, 736],  # 맵 3번 x시작, x끝, y시작, y끝
+            4: [471, 1145, 80, 754],  # 맵 4번 x시작, x끝, y시작, y끝
+        }
 
         # 던전필드에 있는 라벨 정보 가져오기
-
+        self.label_list = self.Page_Dungeon_Field.findChildren(QLabel)
         # self.label_list_battlefield_2 = self.Page_Dungeon_Field_1.findChildren(QLabel)  # {던전 필드2}에 있는 라벨 정보 가져와서 리스트에 저장
 
         # for i in self.label_list:
         #     print(i.objectName()) # 던전에 있는 라벨 객체이름 확인용
-
 
     def keyPressEvent(self, event):
         """키값 입력받아 라벨 움직이는 함수"""
@@ -163,9 +107,9 @@ class WindowClass(QMainWindow, main_game):
                     user_item_get = '포션'
 
             if user_motion_random_val == 2:  # 전투할 경우
-                self.battle_ground() #전투 함수로 이동
-
-
+                """
+                전투 매커니즘으로 연결 필요
+                """
 
             self.Log_textEdit.append(f"{user_item_get}{user_random_get[user_motion_random_val]} ")  # 상태창에 추가하기
 
@@ -193,60 +137,102 @@ class WindowClass(QMainWindow, main_game):
 
         # 던전입구1일 때
         elif current_index == 1:
-            previous_position = self.label_5.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
+            previous_position = self.Character_QLabel_2.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
             if event.key() == Qt.Key_A:  # A 눌렀을 때
-                self.label_5.setPixmap(self.character_left_img)
-                new_position = self.label_5.geometry().translated(-20, 0)  # 새 포지션 값 저장
-                self.label_5.move(self.label_5.x() - 20, self.label_5.y())  # 왼쪽으로 20  이동
+                self.Character_QLabel_2.setPixmap(
+                    self.character_left_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
+                new_position = self.Character_QLabel_2.geometry().translated(-20, 0)  # 새 포지션 값 저장
+                self.Character_QLabel_2.move(self.Character_QLabel_2.x() - 20,
+                                             self.Character_QLabel_2.y())  # 왼쪽으로 20  이동
             elif event.key() == Qt.Key_D:  # D 눌렀을 때
-                self.label_5.setPixmap(self.character_right_img)
-                new_position = self.label_5.geometry().translated(20, 0)  # 이하동일
-                self.label_5.move(self.label_5.x() + 20, self.label_5.y())  # 오른쪽으로 20 이동
+                self.Character_QLabel_2.setPixmap(
+                    self.character_right_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
+                new_position = self.Character_QLabel_2.geometry().translated(20, 0)  # 이하동일
+                self.Character_QLabel_2.move(self.Character_QLabel_2.x() + 20,
+                                             self.Character_QLabel_2.y())  # 오른쪽으로 20 이동
             elif event.key() == Qt.Key_W:  # W눌렀을 때
-                new_position = self.label_5.geometry().translated(0, -20)
-                self.label_5.move(self.label_5.x(), self.label_5.y() - 20)  # 위로 20 이동
+                new_position = self.Character_QLabel_2.geometry().translated(0, -20)
+                self.Character_QLabel_2.move(self.Character_QLabel_2.x(), self.Character_QLabel_2.y() - 20)  # 위로 20 이동
             elif event.key() == Qt.Key_S:  # S눌렀을 때
-                new_position = self.label_5.geometry().translated(0, 20)
-                self.label_5.move(self.label_5.x(), self.label_5.y() + 20)  # 아래로 20 이동
+                new_position = self.Character_QLabel_2.geometry().translated(0, 20)
+                self.Character_QLabel_2.move(self.Character_QLabel_2.x(), self.Character_QLabel_2.y() + 20)  # 아래로 20 이동
             else:
                 return
 
-            # 현재위치 왼쪽 상단에 출력
-            self.TopUI_Coordinate_Label.setText(f"x좌표: {self.label_5.pos().x()}, y좌표:{self.label_5.pos().y()}")
+            #좌표 위에 찍어주기
+            self.TopUI_Coordinate_Label.setText(
+                f"x좌표: {self.Character_QLabel_2.pos().x()}, y좌표:{self.Character_QLabel_2.pos().y()}")
 
             # 던전에서 몬스터 만났을 때 전투 이동
-            if self.label_5.geometry().intersects(self.boss_monster.geometry()):
+            if self.Character_QLabel_2.geometry().intersects(self.boss_monster.geometry()):
                 self.show_messagebox("보스몬스터를 만났습니다!\n전투에 진입합니다.")
                 # 전투로 스택위젯 이동
                 # 전투함수로 이동
                 self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
 
             # 던전에서 미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
-            if self.label_5.geometry().intersects(self.entrance.geometry()) and self.user_can_enter_dungeon == True:
+            if self.Character_QLabel_2.geometry().intersects(
+                    self.entrance.geometry()) and self.user_can_enter_dungeon == True:
                 self.show_messagebox("미궁을 만났습니다!")
-                # 이후 던전으로
-
-
-
-            # 라벨(벽과)겹치면 이전 위치로 이동하도록 함
-            for label in self.label_list:  # 라벨 정보 리스트 가져옴
-                if label != self.label_5 and label != self.label_2 and new_position.intersects(
-                        label.geometry()):  # 만약 겹치면 break
-                    print(f'{label.objectName()}와 겹침')  # 확인용
-                    self.label_5.setGeometry(previous_position)
-                    break
 
             # 던전 벽 캐릭터가 벗어나지 못하게
-            if not ((558 <= new_position.x() <= 1054) and (168 < new_position.y() < 662)):  # 미궁 x값, 미궁 y값 설정
-                self.label_5.setGeometry(previous_position)
+            # 던전맵 벽 값 지정
+            wall_list = {
+                1: [(899, 908, 131, 338),  # 던전 맵 1
+                    (522, 638, 412, 420),
+                    (660, 680, 490, 700),
+                    (829, 1091, 488, 496), ],
+                2: [(800, 820, 117, 341),  # 던전 맵 2
+                    (509, 962, 486, 500)],
+                3: [(893, 909, 96, 327),  # 던전 맵 3
+                    (898, 981, 317, 329),
+                    (488, 718, 429, 443),
+                    (690, 720, 431, 553),
+                    (897, 910, 473, 741)],
+                4: [(680, 967, 203, 233),  # 던전 맵 4
+                    (663, 703, 224, 575),
+                    (954, 969, 221, 577),
+                    (683, 737, 557, 575),
+                    (918, 969, 562, 578),
+                    (950, 1157, 408, 424), ]
+            }
+
+            if self.dungeon_number == 1:  # 15*15 사이즈 맵에 들어갔을 때
+                # 던전 벽을 벗어나지 못하게 함
+                if not ((self.map_size[1][0] <= new_position.x() <= self.map_size[1][1]) and (
+                        self.map_size[1][2] < new_position.y() < self.map_size[1][3])):  # 미궁 x값, 미궁 y값 설정
+                    self.Character_QLabel_2.setGeometry(previous_position)
+                # 던전 내에 위치한 벽을 벗어나지 못하게 함
+                if self.block_dungeon_wall(new_position, previous_position, wall_list, 1):
+                    self.Character_QLabel_2.setGeometry(previous_position)
+            elif self.dungeon_number == 2:  # 16 * 16 사이즈 맵에 들어갔을 때
+                if not ((self.map_size[2][0] <= new_position.x() <= self.map_size[2][1]) and (
+                        self.map_size[2][2] < new_position.y() < self.map_size[2][3])):  # 미궁 x값, 미궁 y값 설정
+                    self.Character_QLabel_2.setGeometry(previous_position)
+                if self.block_dungeon_wall(new_position, previous_position, wall_list, 2):
+                    self.Character_QLabel_2.setGeometry(previous_position)
+            elif self.dungeon_number == 3:  # 17 * 17 사이즈 맵에 들어갔을 때
+                if not ((self.map_size[3][0] <= new_position.x() <= self.map_size[3][1]) and (
+                        self.map_size[3][2] < new_position.y() < self.map_size[3][3])):  # 미궁 x값, 미궁 y값 설정
+                    self.Character_QLabel_2.setGeometry(previous_position)
+                if self.block_dungeon_wall(new_position, previous_position, wall_list, 3):
+                    self.Character_QLabel_2.setGeometry(previous_position)
+            elif self.dungeon_number == 4:  # 18 * 18 사이즈 맵에 들어갔을 때
+                if not ((self.map_size[4][0] <= new_position.x() <= self.map_size[4][1]) and (
+                        self.map_size[4][2] < new_position.y() < self.map_size[4][3])):  # 미궁 x값, 미궁 y값 설정
+                    self.Character_QLabel_2.setGeometry(previous_position)
+                if self.block_dungeon_wall(new_position, previous_position, wall_list, 4):
+                    self.Character_QLabel_2.setGeometry(previous_position)
+
+
+
 
         # 이외 필드일때(전투일때) pass
         else:
             pass
 
-        # 현재위치 왼쪽 상단에 출력
-        self.TopUI_Coordinate_Label.setText(
-            f"x좌표: {self.Character_QLabel.pos().x()}, y좌표:{self.Character_QLabel.pos().y()}")
+            # 현재위치 왼쪽 상단에 출력
+
 
         # # 던전필드 2일때
         # elif current_index == 2:
@@ -280,185 +266,15 @@ class WindowClass(QMainWindow, main_game):
         #     # if not ((558 <= new_position.x() <= 1054) and (168 < new_position.y() < 662)):
         #     #     self.label_5.setGeometry(previous_position)
 
-
-
-    # 공격함수===================================================================================================================
-    def battle_ground(self):
-        """일반 공격필드 메인함수(기본세팅)"""
-
-        self.portal_sample.hide()  # 포탈 숨겨주고
-        self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
-
-        #첫번째 프레임 제외하고 False
-        for FCS in self.frame_class_list[1:]:
-            FCS.setEnabled(False)
-
-        what_enemy_will_user_encounter = 1#random.randint(1, 100) #어떤 적을 만날지 랜덤 설정
-        if what_enemy_will_user_encounter <= 75: #75%의 확률로 일반 적을 만난다
-            self.Log_textEdit.append("일반몬스터를 만났습니다.") #상태창에 표시해주기
-
-            ## 일반몬스터 만났을 때 몬스터 라벨 다르게 해주기
-
-            random.shuffle(self.list_class)  # 클래스 리스트 랜덤으로 섞기
-
-            # 랜덤으로 섞은 캐릭터 클래스 창에 지정해 주기
-            for i in range(5):
-                getattr(self, f'Status{i + 1}_1_Class').setText(self.list_class[i].class_name)  # 클래스명 지정
-                getattr(self, f'Status{i + 1}_1_Name').setText(self.list_class[i].character_name)  # 캐릭터명 지정
-                getattr(self, f'Status{i + 1}_2_HpValue').setText(str(self.list_class[i].hp) + "/" + str(self.list_class[i].get_hp()))  # hp(기본 값/변하는 값)
-                getattr(self, f'Status{i + 1}_2_HpValue').setAlignment(Qt.AlignCenter)
-                getattr(self, f'Status{i + 1}_3_MpValue').setText(str(self.list_class[i].mp) + "/" + str(self.list_class[i].get_mp()))  # mp(기본 값/변하는 값)
-
-            # Class_1_QLabel 라벨에 유저 사진 넣어주기
-            classes = ['전사', '백법사', '흑법사', '적법사', '궁수', '검사']  # 캐릭터 이름 담기
-            class_images = [self.warrior, self.white_wizard, self.black_wizard, self.red_wizard, self.archer, self.sword_man]  # 이미지 리스트와 맞추기
-
-            # 클래스 직업군 텍스트 가져오기
-            class_index1 = classes.index(self.Status1_1_Class.text())
-            class_index2 = classes.index(self.Status2_1_Class.text())
-            class_index3 = classes.index(self.Status3_1_Class.text())
-            class_index4 = classes.index(self.Status4_1_Class.text())
-            class_index5 = classes.index(self.Status5_1_Class.text())
-
-            # 직업군에 따라 이미지 넣어주기
-            self.Class_1_QLabel.setPixmap(class_images[class_index1])
-            self.Class_2_QLabel.setPixmap(class_images[class_index2])
-            self.Class_3_QLabel.setPixmap(class_images[class_index3])
-            self.Class_4_QLabel.setPixmap(class_images[class_index4])
-            self.Class_5_QLabel.setPixmap(class_images[class_index5])
-
-
-
-            ### 전투 시작하면 캐릭터 장비를 각각의 스택위젯 창에 업데이트 시키기 -> 이건 해야함
-
-            #### 일반공격 선택시 -> 다른 버튼들 비활성화 -> hp 가 0초과인 몬스터 버튼 활성화 -> 공격력 25%로 먹이기 -> 상태창에 얼마나 데미지 입혔는지 띄우기 ->  몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> 아군 중 전투가능이 없으면(hp 가 모두 없다면 전투 실패)
-
-            self.Widget_Skill.hide()  # 위젯 스킬 창 숨기기
-
-            # 전투로직 함수로 이동
-            self.Turn() # 전투로직 함수로 이동
-
-
-
-
-            #### 스킬 선택시 -> 위젯 띄우기 -> 캐릭터의 정보가 불러와져서 캐릭터의 스킬만 활성화 -> 클릭하면 몬스터에 공격 데미지 상태창에 표시 -> 몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> hp가 모두 없다면 전투 실패
-            #### 아이템 선택시 -> 장비 및 소비 창 활성화
-            ##### 소비창 버튼 클릭하면 선택한 캐릭터 mp hp 영향 -> 상태창에 띄우기 -> hpmp 라벨 변경 -> 몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> 다음 캐릭터가 없으면 상대턴으로 넘어감
-            ##### 장비창 버튼 클릭하면 각 캐릭터 콤보박스 이동 -> 강화석 있다면 +버튼 활성화 -> (+)버튼 누르면 장비 업그레이드, 상태창에 정보 띄우기
-            #### 회피 선택시 - 30%의 확률로 회피 성공. -> 몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴이동. 마지막 캐릭터일시 1번 캐릭터로 -> hpmp가 모두 없다면 전투 실패
-
-
-
-
-        else:# 25%의 확률로 수호대를 만난다.
-            self.Log_textEdit.append("수호대를 만났습니다.")
-            ##수호대 만났을 때
-            ## 수호대 정보 들어가게 하기
-            ## 수호대, 캐릭터 정보 들어가게 하기
-            #### 공격 선택시 -> hp 가 0초과인 수호대 버튼 활성화 -> 공격력 랜덤으로 먹이기 -> 상태창에 얼마나 데미지 입혔는지 띄우기 ->  수호대가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> hp 가 모두 없다면 전투 실패
-            #### 스킬 선택시 -> 스택 위젯 띄우기 -> 캐릭터의 정보가 불러와져서 캐릭터의 스킬만 활성화 -> 클릭하면 수호대 공격 데미지 상태창에 표시 -> 수호대가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> hpmp가 모두 없다면 전투 실패
-            #### 아이템 선택시 -> 장비 및 소비 창 활성화
-            ##### 소비창 버튼 클릭하면 캐릭터 mp hp 영향 -> 수호대가 다 죽지 않았다면 -> 다음 캐릭터로 턴 이동 -> hpmp가 모두 없다면 전투 실패
-            ##### 장비창 버튼 클릭하면 각 캐릭터 콤보박스 이동 -> 강화석 있다면 +버튼 활성화 ->[ 장비가 노발 장비라면 하급 강화석 필요, 레어 장비라면 상급 강화석 필요. ]->(+)버튼 누르면 장비 업그레이드, 상태창에 정보 띄우기
-            #### 회피 선택시 - 몇 프로의 확률로 회피 성공. -> 몬스터가 다 죽지 않았다면 -> 다음 캐릭터로 턴이동. 마지막 캐릭터일시 1번 캐릭터로 -> hpmp가 모두 없다면 전투 실패
-
-    def monster_info(self):
-        ### 몬스터, 캐릭터 정보 들어가게 하기 (+ hp, mp 정보도)
-        self.monster_num = random.randint(1, 10)  # 몬스터 등장 개체수 랜덤 지정
-        self.monster_hp_dict = {}  # 몬스터 hp 들어갈 딕셔너리
-
-        # 몬스터 정보 라벨/프로그래스바에 넣어주기
-        for i in range(1, self.monster_num + 1):
-            monster_hp = random.randint(200, 1000)
-            getattr(self, f"Monster_{i}_QLabel").setText(f"몬스터 등장\n체력은{monster_hp}")  # 라벨에는 사진 넣기(이후에), 체력은 프로그래스 바로 연결
-            self.monster_hp_dict[i] = monster_hp  # 몬스터 hp 딕셔너리에 담아주기
-            getattr(self, f"Monster_{i}_QProgressBar").setRange(0, monster_hp)  # 프로그래스바 최솟값(=0) / 최댓값(=몬스터 hp) 설정
-            getattr(self, f"Monster_{i}_QProgressBar").setValue(monster_hp)  # 몬스터 체력 프로그래스바에 설정
-            getattr(self, f"Monster_{i}_QButton").setEnabled(False)  # 몬스터 공격버튼 선택 안되게 하기
-
-        for j in range(self.monster_num + 1, 10 + 1):  # 나온 몬스터 이외의 창은 숨기기
-            getattr(self, f"Monster_{j}_QProgressBar").hide()
-            getattr(self, f"Monster_{j}_QButton").hide()
-            getattr(self, f"Monster_{j}_Name").hide()
-
-    def Turn(self):
-        """유저의 공격 - 몬스터 공격 턴 변하는 부분"""
-
-        self.user_turn += 1
-
-        # 유저 턴 프레임 활성화
-        self.frame_class_list[self.user_turn - 1].setEnabled(True)
-
-        #그 외 프레임 비활성화
-        for i in range(1, 6):
-            if i != self.user_turn:
-                self.frame_class_list[i - 1].setEnabled(False)
-
-        # 1번 캐릭터 선택 이외 다른 버튼들 비활성화
-
-        self.Status1_Action1_Attack.clicked.connect(lambda: self.btn_false(1))  # 공격 버튼 누르면 다른 버튼 비활성화
-        self.Status1_Action2_Skill.clicked.connect(lambda: self.btn_false(2))  # 스킬 버튼 누르면 다른 버튼 비활성화
-        self.Status1_Action3_Item.clicked.connect(lambda: self.btn_false(3))  # 아이템 버튼 누르면 다른 버튼 비활성화
-        self.Status1_Action4_Run.clicked.connect(lambda: self.btn_false(4))  # 도망 버튼 누르면 다른 버튼 비활성화
-
-
-
-
-
-    def monster_attack(self, num):
-        """몬스터에게 데미지 입히는 부분"""
-        attack_power = 100 #일단 공격력은 -1
-        self.monster_hp_dict[num] -= attack_power #선택한 몬스터에 공격력 1 먹이기
-        print(self.monster_hp_dict[num])
-        self.Log_textEdit.append(f'{num}번 몬스터에 데미지 {attack_power}를 입혔습니다.')  # 상태창에 추가하기
-
-
-        #몬스터 프로그래스바 리스트 만들어놓기(단순화는 나중에)
-        Monster_QProgressBar_list = [self.Monster_1_QProgressBar, self.Monster_2_QProgressBar, self.Monster_3_QProgressBar,
-                                     self.Monster_4_QProgressBar, self.Monster_5_QProgressBar, self.Monster_6_QProgressBar,
-                                     self.Monster_7_QProgressBar, self.Monster_8_QProgressBar, self.Monster_9_QProgressBar,
-                                     self.Monster_10_QProgressBar]
-
-        Monster_QProgressBar_list[num-1].setValue(self.monster_hp_dict[num])  # 변경된 몬스터 체력 프로그래스바에 설정
-        self.monster_status_inactive() #몬스터 공격버튼 비활성화 시키기
-
-        print(self.user_turn, '번 턴 끝남')
-        self.battle_turn += 1
-        print('배틀턴', self.battle_turn)
-
-
-
-
-
-
-    def btn_false(self, idx):
-        """선택한 버튼 이외에 다른 버튼 비활성화"""
-
-        user_number = f"Status{self.user_turn}" #유저 턴 가져오기
-
-        buttons_to_disable = [
-            getattr(self, f"{user_number}_Action1_Attack"),
-            getattr(self, f"{user_number}_Action2_Skill"),
-            getattr(self, f"{user_number}_Action3_Item"),
-            getattr(self, f"{user_number}_Action4_Run")
-        ]
-
-        for index, button in enumerate(buttons_to_disable, start=1):
-            if idx != index:
-                button.setEnabled(False)
-
-        self.monster_status_active()
-
-
-    def monster_status_active(self):
-        """모든 몬스터들의 공격 버튼 활성화"""
-        for i in range(1, 10+1): # 몬스터들 hp가 0 이상이면 활성화하게 하기(나중에 수정)
-            getattr(self, f"Monster_{i}_QButton").setEnabled(True)
-    def monster_status_inactive(self):
-        """모든 몬스터들의 공격 버튼 비활성화"""
-        for i in range(1, 10+1): # 몬스터들 버튼 모두 비활성화
-            getattr(self, f"Monster_{i}_QButton").setEnabled(False)
-
+    def block_dungeon_wall(self, new_position, previous_position, wall_list, num):
+        """유저가 던전벽에서 나아가지 못하게 하기"""
+        for key, value in wall_list.items():
+            if key == num:
+                for i in value:
+                    if i[0] < new_position.x() < i[1] and i[2] < new_position.y() < i[3]:
+                        self.Character_QLabel_2.setGeometry(previous_position)
+                        return True
+        return False
 
     def show_messagebox(self, text):
         """특정 문구 메세지박스 띄워주기"""
@@ -468,19 +284,49 @@ class WindowClass(QMainWindow, main_game):
 
     def move_to_dungeon(self):
         """던전으로 랜덤 이동하는 부분"""
-        # last_position = self.label.geometry()  # 마지막 좌표 기억
-        # self.label_5.setGeometry(last_position) # 마지막 좌표로 이동한 후 다음 필드에서 동일한 곳에 떨어지게 함 -> 던전 크기 수정으로 취소 / 삭제예정
+
+        # 던전 이미지 불러오기
+        dungeon_img_1 = QPixmap('./배경/던전_1.png')
+        dungeon_img_2 = QPixmap('./배경/던전_2.png')
+        dungeon_img_3 = QPixmap('./배경/던전_3.png')
+        dungeon_img_4 = QPixmap('./배경/던전_4.png')
+
+        self.StackWidget_Field.setCurrentIndex(1)  # 던전필드로 이동
         self.portal_sample.hide()  # 던전 필드로 이동할 때 포탈 숨겨주기
-        # 여기서 self.user_can_enter_dungeon = True로 바꿔주기
 
-        random_dungeon_num = 1  # random.randint(1, 2)  # 던전 랜덤으로 가는 값 추가(4까지 추가 예정)
+        # 던전에서 움직일 캐릭터 라벨 만들어주기
+        self.Character_QLabel_2 = QLabel(self)
+        self.Character_QLabel_2.setFixedSize(30, 50)  # 임시 라벨크기 지정
+        self.Character_QLabel_2.setPixmap(
+            self.character_right_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
+        self.Character_QLabel_2.show()
+
+        # 던전 랜덤 가는 부분
+        random_dungeon_num = random.randint(1, 4)
+
         if random_dungeon_num == 1:
-            self.StackWidget_Field.setCurrentIndex(1)  # 1번 던전 필드로 이동
-            self.Show_Dungeon_Entrance()  # 던전 입구 만들기
+            self.dungeon_number = 1  # 키프레스가 인식해야할 값에 1로 넣어줌
+            self.dungeon_img_label.setPixmap(dungeon_img_1)
+            # self.StackWidget_Field.setCurrentIndex(1)  # 1번 던전 필드로 이동
+            self.Character_QLabel_2.move(601, 673)  # 캐릭터 던전 입구로 보내기
         elif random_dungeon_num == 2:
-            self.StackWidget_Field.setCurrentIndex(2)  # 2번 던전 필드로 이동
+            self.dungeon_number = 2
+            self.dungeon_img_label.setPixmap(dungeon_img_2)
+            self.Character_QLabel_2.move(572, 693)  # 캐릭터 던전 입구로 보내기
+            # self.Show_Dungeon_Entrance(2)  # 던전 입구 만들기
+        elif random_dungeon_num == 3:
+            self.dungeon_number = 3
+            self.dungeon_img_label.setPixmap(dungeon_img_3)
+            self.Character_QLabel_2.move(560, 702)  # 캐릭터 던전 입구로 보내기
+            # self.Show_Dungeon_Entrance(3)  # 던전 입구 만들기
+        elif random_dungeon_num == 4:
+            self.dungeon_number = 4
+            self.dungeon_img_label.setPixmap(dungeon_img_4)
+            self.Character_QLabel_2.move(503, 723)  # 캐릭터 던전 입구로 보내기
+            # self.Show_Dungeon_Entrance(4)  # 던전 입구 만들기
+        self.Show_Dungeon_Entrance(random_dungeon_num)  # 던전 입구 만들기
 
-    def Show_Dungeon_Entrance(self):
+    def Show_Dungeon_Entrance(self, map_num):
         """던전 입구 랜덤으로 만들어주는 함수"""
 
         # 미궁 버튼 임시로 만들어주기
@@ -488,31 +334,23 @@ class WindowClass(QMainWindow, main_game):
         self.entrance.setText("미궁")
         self.entrance.setFixedSize(30, 30)  # 임시 라벨지정
         self.entrance.setStyleSheet('background-color: blue')
-        self.entrance.move(random.randint(558, 1054), random.randint(168, 662))  # 던전 15*15 사이즈
+        self.entrance.move(random.randint(self.map_size[map_num][0], self.map_size[map_num][1]),
+                           random.randint(self.map_size[map_num][2], self.map_size[map_num][3]))  # 던전 15*15 사이즈
+        self.entrance.show()
 
-
-        # 몬스터 위치 임시로 만들어주기
+        # 보스 몬스터 위치 임시로 만들어주기
         self.boss_monster = QLabel(self)  # 보스 몬스터 나타날 포탈 임시
         self.boss_monster.setText("몬스터")
-        self.boss_monster.setFixedSize(30, 30)  # 임시 라벨지정
+        self.boss_monster.setFixedSize(30, 30)  # 임시 라벨크기지정
         self.boss_monster.setStyleSheet('background-color: red')  # 임시로 빨간색으로
-        self.boss_monster.move(random.randint(558, 1054), random.randint(168, 662))  # 보스 몬스터 랜덤으로 등장
-
-        #몬스터 위치 임시로 만들어주기
-        self.boss_monster = QLabel(self) # 보스 몬스터 나타날 포탈 임시
-        self.boss_monster.setText("몬스터")
-        self.boss_monster.setFixedSize(30, 30)  # 임시 라벨지정
-        self.boss_monster.setStyleSheet('background-color: red') #임시로 빨간색으로
-        self.boss_monster.move(random.randint(558, 1054), random.randint(168, 662)) # 보스 몬스터 랜덤으로 등장
-
-
-        self.check_collision(self.entrance)  # 미궁 만들어지는 곳 중복체크 하는 함수로 이동하기
-        self.check_collision(self.boss_monster)  # 미궁 만들어지는 곳 중복체크 하는 함수로 이동하기
-
-        self.entrance.show()
+        self.boss_monster.move(random.randint(self.map_size[map_num][0], self.map_size[map_num][1]),
+                               random.randint(self.map_size[map_num][2], self.map_size[map_num][3]))  # 보스 몬스터 랜덤으로 등장
         self.boss_monster.show()
 
-        # 검은 라벨 만들어서 위에 덮기(유저가 플레이할 때 던전이 안보이게)
+        # self.check_collision(self.entrance)  # 미궁 만들어지는 곳 중복체크 하는 함수로 이동하기
+        # self.check_collision(self.boss_monster)  # 보스몬스터 만들어지는 곳 중복체크 하는 함수로 이동하기
+
+        #검은 라벨 만들어서 위에 덮기(유저가 플레이할 때 던전이 안보이게)
         black_label = QLabel(self)
         black_label.move(0, 30)
         black_label.setStyleSheet('background-color: rgba(0, 0, 0, 200)')
@@ -530,10 +368,10 @@ class WindowClass(QMainWindow, main_game):
 
         for other_label in self.label_list:  # 라벨이 겹치면 값 재설정
             if label.geometry().intersects(other_label.geometry()):
-                label.move(random.randint(558, 1054), random.randint(168, 662))
+                label.move(random.randint(self.map_size[1][0], self.map_size[1][1]),
+                           random.randint(self.map_size[1][2], map_size[1][3]))
                 self.check_collision(label)  # 재귀함수로 이 함수 다시 사용
                 break
-
 
     # def let_user_know_portal_loacation(self)  #유저가 포탈 위치 알게 되는 함수
     # self.{던전포탈위치상태} = True
@@ -546,12 +384,9 @@ class WindowClass(QMainWindow, main_game):
     #         self.{던전포탈위치상태} = True
     #         self.{배경위검은라벨}.show()
 
-
-
     # def 승리함수(self, 이긴위치):
     # 승리했을 때 어떤 상황에 따라 어떤 보상을 줄 지 선택하기
     #
-
 
     # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
     # 게임 종료 이벤트
