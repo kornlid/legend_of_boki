@@ -687,11 +687,10 @@ class WindowClass(QMainWindow, game):
                 f"x좌표: {self.Character_QLabel_2.pos().x()}, y좌표:{self.Character_QLabel_2.pos().y()}")
 
             # 던전에서 몬스터 만났을 때 전투 이동
-            if self.Character_QLabel_2.geometry().intersects(self.boss_monster.geometry()):
-                self.show_messagebox("보스몬스터를 만났습니다!\n전투에 진입합니다.")
-                # 전투로 스택위젯 이동
-                # 전투함수로 이동
-                self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
+            self.show_messagebox("보스몬스터를 만났습니다!\n전투에 진입합니다.")
+            # 전투로 스택위젯 이동
+            # 전투함수로 이동
+            self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
 
             # 던전에서 미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
             if self.Character_QLabel_2.geometry().intersects(
