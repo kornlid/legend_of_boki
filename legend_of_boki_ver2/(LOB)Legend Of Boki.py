@@ -92,7 +92,7 @@ class SkillOption:
         return self.turn
 
 
-# 더 추가할 필요가 있다면 추가하시면 됩니다. 예: (from PyQt5.QtGui import QIcon)
+
 def resource_path(relative_path):
     base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
@@ -152,6 +152,7 @@ class WindowClass(QMainWindow, game):
 
         # 유저는 보스를 이길 때까지 던전에 입장하지 못함
         self.user_can_enter_dungeon = False
+
         # 랜덤 던전 스팟 번호
         self.dungeon_number = 0
 
@@ -164,10 +165,11 @@ class WindowClass(QMainWindow, game):
         self.portal_sample.setText("포탈")
         self.portal_sample.setStyleSheet('background-color: blue')
         self.portal_sample.show()
+        self.portal_sample.move(random.randint(0, 1580), random.randint(0, 760))  # 포탈 위치 랜덤으로 배정
 
         #던전필드에 던전 이미지 들어갈 라벨 만들기
         self.dungeon_img_label = QLabel(self.Page_Dungeon_Field) #던전필드에 던전이미지 들어갈 라벨 추가, 던전필드를 부모로 설정
-        self.dungeon_img_label.setGeometry(0, 0, 1615, 834)
+        self.dungeon_img_label.setGeometry(0, 0, 1580, 780)
         self.dungeon_img_label.show()
 
         #  이 부분은 아래와 중복
@@ -181,17 +183,37 @@ class WindowClass(QMainWindow, game):
         #
         # random_spot = random.randint(1, 4)  # 시작 캐릭터 위치 랜덤으로 위치시키기
         # self.Character_QLabel.move(positions[random_spot][0], positions[random_spot][1])  # 캐릭터를 상하좌우로 위치시키기
-        self.portal_sample.move(random.randint(1, 1580), random.randint(1, 780))  # 포탈 위치 랜덤으로 배정
-
 
 
 
         # 던전 맵 사이즈(크기별)
         self.map_size = {
-            1: [529, 1087, 136, 695],  # 맵 1번 x시작, x끝, y시작, y끝
-            2: [510, 1106, 120, 713],  # 맵 2번 x시작, x끝, y시작, y끝
-            3: [488, 1127, 97, 736],  # 맵 3번 x시작, x끝, y시작, y끝
-            4: [471, 1145, 80, 754],  # 맵 4번 x시작, x끝, y시작, y끝
+            1: [529, 1049, 129, 649],  # 맵 1번 x시작, x끝, y시작, y끝
+            2: [505, 1063, 115, 664],  # 맵 2번 x시작, x끝, y시작, y끝
+            3: [491, 1088, 91, 688],  # 맵 3번 x시작, x끝, y시작, y끝
+            4: [475, 1104, 73, 703],  # 맵 4번 x시작, x끝, y시작, y끝
+        }
+
+        # 던전맵 벽 값 지정
+        self.wall_list = {
+            1: [(530, 631, 383, 397),  # 던전 맵 1
+                (650, 670, 455, 657),
+                (871, 885, 127, 320),
+                (800, 1051, 449, 470), ],
+            2: [(781, 798, 108, 322),  # 던전 맵 2
+                (502, 935, 451, 470)],
+            3: [(490, 708, 395, 417),  # 던전 맵 3
+                (694, 708, 401, 518),
+                (871, 887, 440, 696),
+                (870, 885, 89, 306),
+                (872, 953, 295, 307)],
+            4: [(475, 545, 311, 430),  # 던전 맵 4
+                (675, 720, 526, 535),
+                (650, 691, 207, 537),
+                (675, 939, 206, 219),
+                (904, 940, 204, 536),
+                (894, 940, 526, 538),
+                (928, 1109, 384, 397),]
         }
 
         # 던전필드에 있는 라벨 정보 가져오기
@@ -330,10 +352,8 @@ class WindowClass(QMainWindow, game):
 
         self.skill_14 = SkillOption("강타", None, random.randrange(2, 50), 10, 1, 1)
         self.skillall = [self.skill_1, self.skill_3, self.skill_4, self.skill_5, self.skill_6,
-                         self.skill_7,
-                         self.skill_8, self.skill_9, self.skill_10, self.skill_11, self.skill_12,
-                         self.skill_13,
-                         self.skill_14]
+                         self.skill_7, self.skill_8, self.skill_9, self.skill_10, self.skill_11,
+                         self.skill_12, self.skill_13, self.skill_14]
         if len(self.choice_btn) > 0:
             for skill in self.skillall:
                 if ((skill.name == self.choice_btn[0].text())
@@ -438,22 +458,23 @@ class WindowClass(QMainWindow, game):
         if random_dungeon_num == 1:
             self.dungeon_number = 1  # 키프레스가 인식해야할 값에 1로 넣어줌
             self.dungeon_img_label.setPixmap(dungeon_img_1)
+            # self.dungeon_img_label.move(0,0)
             # self.StackWidget_Field.setCurrentIndex(1)  # 1번 던전 필드로 이동
-            self.Character_QLabel_2.move(601, 673)  # 캐릭터 던전 입구로 보내기
+            self.Character_QLabel_2.move(592, 631)  # 캐릭터 던전 입구로 보내기
         elif random_dungeon_num == 2:
             self.dungeon_number = 2
             self.dungeon_img_label.setPixmap(dungeon_img_2)
-            self.Character_QLabel_2.move(572, 693)  # 캐릭터 던전 입구로 보내기
+            self.Character_QLabel_2.move(567, 644)  # 캐릭터 던전 입구로 보내기
             # self.Show_Dungeon_Entrance(2)  # 던전 입구 만들기
         elif random_dungeon_num == 3:
             self.dungeon_number = 3
             self.dungeon_img_label.setPixmap(dungeon_img_3)
-            self.Character_QLabel_2.move(560, 702)  # 캐릭터 던전 입구로 보내기
+            self.Character_QLabel_2.move(558, 657)  # 캐릭터 던전 입구로 보내기
             # self.Show_Dungeon_Entrance(3)  # 던전 입구 만들기
         elif random_dungeon_num == 4:
             self.dungeon_number = 4
             self.dungeon_img_label.setPixmap(dungeon_img_4)
-            self.Character_QLabel_2.move(503, 723)  # 캐릭터 던전 입구로 보내기
+            self.Character_QLabel_2.move(504, 674)  # 캐릭터 던전 입구로 보내기
             # self.Show_Dungeon_Entrance(4)  # 던전 입구 만들기
         self.Show_Dungeon_Entrance(random_dungeon_num)  # 던전 입구 만들기
 
@@ -479,11 +500,11 @@ class WindowClass(QMainWindow, game):
         self.boss_monster.show()
 
         # 검은 라벨 만들어서 위에 덮기(유저가 플레이할 때 던전이 안보이게) <= 일단 ㄱ
-        black_label = QLabel(self)
-        black_label.move(0, 30)
-        black_label.setStyleSheet('background-color: rgba(0, 0, 0, 200)') #200으로 설정되어 있는 투명도 높이면 어두워짐
-        black_label.setFixedSize(1580, 780)
-        black_label.show()
+        # black_label = QLabel(self)
+        # black_label.move(0, 0)
+        # black_label.setStyleSheet('background-color: rgba(0, 0, 0, 200)') #200으로 설정되어 있는 투명도 높이면 어두워짐
+        # black_label.setFixedSize(1580, 780)
+        # black_label.show()
 
     def block_dungeon_wall(self, new_position, previous_position, wall_list, num):
         """유저가 던전벽에서 나아가지 못하게 하기"""
@@ -582,34 +603,33 @@ class WindowClass(QMainWindow, game):
                     pass
                     enemy_rand = random.randrange(4)
                     if enemy_rand < 3:
-
                         self.Log_textEdit.setText("적을 만났습니다.")
-                        pass
-                        # self.StackWidget_Field.setCurrentIndex(2)
-                        # self.MainFrame_Bottom.setEnabled(True)
-                        # self.Page_Use.setEnabled(False)
-                        # self.StackWidget_Item.setCurrentWidget(self.Page_Use)
-                        # self.j = 1
-                        # for num in range(1, random.randrange(2, 11)):
-                        #     getattr(self, f'Monster_{num}_Name').setText(
-                        #         getattr(self, f'nomalfield_fire_monster{self.j}').name)  # 몬스터 이름
-                        #     getattr(self, f'Monster_{num}_Name').setStyleSheet("Color : white")
-                        #     getattr(self, f'Monster_{num}_QLabel').setPixmap(
-                        #         QPixmap(getattr(self, f'nomalfield_fire_monster{self.j}').image))  # 몬스터 이미지
-                        #     getattr(self, f'Monster_{num}_QProgressBar').setMaximum(
-                        #         getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
-                        #     getattr(self, f'Monster_{num}_QProgressBar').setValue(
-                        #         getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
-                        #     getattr(self, f'Monster_{num}_QButton').setEnabled(False)
-                        #     getattr(self, f'Monster_{num}_Name').show()
-                        #     getattr(self, f'Monster_{num}_QLabel').show()
-                        #     getattr(self, f'Monster_{num}_QButton').show()
-                        #     getattr(self, f'Monster_{num}_QProgressBar').show()
-                        #     if self.j < 3:
-                        #         self.j += 1
-                        #     else:
-                        #         self.j = 1
-                        # self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
+
+                        self.StackWidget_Field.setCurrentIndex(2)
+                        self.MainFrame_Bottom.setEnabled(True)
+                        self.Page_Use.setEnabled(False)
+                        self.StackWidget_Item.setCurrentWidget(self.Page_Use)
+                        self.j = 1
+                        for num in range(1, random.randrange(2, 11)):
+                            getattr(self, f'Monster_{num}_Name').setText(
+                                getattr(self, f'nomalfield_fire_monster{self.j}').name)  # 몬스터 이름
+                            getattr(self, f'Monster_{num}_Name').setStyleSheet("Color : white")
+                            getattr(self, f'Monster_{num}_QLabel').setPixmap(
+                                QPixmap(getattr(self, f'nomalfield_fire_monster{self.j}').image))  # 몬스터 이미지
+                            getattr(self, f'Monster_{num}_QProgressBar').setMaximum(
+                                getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
+                            getattr(self, f'Monster_{num}_QProgressBar').setValue(
+                                getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
+                            getattr(self, f'Monster_{num}_QButton').setEnabled(False)
+                            getattr(self, f'Monster_{num}_Name').show()
+                            getattr(self, f'Monster_{num}_QLabel').show()
+                            getattr(self, f'Monster_{num}_QButton').show()
+                            getattr(self, f'Monster_{num}_QProgressBar').show()
+                            if self.j < 3:
+                                self.j += 1
+                            else:
+                                self.j = 1
+                        self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
                     else:
                         self.Log_textEdit.append("타 수호대를 만났습니다.")
                         # self.StackWidget_Field.setCurrentIndex(2)
@@ -679,26 +699,7 @@ class WindowClass(QMainWindow, game):
                 self.show_messagebox("미궁을 만났습니다!")
 
             # 던전 벽 캐릭터가 벗어나지 못하게
-            # 던전맵 벽 값 지정
-            wall_list = {
-                1: [(899, 908, 131, 338),  # 던전 맵 1
-                    (522, 638, 412, 420),
-                    (660, 680, 490, 700),
-                    (829, 1091, 488, 496), ],
-                2: [(800, 820, 117, 341),  # 던전 맵 2
-                    (509, 962, 486, 500)],
-                3: [(893, 909, 96, 327),  # 던전 맵 3
-                    (898, 981, 317, 329),
-                    (488, 718, 429, 443),
-                    (690, 720, 431, 553),
-                    (897, 910, 473, 741)],
-                4: [(680, 967, 203, 233),  # 던전 맵 4
-                    (663, 703, 224, 575),
-                    (954, 969, 221, 577),
-                    (683, 737, 557, 575),
-                    (918, 969, 562, 578),
-                    (950, 1157, 408, 424), ]
-            }
+
 
             # 15*15 사이즈 맵에 들어갔을 때
             if self.dungeon_number == 1:
@@ -707,7 +708,7 @@ class WindowClass(QMainWindow, game):
                         self.map_size[1][2] < new_position.y() < self.map_size[1][3])):  # 미궁 x값, 미궁 y값 설정
                     self.Character_QLabel_2.setGeometry(previous_position)
                 # 던전 내에 위치한 벽을 벗어나지 못하게 함
-                if self.block_dungeon_wall(new_position, previous_position, wall_list, 1):
+                if self.block_dungeon_wall(new_position, previous_position, self.wall_list, 1):
                     self.Character_QLabel_2.setGeometry(previous_position)
 
             # 16 * 16 사이즈 맵에 들어갔을 때
@@ -715,7 +716,7 @@ class WindowClass(QMainWindow, game):
                 if not ((self.map_size[2][0] <= new_position.x() <= self.map_size[2][1]) and (
                         self.map_size[2][2] < new_position.y() < self.map_size[2][3])):  # 미궁 x값, 미궁 y값 설정
                     self.Character_QLabel_2.setGeometry(previous_position)
-                if self.block_dungeon_wall(new_position, previous_position, wall_list, 2):
+                if self.block_dungeon_wall(new_position, previous_position, self.wall_list, 2):
                     self.Character_QLabel_2.setGeometry(previous_position)
 
             # 17 * 17 사이즈 맵에 들어갔을 때
@@ -723,7 +724,7 @@ class WindowClass(QMainWindow, game):
                 if not ((self.map_size[3][0] <= new_position.x() <= self.map_size[3][1]) and (
                         self.map_size[3][2] < new_position.y() < self.map_size[3][3])):  # 미궁 x값, 미궁 y값 설정
                     self.Character_QLabel_2.setGeometry(previous_position)
-                if self.block_dungeon_wall(new_position, previous_position, wall_list, 3):
+                if self.block_dungeon_wall(new_position, previous_position, self.wall_list, 3):
                     self.Character_QLabel_2.setGeometry(previous_position)
 
             # 18 * 18 사이즈 맵에 들어갔을 때
@@ -731,7 +732,7 @@ class WindowClass(QMainWindow, game):
                 if not ((self.map_size[4][0] <= new_position.x() <= self.map_size[4][1]) and (
                         self.map_size[4][2] < new_position.y() < self.map_size[4][3])):  # 미궁 x값, 미궁 y값 설정
                     self.Character_QLabel_2.setGeometry(previous_position)
-                if self.block_dungeon_wall(new_position, previous_position, wall_list, 4):
+                if self.block_dungeon_wall(new_position, previous_position, self.wall_list, 4):
                     self.Character_QLabel_2.setGeometry(previous_position)
 
     # # 이외 필드일때(전투일때) pass
