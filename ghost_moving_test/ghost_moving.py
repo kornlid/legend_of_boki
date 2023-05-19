@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
     def move_label(self):
         # Get the current position of the label
         current_pos = self.label.pos()
+        if not self.current_pos.x()
 
         # Calculate the new position
         if self.random_num == 1:  # 우하
