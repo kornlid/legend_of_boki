@@ -7,7 +7,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import uic, Qt
 from PyQt5 import QtGui
 from PyQt5.QtGui import QPixmap, QMovie
-from PyQt5.QtCore import Qt, QByteArray, QSize
+from PyQt5.QtCore import Qt, QByteArray, QSize, QTimer
 
 from maingame import Ui_Maingame as game
 
@@ -171,6 +171,20 @@ class WindowClass(QMainWindow, game):
         self.dungeon_img_label = QLabel(self.Page_Dungeon_Field) #던전필드에 던전이미지 들어갈 라벨 추가, 던전필드를 부모로 설정
         self.dungeon_img_label.setGeometry(0, 0, 1580, 780)
         self.dungeon_img_label.show()
+
+        # 유령 이미지 불러오기
+        self.ghost_img_top = QPixmap('./ghost_img/ghost_top.png')  # 귀신 이미지 상
+        self.ghost_img_right = QPixmap('./ghost_img/ghost_right.png')  # 우
+        self.ghost_img_left = QPixmap('./ghost_img/ghost_left.png')  # 좌
+        self.ghost_img_bottom = QPixmap('./ghost_img/ghost_bottom.png')  # 하
+        self.ghost_img_right_top = QPixmap('./ghost_img/ghost_right_top.png')  # 우상
+        self.ghost_img_left_top = QPixmap('./ghost_img/ghost_left_top.png')  # 좌상
+        self.ghost_img_left_bottom = QPixmap('./ghost_img/ghost_left_bottom.png')  # 좌하
+        self.ghost_img_right_bottom = QPixmap('./ghost_img/ghost_right_bottom.png')  # 좌하
+        self.random_num = None
+
+
+
 
         #  이 부분은 아래와 중복
         # # 캐릭터의 위치에 따라 포탈 위치 변경 / 유저의 x, y값 지정하기
@@ -452,8 +466,38 @@ class WindowClass(QMainWindow, game):
             self.character_right_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
         self.Character_QLabel_2.show()
 
+        # 유령 크기 고정해주기
+        self.ghost_fixed_size = 100
+
+        # 던전에서 돌아다닐 유령 담길 라벨 만들어주기
+        self.ghost_label = QLabel(self.Page_Dungeon_Field)
+        self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
+                                                               aspectRatioMode=Qt.IgnoreAspectRatio))
+
+
+        # 유령 방향 타이머
+        self.position = QTimer()
+        self.position.setInterval(3000)
+        self.position.timeout.connect(self.direction)
+        self.position.start()
+
+
+        # 유령 타이머
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.move_label)
+        self.timer.start(10)
+
         # 던전 랜덤 가는 부분
         random_dungeon_num = 4 #random.randint(1, 4)
+
+        #유령 위치 던전 내로 고정하기
+        self.ghost_label.move(
+            random.randint(self.map_size[random_dungeon_num][0], self.map_size[random_dungeon_num][1]),
+            random.randint(self.map_size[random_dungeon_num][2], self.map_size[random_dungeon_num][3]))
+
+        #유령 라벨 show()
+        self.ghost_label.show()
+
         print('던전번호는', random_dungeon_num)
         if random_dungeon_num == 1:
             self.dungeon_number = 1  # 키프레스가 인식해야할 값에 1로 넣어줌
@@ -500,11 +544,11 @@ class WindowClass(QMainWindow, game):
         self.boss_monster.show()
 
         # 검은 라벨 만들어서 위에 덮기(유저가 플레이할 때 던전이 안보이게) <= 일단 ㄱ
-        # black_label = QLabel(self)
-        # black_label.move(0, 0)
-        # black_label.setStyleSheet('background-color: rgba(0, 0, 0, 200)') #200으로 설정되어 있는 투명도 높이면 어두워짐
-        # black_label.setFixedSize(1580, 780)
-        # black_label.show()
+        black_label = QLabel(self)
+        black_label.move(0, 0)
+        black_label.setStyleSheet('background-color: rgba(0, 0, 0, 100)') #200으로 설정되어 있는 투명도 높이면 어두워짐
+        black_label.setFixedSize(1580, 780)
+        black_label.show()
 
     def block_dungeon_wall(self, new_position, previous_position, wall_list, num):
         """유저가 던전벽에서 나아가지 못하게 하기"""
@@ -521,6 +565,84 @@ class WindowClass(QMainWindow, game):
         reply = QMessageBox()
         reply.setText(text)
         reply.exec_()
+
+    def direction(self):
+        """유령 방향 랜덤값 반환"""
+        self.random_num = random.randint(1, 6)
+        if self.random_num == 1:  # 우하
+            self.ghost_label.setPixmap(
+                self.ghost_img_right_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+        elif self.random_num == 2:  # 우상
+            self.ghost_label.setPixmap(
+                self.ghost_img_right_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+        elif self.random_num == 3:  # 좌상
+            self.ghost_label.setPixmap(
+                self.ghost_img_left_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+        elif self.random_num == 4:  # 좌하
+            self.ghost_label.setPixmap(
+                self.ghost_img_left_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+        elif self.random_num == 5:  # 왼쪽
+            self.ghost_label.setPixmap(self.ghost_img_left.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+        elif self.random_num == 6:  # 오른쪽
+            self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+
+    def move_label(self):
+        """유령 움직임 조정 함수"""
+
+        # 현재 라벨 포지션 받기
+        current_pos = self.ghost_label.pos()
+
+        #x, y값 조정
+        x_start = self.map_size[self.dungeon_number][0]
+        x_end = self.map_size[self.dungeon_number][1]
+        y_start = self.map_size[self.dungeon_number][2]
+        y_end = self.map_size[self.dungeon_number][3]
+
+        # 새 위치 변수 초기화
+        new_x = current_pos.x()
+        new_y = current_pos.y()
+
+        # 새 위치 계산
+        if self.random_num == 1:  # 우하
+            # self.ghost_label.setPixmap(
+            #     self.ghost_img_right_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+            new_x = min(current_pos.x() + 1, x_end)
+            new_y = min(current_pos.y() + 1, y_end)
+        elif self.random_num == 2:  # 우상
+            # self.ghost_label.setPixmap(
+            #     self.ghost_img_right_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+            new_x = min(current_pos.x() + 1, x_end)
+            new_y = max(current_pos.y() - 1, y_start)
+        elif self.random_num == 3:  # 좌상
+            # self.ghost_label.setPixmap(
+            #     self.ghost_img_left_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+            new_x = max(current_pos.x() - 1, x_start)
+            new_y = max(current_pos.y() - 1, y_start)
+        elif self.random_num == 4:  # 좌하
+            # self.ghost_label.setPixmap(
+            #     self.ghost_img_left_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+            new_x = max(current_pos.x() - 1, x_start)
+            new_y = min(current_pos.y() + 1, y_end)
+        elif self.random_num == 5:  # 왼쪽
+            # self.ghost_label.setPixmap(self.ghost_img_left.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+            new_x = max(current_pos.x() - 1, x_start)
+            new_y = current_pos.y()
+        elif self.random_num == 6:  # 오른쪽
+            # self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+            new_x = min(current_pos.x() + 1, x_end)
+            new_y = current_pos.y()
+        # elif self.random_num == 7:  # 상
+        #     self.ghost_label.setPixmap(self.ghost_img_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+        #     new_x = current_pos.x()
+        #     new_y = max(current_pos.y() - 1, y_start)
+        # else:  # 하
+        #     self.ghost_label.setPixmap(
+        #         self.ghost_img_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
+        #     new_x = current_pos.x()
+        #     new_y = min(current_pos.y() + 1, y_end)
+
+        # 유령라벨 새 포지션으로 옮기기
+        self.ghost_label.move(new_x, new_y)
 
     # 소연 함수 끝 ==========================================================================================================
     # 캐릭터 방향키로 움직이기===============================================================================================
@@ -604,32 +726,32 @@ class WindowClass(QMainWindow, game):
                     enemy_rand = random.randrange(4)
                     if enemy_rand < 3:
                         self.Log_textEdit.setText("적을 만났습니다.")
-
-                        self.StackWidget_Field.setCurrentIndex(2)
-                        self.MainFrame_Bottom.setEnabled(True)
-                        self.Page_Use.setEnabled(False)
-                        self.StackWidget_Item.setCurrentWidget(self.Page_Use)
-                        self.j = 1
-                        for num in range(1, random.randrange(2, 11)):
-                            getattr(self, f'Monster_{num}_Name').setText(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').name)  # 몬스터 이름
-                            getattr(self, f'Monster_{num}_Name').setStyleSheet("Color : white")
-                            getattr(self, f'Monster_{num}_QLabel').setPixmap(
-                                QPixmap(getattr(self, f'nomalfield_fire_monster{self.j}').image))  # 몬스터 이미지
-                            getattr(self, f'Monster_{num}_QProgressBar').setMaximum(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
-                            getattr(self, f'Monster_{num}_QProgressBar').setValue(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
-                            getattr(self, f'Monster_{num}_QButton').setEnabled(False)
-                            getattr(self, f'Monster_{num}_Name').show()
-                            getattr(self, f'Monster_{num}_QLabel').show()
-                            getattr(self, f'Monster_{num}_QButton').show()
-                            getattr(self, f'Monster_{num}_QProgressBar').show()
-                            if self.j < 3:
-                                self.j += 1
-                            else:
-                                self.j = 1
-                        self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
+                        pass
+                        # self.StackWidget_Field.setCurrentIndex(2)
+                        # self.MainFrame_Bottom.setEnabled(True)
+                        # self.Page_Use.setEnabled(False)
+                        # self.StackWidget_Item.setCurrentWidget(self.Page_Use)
+                        # self.j = 1
+                        # for num in range(1, random.randrange(2, 11)):
+                        #     getattr(self, f'Monster_{num}_Name').setText(
+                        #         getattr(self, f'nomalfield_fire_monster{self.j}').name)  # 몬스터 이름
+                        #     getattr(self, f'Monster_{num}_Name').setStyleSheet("Color : white")
+                        #     getattr(self, f'Monster_{num}_QLabel').setPixmap(
+                        #         QPixmap(getattr(self, f'nomalfield_fire_monster{self.j}').image))  # 몬스터 이미지
+                        #     getattr(self, f'Monster_{num}_QProgressBar').setMaximum(
+                        #         getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
+                        #     getattr(self, f'Monster_{num}_QProgressBar').setValue(
+                        #         getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
+                        #     getattr(self, f'Monster_{num}_QButton').setEnabled(False)
+                        #     getattr(self, f'Monster_{num}_Name').show()
+                        #     getattr(self, f'Monster_{num}_QLabel').show()
+                        #     getattr(self, f'Monster_{num}_QButton').show()
+                        #     getattr(self, f'Monster_{num}_QProgressBar').show()
+                        #     if self.j < 3:
+                        #         self.j += 1
+                        #     else:
+                        #         self.j = 1
+                        # self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
                     else:
                         self.Log_textEdit.append("타 수호대를 만났습니다.")
                         # self.StackWidget_Field.setCurrentIndex(2)
@@ -656,7 +778,7 @@ class WindowClass(QMainWindow, game):
 
             # 던전입구1일 때
 
-        #던전필드일때
+        #던전필드일때===
         elif current_index == 1:
             previous_position = self.Character_QLabel_2.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
             if event.key() == Qt.Key_A:  # A 눌렀을 때
@@ -686,11 +808,13 @@ class WindowClass(QMainWindow, game):
             self.TopUI_Coordinate_Label.setText(
                 f"x좌표: {self.Character_QLabel_2.pos().x()}, y좌표:{self.Character_QLabel_2.pos().y()}")
 
-            # 던전에서 몬스터 만났을 때 전투 이동
-            self.show_messagebox("보스몬스터를 만났습니다!\n전투에 진입합니다.")
-            # 전투로 스택위젯 이동
-            # 전투함수로 이동
-            self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
+
+            if self.Character_QLabel_2.geometry().intersects(self.boss_monster.geometry()):
+                # 던전에서 몬스터 만났을 때 전투 이동
+                self.show_messagebox("보스몬스터를 만났습니다!\n전투에 진입합니다.")
+                # 전투로 스택위젯 이동
+                # 전투함수로 이동
+                self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
 
             # 던전에서 미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
             if self.Character_QLabel_2.geometry().intersects(
