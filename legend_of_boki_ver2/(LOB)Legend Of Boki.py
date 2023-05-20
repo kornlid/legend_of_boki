@@ -604,31 +604,21 @@ class WindowClass(QMainWindow, game):
 
         # 새 위치 계산
         if self.random_num == 1:  # 우하
-            # self.ghost_label.setPixmap(
-            #     self.ghost_img_right_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
             new_x = min(current_pos.x() + 1, x_end)
             new_y = min(current_pos.y() + 1, y_end)
         elif self.random_num == 2:  # 우상
-            # self.ghost_label.setPixmap(
-            #     self.ghost_img_right_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
             new_x = min(current_pos.x() + 1, x_end)
             new_y = max(current_pos.y() - 1, y_start)
         elif self.random_num == 3:  # 좌상
-            # self.ghost_label.setPixmap(
-            #     self.ghost_img_left_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
             new_x = max(current_pos.x() - 1, x_start)
             new_y = max(current_pos.y() - 1, y_start)
         elif self.random_num == 4:  # 좌하
-            # self.ghost_label.setPixmap(
-            #     self.ghost_img_left_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
             new_x = max(current_pos.x() - 1, x_start)
             new_y = min(current_pos.y() + 1, y_end)
         elif self.random_num == 5:  # 왼쪽
-            # self.ghost_label.setPixmap(self.ghost_img_left.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
             new_x = max(current_pos.x() - 1, x_start)
             new_y = current_pos.y()
         elif self.random_num == 6:  # 오른쪽
-            # self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
             new_x = min(current_pos.x() + 1, x_end)
             new_y = current_pos.y()
         # elif self.random_num == 7:  # 상

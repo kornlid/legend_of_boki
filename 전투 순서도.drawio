@@ -1,0 +1,71 @@
+<mxfile host="app.diagrams.net" modified="2023-05-14T09:41:05.331Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" etag="ipvll_PVK3ip0bVebANo" version="21.1.2" type="device">
+  <diagram name="페이지-1" id="habmXwXG60ndBMa90bGh">
+    <mxGraphModel dx="2501" dy="764" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="w2eH9PdxNItXoTGUo1_q-1" target="w2eH9PdxNItXoTGUo1_q-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-1" value="전투&amp;nbsp; 선택되었을 때" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.558;entryY=-0.083;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="w2eH9PdxNItXoTGUo1_q-2" target="w2eH9PdxNItXoTGUo1_q-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="w2eH9PdxNItXoTGUo1_q-2" target="w2eH9PdxNItXoTGUo1_q-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="w2eH9PdxNItXoTGUo1_q-2" target="w2eH9PdxNItXoTGUo1_q-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-2" value="전투로 창이동 시키기" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="w2eH9PdxNItXoTGUo1_q-3" target="w2eH9PdxNItXoTGUo1_q-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-3" value="일반몬스터 만났을 때" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-4" value="수호대 만났을 때" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-5" value="보스 만났을 때" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="w2eH9PdxNItXoTGUo1_q-10">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="600" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-10" value="맵에 따라 다른 몬스터&lt;br&gt;출현&lt;br&gt;(숲, 얼음, 물, 불)" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="490" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="w2eH9PdxNItXoTGUo1_q-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="710" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-13" value="몬스터 정보 화면에 출력" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="600" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-15" value="내 캐릭터 정보 화면에 출력" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="710" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-18" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="850" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-19" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="20" y="720" as="sourcePoint" />
+            <mxPoint x="70" y="730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w2eH9PdxNItXoTGUo1_q-20" value="턴에 맞춰서 버튼 활성화" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-60" y="690" width="100" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
