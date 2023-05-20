@@ -485,10 +485,10 @@ class WindowClass(QMainWindow, game):
         # 유령 타이머
         self.timer = QTimer()
         self.timer.timeout.connect(self.move_label)
-        self.timer.start(10)
+        self.timer.start(40)
 
         # 던전 랜덤 가는 부분
-        random_dungeon_num = 4 #random.randint(1, 4)
+        random_dungeon_num = random.randint(1, 4)
 
         #유령 위치 던전 내로 고정하기
         self.ghost_label.move(
