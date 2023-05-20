@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
 
 
 
-        self.random_num = None
+        self.random_num = 1
 
         # 방향 타이머
         self.position = QTimer()
