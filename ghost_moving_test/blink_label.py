@@ -37,8 +37,8 @@ class BlinkingLabel(QWidget):
     def start_blinking(self):
         """버튼을 누르면 비활성화 및 깜빡임 함수호출, 2초뒤에 멈추게"""
         self.button.setEnabled(False)
-        self.timer.start(500)  # 0.5초마다 toggle_background() 호출
-        QTimer.singleShot(2000, self.stop_blinking)  # 2초 후에 stop_blinking() 호출
+        self.timer.start(200)  # 0.5초마다 toggle_background() 호출
+        QTimer.singleShot(1000, self.stop_blinking)  # 2초 후에 stop_blinking() 호출
 
     def toggle_background(self):
         if self.label.palette().color(self.label.backgroundRole()) == QColor("transparent"):
