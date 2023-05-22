@@ -26,30 +26,37 @@ class Status:
         self.level = level
 
     def get_classname(self):
+        """클래스 이름"""
         return self.class_name
 
     def get_charactername(self):
+        """캐릭터 이름"""
         return self.character_name
 
     def get_maxhp(self):
-        return self.hp * self.level
+        """max_hp 반환"""
+        return self.hp * self.level  # 반환 hp = 기존 hp * level
 
     def get_nowhp(self):
-        return self.get_maxhp()
+        """현재 hp"""
+        return self.get_maxhp()  # max_hp값 리턴
 
     def get_level(self):
+        """클래스 레벨"""
         return self.level
 
     def get_maxmp(self):
-        return self.mp * self.level
+        """최대 mp"""
+        return self.mp * self.level  # mp* 레벨 리턴
 
 
 class MonsterOption:
     """
-    몬스터 상속 클래스
+    몬스터 상속 클래스: 몬스터 필드/ 이름/ 이미지/ 레벨/ hp/ 공격력
     """
 
     def __init__(self, field, name, img, level, hp, atk):
+        """몬스터 필드/ 이름/ 이미지/ 레벨/ hp/ 공격력"""
         self.field = field
         self.name = name
         self.image = img
@@ -84,7 +91,7 @@ class MonsterOption:
 
 class SkillOption:
     """
-    스킬 상속 클래스
+    스킬 상속 클래스: 이름, 이미지, 데미지 값, 소비mp(스킬마나), 스킬 종류, ??
     """
 
     def __init__(self, name, img, value, mp, target, turn):
@@ -116,7 +123,7 @@ class SkillOption:
         return self.mp
 
     def get_turn(self):
-        """몰루"""
+        """몰루<--??오잉"""
         return self.turn
 
 
@@ -134,7 +141,7 @@ class WindowClass(QMainWindow, game):
 
         # 유저 턴 구분 초기 설정값
         self.user_turn = 0
-        self.class_turn = [1,2,3,4,5]
+        self.class_turn = [1, 2, 3, 4, 5]
 
         # ui 하단 버튼 비활성화
         for i in range(1, 6):
@@ -147,25 +154,36 @@ class WindowClass(QMainWindow, game):
         # 해당 인스턴스에 캐릭터 정보 저장
         self.guardLevel = 1
 
-        self.guardoption()
+        self.guardoption()  # 캐릭터 생성해줌
         self.StautsHpall = []
         self.StautsMpall = []
         self.Statusclass = []
+
         # 리스트를 셔플로 돌려줌
+        # 위 self.guardoption()에서 생성한 클래스 캐릭터들의 값총 6개-(전체정보/최대hp/최대mp)저장
         random.shuffle(self.list_class)
+
+        # 위에서 섞은 list_class에서 1부터 5까지 가져와 담아줌
         for i in range(1, 6):
+            # 빈 리스트에 추가
+            self.Statusclass.append(self.list_class[i - 1][0])  # 빈 리스트 Statusclass에 하나씩 전체정보를 append해줌
+            self.StautsHpall.append(self.list_class[i - 1][1])  # 빈 리스트 StautsHpall에 하나씩 최대hp를 append해줌
+            self.StautsMpall.append(self.list_class[i - 1][1])  # 빈 리스트 StautsMpall에 하나씩 최대mp를 append해줌
+
+            # 하단 ui에 캐릭터 추가
             getattr(self, f'Status{i}_1_Class').setText(self.list_class[i - 1][0].class_name)  # 클래스명 지정
+            getattr(self, f'Status{i}_1_Name').setText(self.list_class[i - 1][0].character_name)  # 캐릭터명 지정
+            getattr(self, f'Status{i}_2_HpValue').setText(
+                str(self.list_class[i - 1][1]) + "/" + str(self.list_class[i - 1][0].get_maxhp()))  # hp(기본 값/변하는 값)
+            getattr(self, f'Status{i}_3_MpValue').setText(
+                str(self.list_class[i - 1][2]) + "/" + str(self.list_class[i - 1][0].get_maxmp()))  # mp(기본 값/변하는 값)
+
+            # 정렬 및 스타일시트 배경 디자인
+            getattr(self, f'Status{i}_2_HpValue').setAlignment(Qt.AlignCenter)
+            getattr(self, f'Status{i}_1_Name').setAlignment(Qt.AlignCenter)
+            getattr(self, f'Status{i}_3_MpValue').setAlignment(Qt.AlignCenter)
             getattr(self, f'Status{i}_1_Class').setAlignment(Qt.AlignCenter)  # 텍스트 가운데 정렬
             getattr(self, f'Status{i}_1_Class').setStyleSheet('QLabel{background-color:#55aaff;}')  # 클래스 배경 색상 지정
-            getattr(self, f'Status{i}_1_Name').setText(self.list_class[i - 1][0].character_name)  # 캐릭터명 지정
-            getattr(self, f'Status{i}_1_Name').setAlignment(Qt.AlignCenter)
-            self.Statusclass.append(self.list_class[i - 1][0])
-            self.StautsHpall.append(self.list_class[i - 1][1])
-            getattr(self, f'Status{i}_2_HpValue').setText(str(self.list_class[i - 1][1]) + "/" + str(self.list_class[i - 1][0].get_maxhp()))  # hp(기본 값/변하는 값)
-            getattr(self, f'Status{i}_2_HpValue').setAlignment(Qt.AlignCenter)
-            self.StautsMpall.append(self.list_class[i - 1][1])
-            getattr(self, f'Status{i}_3_MpValue').setText(str(self.list_class[i - 1][2]) + "/" + str(self.list_class[i - 1][0].get_maxmp()))  # mp(기본 값/변하는 값)
-            getattr(self, f'Status{i}_3_MpValue').setAlignment(Qt.AlignCenter)
             getattr(self, f'Status{i}_2_Hp').setStyleSheet('QLabel{background-color:#55aaff;}')  # hp, mp 배경 색상 지정
             getattr(self, f'Status{i}_3_Mp').setStyleSheet('QLabel{background-color:#55aaff;}')
 
@@ -258,63 +276,73 @@ class WindowClass(QMainWindow, game):
         # ++ keypressevent 함수에 추가로 추합
         # ==================================================================================================================
 
-        # 몬스터 상속
+        # 몬스터 상속 - 몬스터 필드/ 이름/ 이미지/ 레벨/ hp/ 공격력(임시로100)
         self.nomalfield_fire_monster1 = MonsterOption("불의 지역", "불타는 나무정령", "character_1.png", 1,
-                                                      random.randrange(200, 1000), 50)
+                                                      random.randrange(200, 1000), 100)
         self.nomalfield_fire_monster2 = MonsterOption("불의 지역", "불의 정령", "character_2.png", 1,
-                                                      random.randrange(200, 1000), 50)
+                                                      random.randrange(200, 1000), 100)
         self.nomalfield_fire_monster3 = MonsterOption("불의 지역", "불타는 골렘", "character_3.png", 1,
-                                                      random.randrange(200, 1000), 50)
-
+                                                      random.randrange(200, 1000), 100)
+        # 몬스터 담아주기
         self.monsterbox = [self.nomalfield_fire_monster1, self.nomalfield_fire_monster2, self.nomalfield_fire_monster3]
 
+        # 스킬 상속 이후 리턴 값으로 리스트 줌
         self.skillbox()
 
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        self.showFullScreen()
-        # self.exitAction.triggered.connect(qApp.closeAllWindows) # 게임 종    료 이벤트
-        # TODO 캐릭터 움직일 때 마다 x, y 좌표 반영하기
-        ## [임시 캐릭터 설정]
+        ## 임시 캐릭터 설정
+
         self.character_left_img = QPixmap('character_left.png')  # 캐릭터 왼쪽 이미지
         self.character_right_img = QPixmap('character_right.png')  # 캐릭터 오른쪽 이미지
-        self.back_ground_label.setPixmap(QtGui.QPixmap(
-            "용암.png"))  # 임시 일반 필드 배경 이미지
+
+        ## 배경 및 위젯 설정
+        self.back_ground_label.setPixmap(QtGui.QPixmap("용암.png"))  # 임시 일반 필드 배경 이미지
         self.back_ground_label.move(0, -1)  # 배경 위치 조정
         self.Widget_Skill.move(826, -1)  # 전투중 스킬 선택시 생성되는 스킬 위젯 위치
-        self.HoldSwitch = 0
-        self.Widget_Skill.hide()
-        self.Page_Use_ing.setEnabled(False)
-        # self.Page_Equip.setEnabled(False)
-        self.Btn_Equip.clicked.connect(lambda y: self.use_uiABC(4))
-        self.Btn_Portion.clicked.connect(lambda y: self.use_uiABC(0))
-        self.Btn_Status.clicked.connect(lambda y: self.use_uiABC(2))
+        self.Widget_Skill.hide()  # 위젯창은 숨겨 둠
 
+        # 헤더 프레임 없애고 전체화면으로 띄우기
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.showFullScreen()
+        # self.exitAction.triggered.connect(qApp.closeAllWindows) # 게임 종료 이벤트
+
+        self.HoldSwitch = 0
+        self.Page_Use_ing.setEnabled(False)  # 캐릭터 세부정보창 비활성화(우측 상단 index-1)
+        # self.Page_Equip.setEnabled(False)
+        self.Btn_Equip.clicked.connect(lambda y: self.use_uiABC(4))  # 우측 상단 장비 버튼 클릭하면 장비창 이동
+        self.Btn_Portion.clicked.connect(lambda y: self.use_uiABC(0))  # 포션버튼 클릭하면 포션 이동
+        self.Btn_Status.clicked.connect(lambda y: self.use_uiABC(2))  # 캐릭터 세부 장비 활성화
+
+        # 여기서부터 봐야 함
         for num in range(1, 6):  # 액션버튼 1~4 시그널 슬롯 연결
-            getattr(self, f'Status{num}_Action1_Attack').clicked.connect(lambda x, y=num: self.nomalact(y))
-            getattr(self, f'Status{num}_Action2_Skill').clicked.connect(self.skillopen)
+            getattr(self, f'Status{num}_Action1_Attack').clicked.connect(
+                lambda x, y=num: self.nomalact(y))  # 일반공격함수로 연결
+            getattr(self, f'Status{num}_Action2_Skill').clicked.connect(self.skillopen)  # 스킬옵션 함수로 연결
             getattr(self, f'Status{num}_Action3_Item').clicked.connect(lambda y: self.use_uiABC(1))
 
-        # 클래스 스킬 버튼들 리스트화
-        self.pushbox = [self.Class2_Skill1_Btn, self.Class2_Skill2_Btn, self.Class2_Skill3_Btn, self.Class2_Skill4_Btn,
-                        self.Class2_Skill5_Btn, self.Class2_Skill6_Btn, self.Class3_Skill1_Btn, self.Class3_Skill2_Btn,
-                        self.Class3_Skill3_Btn, self.Class3_Skill4_Btn, self.Class4_Skill1_Btn, self.Class4_Skill2_Btn,
-                        self.Class4_Skill3_Btn, self.Class4_Skill4_Btn, self.Class4_Skill5_Btn, self.Class4_Skill6_Btn,
-                        self.Class4_Skill7_Btn, self.Class5_Skill1_Btn, self.Class5_Skill2_Btn, self.Class5_Skill3_Btn,
-                        self.Class6_Skill1_Btn, self.Class1_Skill1_Btn]
+        # 클래스 스킬 버튼들 리스트화 /
+        # #미하일 도발스킬 / #루미너스 스킬: 힐, 그레이트힐, 힐올, 공격력업, 방어력업, 맵핵 / #알렉스 스킬: 파이어볼, 파이어월, 블리자드, 썬더브레이커 / # 메르데스 집중타, 듀얼샷, 마스터샷 / #샐리멘더 힐, 그레이트힐, 힐올, 파이어볼 파이어월, 블리자드 썬더브레이커
+        self.pushbox = [self.Class1_Skill1_Btn, self.Class2_Skill1_Btn, self.Class2_Skill2_Btn, self.Class2_Skill3_Btn,
+                        self.Class2_Skill4_Btn, self.Class2_Skill5_Btn, self.Class2_Skill6_Btn,
+                        self.Class3_Skill1_Btn, self.Class3_Skill2_Btn, self.Class3_Skill3_Btn, self.Class3_Skill4_Btn,
+                        self.Class4_Skill1_Btn, self.Class4_Skill2_Btn, self.Class4_Skill3_Btn,
+                        self.Class4_Skill4_Btn, self.Class4_Skill5_Btn, self.Class4_Skill6_Btn, self.Class4_Skill7_Btn,
+                        self.Class5_Skill1_Btn, self.Class5_Skill2_Btn, self.Class5_Skill3_Btn,
+                        self.Class6_Skill1_Btn]  # 강타
+
         # 아이템 사용 버튼 리스트화 및 연결
-        self.itemusebox = []
-        for btn in range(1, 15):
+        self.itemusebox = []  # 아이템을 사용할 부분 담아줌 빈 리스트에
+        for btn in range(1, 15):  # 1번부터 14까지 포션 버튼을 리스트에 담아준다.
             self.itemusebox.append(getattr(self, f'Portion_{btn}_Btn'))
 
-        for idx, usebtn in enumerate(self.itemusebox):
-            usebtn.clicked.connect(lambda x, y=idx + 1: self.itemuse(y))
+        for idx, usebtn in enumerate(self.itemusebox): # 포션버튼 객체가 리스트에 담아진 걸 인덱스, 버튼으로 for문 돌려줌
+            usebtn.clicked.connect(lambda x, y=idx + 1: self.itemuse(y)) #만약 버튼이 클릭되면 인덱스 값 가지고 itemuse버튼으로 연결
 
         # 몬스터 공격 버튼 연결 과정 -=================================================-
-        self.actbtnbox = []
-        for i in range(1, 11):
+        self.actbtnbox = [] # 빈 리스트에 몬스터 공격버튼 담아줌
+        for i in range(1, 11): # 1부터 10번까지 리스트에 공격버튼 객체 담아준다
             self.actbtnbox.append(getattr(self, f'Monster_{i}_QButton'))
 
-        for idx, actbtn in enumerate(self.actbtnbox):
+        for idx, actbtn in enumerate(self.actbtnbox): # 몬스터 공격버튼 누르면
             actbtn.clicked.connect(lambda x, y=idx + 1: self.atktype(y))
 
         # 몬스터 공격 버튼 연결 과정 -=================================================-끝
@@ -356,6 +384,7 @@ class WindowClass(QMainWindow, game):
 
     # 혜빈 파일 함수===================================================================================================시작
     def guardoption(self):
+        """캐릭터 생성 및 hp/mp 저장"""
         self.class_1 = Status('전사', '미하일', 300, 0, self.guardLevel)
         self.class_2 = Status('백법사', '루미너스', 200, 150, self.guardLevel)
         self.class_3 = Status('흑법사', '알렉스', 200, 150, self.guardLevel)
@@ -369,6 +398,7 @@ class WindowClass(QMainWindow, game):
         self.class4_nowhp = self.class_4.get_maxhp()
         self.class5_nowhp = self.class_5.get_maxhp()
         self.class6_nowhp = self.class_6.get_maxhp()
+
         self.class1_nowmp = self.class_1.get_maxmp()
         self.class2_nowmp = self.class_2.get_maxmp()
         self.class3_nowmp = self.class_3.get_maxmp()
@@ -403,15 +433,17 @@ class WindowClass(QMainWindow, game):
 
     def atktype(self, typenum):
         # 스킬 공격시 적 데미지 입는 로직
-        if self.attackType == 1:
-            self.skillact(typenum)
+        if self.attackType == 1: # 공격 타입이 1이라면
+            self.skillact(typenum) # 몬스터에게 공격
         # 일반 공격시 적 데미지 입는 로직
-        elif self.attackType == 0:
-            if getattr(self, f'Monster_{typenum}_QProgressBar').value() > self.choice_btn:
+        elif self.attackType == 0: # 공격 타입이 0이라면
+            #몬스터의 체력이 1보다 클 경우 프로그레스 바에 표시
+            if getattr(self, f'Monster_{typenum}_QProgressBar').value() > self.choice_btn: #여기서부터 이해가 안되기 시작한다.
                 getattr(self, f'Monster_{typenum}_QProgressBar').setValue(
                     getattr(self, f'Monster_{typenum}_QProgressBar').value() - self.choice_btn)
                 self.Log_textEdit.append(
                     getattr(self, f'Monster_{typenum}_Name').text() + "에게 %d만큼 피해를 입혔습니다." % self.choice_btn)
+            #몬스터의 체력이
             elif getattr(self, f'Monster_{typenum}_QProgressBar').value() < self.choice_btn:
                 if getattr(self, f'Monster_{typenum}_QProgressBar').value() < self.choice_btn:
                     getattr(self, f'Monster_{typenum}_QLabel').hide()
@@ -466,7 +498,7 @@ class WindowClass(QMainWindow, game):
                 # elif self.class_turn[idx-1] == 1:
                 #     FCS.setEnabled(False)
                 # print('유저 활성화')
-                for btn in range(1, len(self.frame_class_list)+1):  # 턴 변경에 따른 하단 ui 버튼 모두 활성화
+                for btn in range(1, len(self.frame_class_list) + 1):  # 턴 변경에 따른 하단 ui 버튼 모두 활성화
                     getattr(self, f'Status{btn}_Action1_Attack').setEnabled(True)
                     getattr(self, f'Status{btn}_Action1_Attack').setStyleSheet('')  # 버튼 스타일 디폴트로 다시 변경
                     getattr(self, f'Status{btn}_Action2_Skill').setEnabled(True)
@@ -492,23 +524,43 @@ class WindowClass(QMainWindow, game):
         self.monlifecnt = 0  # 존재하는 몬스터 마리수
         for num in range(1, 11):
             if getattr(self, f'Monster_{num}_Name').text() != "":
-                for monster in self.monsterbox:
+                for monster in self.monsterbox:  # 몬스터들의 이름 리스트 [self.nomalfield_fire_monster1, self.nomalfield_fire_monster2, self.nomalfield_fire_monster3]
                     if monster.name == getattr(self, f'Monster_{num}_Name').text():
-                        self.classnum = random.randrange(1,6)
+                        self.classnum = random.randrange(1, 6)
                         if self.StautsHpall[self.classnum - 1] > monster.atk:
-                            self.StautsHpall[self.classnum-1] = self.StautsHpall[self.classnum-1]-monster.atk
-                            getattr(self, f'Status{self.classnum}_2_HpValue').setText(str(self.StautsHpall[self.classnum-1]) + "/" + str(self.Statusclass[self.classnum-1].get_maxhp()))
-                            self.Log_textEdit.append("%s이 %s에게 데미지를 %d만큼 입혔습니다."%(monster.name,getattr(self, f'Status{self.classnum}_1_Name').text(),monster.atk))
+                            self.StautsHpall[self.classnum - 1] = self.StautsHpall[self.classnum - 1] - monster.atk
+                            getattr(self, f'Status{self.classnum}_2_HpValue').setText(
+                                str(self.StautsHpall[self.classnum - 1]) + "/" + str(
+                                    self.Statusclass[self.classnum - 1].get_maxhp()))
+                            self.Log_textEdit.append("%s이 %s에게 데미지를 %d만큼 입혔습니다." % (
+                            monster.name, getattr(self, f'Status{self.classnum}_1_Name').text(), monster.atk))
                         else:
-                            self.Log_textEdit.append("%s가 사망하였습니다."%getattr(self, f'Status{self.classnum}_1_Name').text())
-                            getattr(self, f'Status{self.classnum}_2_HpValue').setText("0" + "/" + str(self.Statusclass[self.classnum - 1].get_maxhp()))
-                            self.class_list = self.frame_class_list.pop(self.classnum-1)
-                            continue
+                            self.Log_textEdit.append(
+                                "%s가 사망하였습니다." % getattr(self, f'Status{self.classnum}_1_Name').text())
+                            getattr(self, f'Status{self.classnum}_2_HpValue').setText(
+                                "0" + "/" + str(self.Statusclass[self.classnum - 1].get_maxhp()))
+                            if self.classnum - 1 < len(self.frame_class_list):
+                                self.class_list = self.frame_class_list.pop(self.classnum - 1)
+                                print(self.class_list)
+                            else:
+                                print("벗어난 인덱스:", self.classnum - 1)
+                            # self.class_list = self.frame_class_list.pop(self.classnum-1)
+                            # print(self.class_list)
+                            # continue
 
+    # 혜빈 파일 함수===================================================================================================끝끝
+    # 혜빈 파일 함수===================================================================================================끝끝
+    # 혜빈 파일 함수===================================================================================================끝끝
 
-    # 혜빈 파일 함수===================================================================================================끝끝
-    # 혜빈 파일 함수===================================================================================================끝끝
-    # 혜빈 파일 함수===================================================================================================끝끝
+    # 소연 임시 함수 =================
+
+    def set_actions_enabled(self, status_count, enabled):
+        """클래스 프레임 활성화/비활성화 시키기"""
+        for i in range(1, status_count + 1):
+            getattr(self, f'Status{i}_Action1_Attack').setEnabled(enabled)
+            getattr(self, f'Status{i}_Action2_Skill').setEnabled(enabled)
+            getattr(self, f'Status{i}_Action3_Item').setEnabled(enabled)
+            getattr(self, f'Status{i}_Action4_Run').setEnabled(enabled)
 
     # 소연 파일 함수 시작===============================================================================================시작시작
     def move_to_dungeon(self):
@@ -703,6 +755,8 @@ class WindowClass(QMainWindow, game):
         스킬 상속 이후 리턴 값으로 리스트 줌
         :return:
         """
+
+        # SkillOption 클래스: 이름, 이미지, 데미지 값, 소비mp(스킬마나), 스킬 종류(0-버프, 1-단일, 2-전체), ??
         self.skill_1 = SkillOption("힐", None, random.randrange(30, 70), 10, 0, 1)
         self.skill_2 = SkillOption("그레이트 힐", None, random.randrange(60, 100), 20, 0, 1)
         self.skill_3 = SkillOption("힐 올", None, random.randrange(40, 80), 10, 0, 1)
@@ -722,27 +776,30 @@ class WindowClass(QMainWindow, game):
         self.skill_14 = SkillOption("강타", None, random.randrange(20, 500), 10, 1, 1)
         self.skill_15 = SkillOption("도발", None, 0, 10, 3, 1)
         self.skillall = [self.skill_1, self.skill_3, self.skill_4, self.skill_5, self.skill_6,
-                         self.skill_7,
-                         self.skill_8, self.skill_9, self.skill_10, self.skill_11, self.skill_12,
-                         self.skill_13,
-                         self.skill_14, self.skill_15]
+                         self.skill_7, self.skill_8, self.skill_9, self.skill_10, self.skill_11,
+                         self.skill_12, self.skill_13, self.skill_14, self.skill_15]
+
+        # 스킬들을 담아서 return 해줌
         return self.skillall
 
     def nomalact(self, num):
-        self.attackType = 0
-        self.choice_btn = num * 10
-        for actbtn in self.actbtnbox:
+        """일반공격 함수"""
+        self.attackType = 0  # 공격타입 0
+        self.choice_btn = num * 10  # 이건뭐니
+        for actbtn in self.actbtnbox:  # 공격할 몬스터 pushButton담긴 리스트
             actbtn.setEnabled(True)
 
     def skillopen(self):
-        self.attackType = 1
-        self.Widget_Skill.show()
+        """클래스가 스킬함수버튼 클릭했을 때"""
+        self.attackType = 1  # 공격타입 1
+        self.Widget_Skill.show()  # 스킬위젯 창 띄워주기
         for rockbtn in self.pushbox:
             rockbtn.setEnabled(True)
         for idx, skillbtn in enumerate(self.pushbox):
             skillbtn.clicked.connect(lambda x, y=idx + 1: self.btnname(y))
 
     def skillact(self, btn):
+        """몬스터에게 공격하는 함수"""
         # self.skillbox()
         if len(self.choice_btn) != 0:
             for skill in self.skillall:
@@ -839,27 +896,29 @@ class WindowClass(QMainWindow, game):
 
     # 상황에 따른 ui 선택 활성화 여부
     def use_uiABC(self, num):
-        if num == 0:
+        """0:소비아이템창/ 1:소비아이템활성화/ 2:캐릭터세부창비활성화/ 3:캐릭터세부창활성화/ 4:장비창이동"""
+        if num == 0:  # 소비아이템 창
             self.StackWidget_Item.setCurrentIndex(0)
-        elif num == 1:
+        elif num == 1:  # 소비아이템 활성화
             """전투시 아이템 버튼을 클릭하면 사용할수있는 소비아이템들이 활성화됨"""
             self.Page_Use.setEnabled(True)
             for btn in range(1, 11):
                 getattr(self, f'Portion_{btn}_Btn').setEnabled(True)
             self.StackWidget_Item.setCurrentIndex(0)
-        elif num == 2:
+        elif num == 2:  # 캐릭터 세부창 비활성화
+
             self.Page_Use_ing.setEnabled(False)
             self.StackWidget_Item.setCurrentIndex(1)
-        elif num == 3:
+        elif num == 3:  # 캐릭터 세부창 활성화
             self.Page_Use_ing.setEnabled(True)
             self.StackWidget_Item.setCurrentIndex(1)
-        elif num == 4:
+        elif num == 4:  # 장비창 이동
             self.StackWidget_Item.setCurrentIndex(2)
 
     def itemuse(self, num):
         """아이템 선택시 발동되는 함수"""
 
-        self.Log_textEdit.append(getattr(self, f'Portion_{num}_Btn').text())
+        self.Log_textEdit.append(getattr(self, f'Portion_{num}_Btn').text()) # 상태창에 어떤 버튼 클릭했는지 보여줌
         # 아이템 취합시 추가 로직 해야됨
         # 아이템 취합시 추가 로직 해야됨
         # 아이템 취합시 추가 로직 해야됨
