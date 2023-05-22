@@ -418,7 +418,7 @@ class WindowClass(QMainWindow, game):
         print('유저턴', self.user_turn)
         ## 유저 턴 확인
         if self.user_turn > 5 :  # 만약 유저 턴이 5보다 크다면
-            self.user_turn = 1  # 1로 만들어준다.
+            self.user_turn = 0  # 1로 만들어준다.
 
         else:
             self.user_turn += 1  # 그렇지 않다면 턴 더해주기
