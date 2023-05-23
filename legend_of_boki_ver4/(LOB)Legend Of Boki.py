@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from PyQt5 import uic, Qt
 from PyQt5 import QtGui
-from PyQt5.QtGui import QPixmap, QMovie
+from PyQt5.QtGui import QPixmap, QMovie, QFontDatabase, QFont
 from PyQt5.QtCore import Qt, QByteArray, QSize, QTimer
 
 from maingame import Ui_Maingame as game
@@ -136,6 +136,15 @@ class WindowClass(QMainWindow, game):
         super().__init__()
         self.setupUi(self)
 
+        # # 폰트 지정
+        # # TTF 파일을 추가
+        # QFontDatabase.addApplicationFont('neodgm.ttf')
+        #
+        # # QFont 객체를 만든다.
+        # font = QFont('Neo둥근모')
+        # font_style = 'font-family: Neo둥근모;'
+        # self.setStyleSheet(font_style)
+
         # 공격 타입 구분 초기 설정값
         self.attackType = 0
 
@@ -228,6 +237,8 @@ class WindowClass(QMainWindow, game):
         self.ghost_img_right_bottom = QPixmap('./ghost_img/ghost_right_bottom.png')  # 좌하
         self.random_num = 1  # 유령 움직임 초기설정
 
+
+
         #  이 부분은 아래와 중복
         # # 캐릭터의 위치에 따라 포탈 위치 변경 / 유저의 x, y값 지정하기
         # positions = {
@@ -247,6 +258,7 @@ class WindowClass(QMainWindow, game):
             3: [491, 1088, 91, 688],  # 맵 3번 x시작, x끝, y시작, y끝
             4: [475, 1104, 73, 703],  # 맵 4번 x시작, x끝, y시작, y끝
         }
+
 
         # 던전맵 벽 값 지정
         self.wall_list = {
@@ -343,7 +355,7 @@ class WindowClass(QMainWindow, game):
             self.actbtnbox.append(getattr(self, f'Monster_{i}_QButton'))
 
         for idx, actbtn in enumerate(self.actbtnbox): # 몬스터 공격버튼 누르면
-            actbtn.clicked.connect(lambda x, y=idx + 1: self.atktype(y))
+            actbtn.clicked.connect(lambda x, y=idx + 1: self.atktype(y))#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@도와줘요호현공주
 
         # 몬스터 공격 버튼 연결 과정 -=================================================-끝
         for btn in self.actbtnbox:
@@ -437,7 +449,7 @@ class WindowClass(QMainWindow, game):
             self.skillact(typenum) # 몬스터에게 공격
         # 일반 공격시 적 데미지 입는 로직
         elif self.attackType == 0: # 공격 타입이 0이라면
-            #몬스터의 체력이 1보다 클 경우 프로그레스 바에 표시
+            #몬스터의 체력이 보다 클 경우 프로그레스 바에 표시
             if getattr(self, f'Monster_{typenum}_QProgressBar').value() > self.choice_btn: #여기서부터 이해가 안되기 시작한다.
                 getattr(self, f'Monster_{typenum}_QProgressBar').setValue(
                     getattr(self, f'Monster_{typenum}_QProgressBar').value() - self.choice_btn)
@@ -460,7 +472,7 @@ class WindowClass(QMainWindow, game):
                 self.Log_textEdit.setText("몬스터를 전부 처치하여 필드로 돌아왔습니다.")
                 self.Log_textEdit.append("보상 : 경험치 50exp")
                 self.StackWidget_Field.setCurrentIndex(0)
-                self.HoldSwitch = 0
+                # self.HoldSwitch = 0
                 self.cnt = 0
                 return self.battleclear()
             self.user_Turn()
@@ -528,7 +540,8 @@ class WindowClass(QMainWindow, game):
                     if monster.name == getattr(self, f'Monster_{num}_Name').text():
                         self.classnum = random.randrange(1, 6)
                         if self.StautsHpall[self.classnum - 1] > monster.atk:
-                            self.StautsHpall[self.classnum - 1] = self.StautsHpall[self.classnum - 1] - monster.atk
+                            # self.StautsHpall[self.classnum - 1] = self.StautsHpall[self.classnum - 1] - monster.atk
+                            self.StautsHpall[self.classnum - 1] -= monster.atk
                             getattr(self, f'Status{self.classnum}_2_HpValue').setText(
                                 str(self.StautsHpall[self.classnum - 1]) + "/" + str(
                                     self.Statusclass[self.classnum - 1].get_maxhp()))
@@ -553,6 +566,21 @@ class WindowClass(QMainWindow, game):
     # 혜빈 파일 함수===================================================================================================끝끝
 
     # 소연 임시 함수 =================
+
+    # 맵 위치에 따른 상단에 맵 위치 변경
+    def user_location(self, x, y):
+        """유저의 위치값 반환함"""
+        user_present_location = {
+            '불': [0, 760, -20, 360],  # 불의지역 x1, x2, y3, y4  값
+            '눈': [780, 1560, -20, 360],  # 눈의지역
+            '숲': [0, 760, 380, 740],  # 숲의지역
+            '물': [780, 1560, 380, 740]  # 물의지역
+        }
+
+        for key, value in user_present_location.items():
+            if value[0] <= x <= value[1] and value[2] <= y <= value[3]:
+                return key
+        return None
 
     def set_actions_enabled(self, status_count, enabled):
         """클래스 프레임 활성화/비활성화 시키기"""
@@ -967,13 +995,14 @@ class WindowClass(QMainWindow, game):
         # 소연 keypressevent 함수 내 수정(current_index값 받아오기)===========================================================
 
         # 현재 스택위젯 값 가져오기
-        current_index = self.StackWidget_Field.currentIndex()
+        self.current_index = self.StackWidget_Field.currentIndex()
 
         ## 일반필드일 때
-        if current_index == 0:
+        if self.current_index == 0:
             # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
             previous_position = self.Character_QLabel.geometry()
-
+            map = self.user_location(self.Character_QLabel.x(), self.Character_QLabel.y())
+            self.TopUI_Map_Label.setText(f'{map}의 지역')
             rand_event = random.randrange(1, 11)
             if ((event.key() == Qt.Key_A)  # "a"키를 누를경우 캐릭터 현재 x값을 -20
                     and (self.Character_QLabel.x() > 0)):
@@ -1013,97 +1042,97 @@ class WindowClass(QMainWindow, game):
                     enemy_rand = random.randrange(4)
                     if enemy_rand < 3:
                         self.Log_textEdit.setText("적을 만났습니다.")
-
-                        """
-                        적을 만났을때 설정값
-                        """
-                        # # 아이템 사용시 전체 트루로 만들어줘야해요 그래야 꺼졌을때 다시 켜지니까
-                        # for usebtn in self.itemusebox:
-                        #     usebtn.setEnabled(True)
-
-                        self.user_turn = 0  # 유저 턴 중간에 끝나면 초기화 안된상태로 넘어감 그래서 예외처리함
-                        self.user_turn = 0  # 유저 턴 중간에 끝나면 초기화 안된상태로 넘어감 그래서 예외처리함
-
-                        for rockbtn in self.frame_class_list:
-                            rockbtn.setEnabled(True)
-                        self.portal_sample.hide()
-                        # 인벤토리 ui를 소비창으로 변경
-                        self.StackWidget_Item.setCurrentWidget(self.Page_Use)
-
-                        # 인벤토리 선택 버튼 및 소비 아이템 버튼 비활성화
-                        self.Btn_Equip.setEnabled(False)
-                        self.Btn_Portion.setEnabled(False)
-                        self.Btn_Status.setEnabled(False)
-
-                        # 소비 아이템 클릭 비활성화
-                        for btn in range(1, 15):
-                            getattr(self, f'Portion_{btn}_Btn').setEnabled(False)
-                        # 하단 ui 버튼 클릭 시 다른 버튼 비활성화 시키기
-                        # 1번 턴만 활성화 나머지 비활성화
-                        getattr(self, f'Status{1}_Action1_Attack').setEnabled(True)
-                        getattr(self, f'Status{1}_Action2_Skill').setEnabled(True)
-                        getattr(self, f'Status{1}_Action3_Item').setEnabled(True)
-                        getattr(self, f'Status{1}_Action4_Run').setEnabled(True)
-
-                        for btn in range(1, 6):  # 추후 삭제 대상
-                            getattr(self, f'Status{btn}_Action1_Attack').clicked.connect(lambda: self.change('1'))
-                            getattr(self, f'Status{btn}_Action2_Skill').clicked.connect(lambda: self.change('2'))
-                            getattr(self, f'Status{btn}_Action3_Item').clicked.connect(lambda: self.change('3'))
-                            getattr(self, f'Status{btn}_Action4_Run').clicked.connect(lambda: self.change('4'))
-
-                        # 캐릭터 창 초기 [0] 빼고 비활성화 상태
-                        for FCS in self.frame_class_list[1:]:
-                            FCS.setEnabled(False)
-
-                        skills = {'미하일': 1, '루미너스': 2, '알렉스': 3, '샐러맨더': 4, '메르데스': 5,
-                                  '랜슬롯': 6}  # 각 이름에 대한 인덱스를 찾아서 람다 함수 내에서 스킬 버튼을 연결
-                        name_text = self.Status1_1_Name.text()
-                        name_text2 = self.Status2_1_Name.text()
-                        name_text3 = self.Status3_1_Name.text()
-                        name_text4 = self.Status4_1_Name.text()
-                        name_text5 = self.Status5_1_Name.text()
-                        self.Status1_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text): self.skill_btn(index))
-                        self.Status2_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text2): self.skill_btn(index))
-                        self.Status3_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text3): self.skill_btn(index))
-                        self.Status4_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text4): self.skill_btn(index))
-                        self.Status5_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text5): self.skill_btn(index))
-
-                        # 몬스터 랜덤 등장 구현
-                        self.j = 1
-                        for num in range(1, random.randrange(2, 11)):
-                            getattr(self, f'Monster_{num}_Name').setText(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').name)  # 몬스터 이름
-                            getattr(self, f'Monster_{num}_Name').setStyleSheet("Color : white")
-                            getattr(self, f'Monster_{num}_QLabel').setPixmap(
-                                QPixmap(getattr(self, f'nomalfield_fire_monster{self.j}').image))  # 몬스터 이미지
-                            getattr(self, f'Monster_{num}_QProgressBar').setMaximum(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
-                            getattr(self, f'Monster_{num}_QProgressBar').setValue(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
-                            getattr(self, f'Monster_{num}_QButton').setEnabled(False)
-                            getattr(self, f'Monster_{num}_Name').show()
-                            getattr(self, f'Monster_{num}_QLabel').show()
-                            getattr(self, f'Monster_{num}_QButton').show()
-                            getattr(self, f'Monster_{num}_QProgressBar').show()
-                            if self.j < 3:
-                                self.j += 1
-                            else:
-                                self.j = 1
-
-                        self.StackWidget_Field.setCurrentIndex(2)
-                        self.Page_Use.setEnabled(False)
-
-                    else:
-                        self.Log_textEdit.append("타 수호대를 만났습니다.")
-                        self.HoldSwitch = 0  # 추후 수정 : 수호대는 아직 설정안해놔서 걸리면 다시 움직일수있게 홀드스위치 0으로 돌림
-                        # self.StackWidget_Field.setCurrentIndex(2)
-                        # self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
-
+                        pass
+                    #     """
+                    #     적을 만났을때 설정값
+                    #     """
+                    #     # # 아이템 사용시 전체 트루로 만들어줘야해요 그래야 꺼졌을때 다시 켜지니까
+                    #     # for usebtn in self.itemusebox:
+                    #     #     usebtn.setEnabled(True)
+                    #
+                    #     self.user_turn = 0  # 유저 턴 중간에 끝나면 초기화 안된상태로 넘어감 그래서 예외처리함
+                    #     self.user_turn = 0  # 유저 턴 중간에 끝나면 초기화 안된상태로 넘어감 그래서 예외처리함
+                    #
+                    #     for rockbtn in self.frame_class_list:
+                    #         rockbtn.setEnabled(True)
+                    #     self.portal_sample.hide()
+                    #     # 인벤토리 ui를 소비창으로 변경
+                    #     self.StackWidget_Item.setCurrentWidget(self.Page_Use)
+                    #
+                    #     # 인벤토리 선택 버튼 및 소비 아이템 버튼 비활성화
+                    #     self.Btn_Equip.setEnabled(False)
+                    #     self.Btn_Portion.setEnabled(False)
+                    #     self.Btn_Status.setEnabled(False)
+                    #
+                    #     # 소비 아이템 클릭 비활성화
+                    #     for btn in range(1, 15):
+                    #         getattr(self, f'Portion_{btn}_Btn').setEnabled(False)
+                    #     # 하단 ui 버튼 클릭 시 다른 버튼 비활성화 시키기
+                    #     # 1번 턴만 활성화 나머지 비활성화
+                    #     getattr(self, f'Status{1}_Action1_Attack').setEnabled(True)
+                    #     getattr(self, f'Status{1}_Action2_Skill').setEnabled(True)
+                    #     getattr(self, f'Status{1}_Action3_Item').setEnabled(True)
+                    #     getattr(self, f'Status{1}_Action4_Run').setEnabled(True)
+                    #
+                    #     for btn in range(1, 6):  # 추후 삭제 대상
+                    #         getattr(self, f'Status{btn}_Action1_Attack').clicked.connect(lambda: self.change('1'))
+                    #         getattr(self, f'Status{btn}_Action2_Skill').clicked.connect(lambda: self.change('2'))
+                    #         getattr(self, f'Status{btn}_Action3_Item').clicked.connect(lambda: self.change('3'))
+                    #         getattr(self, f'Status{btn}_Action4_Run').clicked.connect(lambda: self.change('4'))
+                    #
+                    #     # 캐릭터 창 초기 [0] 빼고 비활성화 상태
+                    #     for FCS in self.frame_class_list[1:]:
+                    #         FCS.setEnabled(False)
+                    #
+                    #     skills = {'미하일': 1, '루미너스': 2, '알렉스': 3, '샐러맨더': 4, '메르데스': 5,
+                    #               '랜슬롯': 6}  # 각 이름에 대한 인덱스를 찾아서 람다 함수 내에서 스킬 버튼을 연결
+                    #     name_text = self.Status1_1_Name.text()
+                    #     name_text2 = self.Status2_1_Name.text()
+                    #     name_text3 = self.Status3_1_Name.text()
+                    #     name_text4 = self.Status4_1_Name.text()
+                    #     name_text5 = self.Status5_1_Name.text()
+                    #     self.Status1_Action2_Skill.clicked.connect(
+                    #         lambda x, index=skills.get(name_text): self.skill_btn(index))
+                    #     self.Status2_Action2_Skill.clicked.connect(
+                    #         lambda x, index=skills.get(name_text2): self.skill_btn(index))
+                    #     self.Status3_Action2_Skill.clicked.connect(
+                    #         lambda x, index=skills.get(name_text3): self.skill_btn(index))
+                    #     self.Status4_Action2_Skill.clicked.connect(
+                    #         lambda x, index=skills.get(name_text4): self.skill_btn(index))
+                    #     self.Status5_Action2_Skill.clicked.connect(
+                    #         lambda x, index=skills.get(name_text5): self.skill_btn(index))
+                    #
+                    #     # 몬스터 랜덤 등장 구현
+                    #     self.j = 1
+                    #     for num in range(1, random.randrange(2, 11)):
+                    #         getattr(self, f'Monster_{num}_Name').setText(
+                    #             getattr(self, f'nomalfield_fire_monster{self.j}').name)  # 몬스터 이름
+                    #         getattr(self, f'Monster_{num}_Name').setStyleSheet("Color : white")
+                    #         getattr(self, f'Monster_{num}_QLabel').setPixmap(
+                    #             QPixmap(getattr(self, f'nomalfield_fire_monster{self.j}').image))  # 몬스터 이미지
+                    #         getattr(self, f'Monster_{num}_QProgressBar').setMaximum(
+                    #             getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
+                    #         getattr(self, f'Monster_{num}_QProgressBar').setValue(
+                    #             getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # 몬스터 체력
+                    #         getattr(self, f'Monster_{num}_QButton').setEnabled(False)
+                    #         getattr(self, f'Monster_{num}_Name').show()
+                    #         getattr(self, f'Monster_{num}_QLabel').show()
+                    #         getattr(self, f'Monster_{num}_QButton').show()
+                    #         getattr(self, f'Monster_{num}_QProgressBar').show()
+                    #         if self.j < 3:
+                    #             self.j += 1
+                    #         else:
+                    #             self.j = 1
+                    #
+                    #     self.StackWidget_Field.setCurrentIndex(2)
+                    #     self.Page_Use.setEnabled(False)
+                    #
+                    # else:
+                    #     self.Log_textEdit.append("타 수호대를 만났습니다.")
+                    #     self.HoldSwitch = 0  # 추후 수정 : 수호대는 아직 설정안해놔서 걸리면 다시 움직일수있게 홀드스위치 0으로 돌림
+                    #     # self.StackWidget_Field.setCurrentIndex(2)
+                    #     # self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
+                    #
 
                 elif rand_event > 7:
                     self.Log_textEdit.append("아이템을 획득하였습니다.")
@@ -1118,7 +1147,7 @@ class WindowClass(QMainWindow, game):
                 self.move_to_dungeon()  # 랜덤으로 던전으로 이동
 
         ## 던전필드일때
-        elif current_index == 1:
+        elif self.current_index == 1:
             previous_position = self.Character_QLabel_2.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
             if event.key() == Qt.Key_A:  # A 눌렀을 때
                 self.Character_QLabel_2.setPixmap(
@@ -1217,6 +1246,7 @@ class WindowClass(QMainWindow, game):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setFont(QFont('neodgm.ttf'))
     myWindow = WindowClass()
     myWindow.show()
     app.exec_()
