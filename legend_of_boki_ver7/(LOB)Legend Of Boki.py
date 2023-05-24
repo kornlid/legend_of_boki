@@ -1072,6 +1072,54 @@ class WindowClass(QMainWindow, game):
         msg_box.exec_()
         self.mark_label.hide()
 
+    def item_get_and_exclamentation_mark(self):
+        """아이템 주움과 동시에 !마크 뜨는 함수"""
+        # mark_label =
+
+    def Add_Dungeon_monster_info(self):
+        """던전 몬스터들을 나오게 함"""
+        self.dungeon_random_monster_hp = {} #던전 일반몬스터 체력 담기
+        dungeon_monster_style = [] #던전 일반몬스터 스타일 담기
+
+        dungeon_monster_random_num = random.randint(1, 10) #던전몬스터 숫자
+
+        for i in range(1, dungeon_monster_random_num+1): #던전 몬스터 스타일 담기
+            dungeon_monster_style.append(random.randint(1, 12))
+        print('던전몬스터스타일',dungeon_monster_style)
+
+        for num in range(1, dungeon_monster_random_num + 1):
+            monster = self.dugeonfieldbox[dungeon_monster_style[num-1]-1]
+            print(monster)
+            getattr(self, f'Monster_{num}_Name').setText(monster.name)  # MonsterImage 이름
+            getattr(self, f'Monster_{num}_QLabel').setPixmap(QPixmap(monster.image))  # MonsterImage 이미지
+            getattr(self, f'Monster_{num}_QProgressBar').setMaximum(monster.hp)  # MonsterImage 체력
+            self.dungeon_random_monster_hp[num] = monster.hp  # MonsterImage 체력 더하기
+            getattr(self, f'Monster_{num}_QProgressBar').setValue(monster.hp)  # MonsterImage 체력
+            getattr(self, f'Monster_{num}_QButton').setEnabled(False)
+            getattr(self, f'Monster_{num}_Name').show()
+            getattr(self, f'Monster_{num}_QLabel').show()
+            getattr(self, f'Monster_{num}_QButton').show()
+            getattr(self, f'Monster_{num}_QProgressBar').show()
+
+        for num in range(dungeon_monster_random_num, 10 + 1):
+            getattr(self, f'Monster_{num}_Name').hide()
+            getattr(self, f'Monster_{num}_QLabel').hide()
+            getattr(self, f'Monster_{num}_QButton').hide()
+            getattr(self, f'Monster_{num}_QProgressBar').hide()
+
+        self.portal_hide(True)
+
+    def portal_hide(self, state):
+        if state == True:
+            self.boss_monster.hide()
+            self.entrance.hide()
+            self.Character_QLabel_2.hide()
+        else:
+            self.boss_monster.show()
+            self.entrance.show()
+            self.Character_QLabel_2.show()
+
+
     # 소연 함수 끝 ===================================================================================================================
 
 
@@ -1081,7 +1129,6 @@ class WindowClass(QMainWindow, game):
     def Add_Monster_info(self):
         # MonsterRand
         """MonsterImage 랜덤 등장 구현"""
-        self.j = 1
         monster_random_num = random.randrange(2, 11)  # MonsterImage 랜덤 등장 숫자
         self.monster_hp_dict = {}  # 빈 딕셔너리에 MonsterImage 체력 담기
         list_fieldname = ["불", "눈", "숲", "물"]
@@ -1108,10 +1155,6 @@ class WindowClass(QMainWindow, game):
             getattr(self, f'Monster_{num}_QButton').show()
             getattr(self, f'Monster_{num}_QProgressBar').show()
 
-            if self.j < 3:
-                self.j += 1
-            else:
-                self.j = 1
         print("몬스터체력", self.monster_hp_dict)
 
         for num in range(monster_random_num, 10 + 1):
@@ -1119,6 +1162,7 @@ class WindowClass(QMainWindow, game):
             getattr(self, f'Monster_{num}_QLabel').hide()
             getattr(self, f'Monster_{num}_QButton').hide()
             getattr(self, f'Monster_{num}_QProgressBar').hide()
+
 
     # 전투 시작
     # 유저 턴 시작
@@ -1607,26 +1651,26 @@ class WindowClass(QMainWindow, game):
 
             elif rand_event <= 7:
                 self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
-                enemy_rand = random.randrange(4)
-                if enemy_rand < 3:
-                    pass #실험용 pass
-                    self.Log_textEdit.setText("적을 만났습니다.")
-                    self.portal_sample.hide()
-                    self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
-                    self.Add_Monster_info()
-                    self.User_Turn()
-                    """
-                    적을 만났을때 설정값
-                    """
-                    #나중에 삭제
-                    self.win_btn.show()
-
-                    # 인벤토리 ui를 소비창으로 변경
-                    self.StackWidget_Item.setCurrentWidget(self.Page_Use)
-                    self.Page_Use.setEnabled(False)
-
-                else:
-                    self.Log_textEdit.append("타 수호대를 만났습니다.")
+                # enemy_rand = random.randrange(4)
+                # if enemy_rand < 3:
+                #     pass #실험용 pass
+                #     self.Log_textEdit.setText("적을 만났습니다.")
+                #     self.portal_sample.hide()
+                #     self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
+                #     self.Add_Monster_info()
+                #     self.User_Turn()
+                #     """
+                #     적을 만났을때 설정값
+                #     """
+                #     #나중에 삭제
+                #     self.win_btn.show()
+                #
+                #     # 인벤토리 ui를 소비창으로 변경
+                #     self.StackWidget_Item.setCurrentWidget(self.Page_Use)
+                #     self.Page_Use.setEnabled(False)
+                #
+                # else:
+                #     self.Log_textEdit.append("타 수호대를 만났습니다.")
 
 
             elif rand_event > 7:
@@ -1694,6 +1738,13 @@ class WindowClass(QMainWindow, game):
             # 좌표 위에 찍어주기
             self.TopUI_Coordinate_Label.setText(
                 f"x좌표: {self.Character_QLabel_2.pos().x()}, y좌표:{self.Character_QLabel_2.pos().y()}")
+
+            # 980625소연수정필요
+            random_num_for_user_next_action = random.randint(1, 3)
+            if random_num_for_user_next_action == 1:
+                self.Add_Dungeon_monster_info()
+                self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
+                self.win_btn.show()
 
             # 던전에서 MonsterImage 만났을 때 전투 이동
             if self.Character_QLabel_2.geometry().intersects(self.boss_monster.geometry()):
