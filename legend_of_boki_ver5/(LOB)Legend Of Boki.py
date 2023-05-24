@@ -188,7 +188,7 @@ class WindowClass(QMainWindow, game):
         QFontDatabase.addApplicationFont('neodgm.ttf')
 
         # QFont 객체를 만든다.
-        font = QFont('Neo둥근모', 12)
+        # font = QFont('Neo둥근모', 12)
         font_style = 'font-family: Neo둥근모;'
         self.setStyleSheet(font_style)
 
@@ -1155,9 +1155,9 @@ class WindowClass(QMainWindow, game):
             previous_position = self.Character_QLabel_2.geometry()  # 이전 위치
             if event.key() in directions:  # 방향키가 눌렸을 때
                 if event.key() == list(directions.keys())[0]:
-                    self.Character_QLabel_2.setPixmap(self.character_left_img)
+                    self.Character_QLabel_2.setPixmap(self.character_left_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
                 if event.key() == list(directions.keys())[1]:
-                    self.Character_QLabel_2.setPixmap(self.character_right_img)
+                    self.Character_QLabel_2.setPixmap(self.character_right_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
                 dx, dy = directions[event.key()]  # 방향키에 해당하는 좌표 변화값을 가져옴
                 new_position = self.Character_QLabel_2.geometry().translated(dx, dy)  # 새 위치 계산
                 self.Character_QLabel_2.move(new_position.x(), new_position.y())  # 새 위치로 이동

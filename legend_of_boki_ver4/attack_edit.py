@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from PyQt5 import uic, Qt
 from PyQt5 import QtGui
-from PyQt5.QtGui import QPixmap, QMovie
+from PyQt5.QtGui import QPixmap, QMovie, QFontDatabase, QFont
 from PyQt5.QtCore import Qt, QByteArray, QSize, QTimer
 
 from maingame import Ui_Maingame as game
@@ -132,6 +132,8 @@ class WindowClass(QMainWindow, game):
     메인 게임 진행
     """
 
+
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -255,21 +257,6 @@ class WindowClass(QMainWindow, game):
         # 헤더 프레임 없애고 전체화면으로 띄우기
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.showFullScreen()
-        # self.exitAction.triggered.connect(qApp.closeAllWindows) # 게임 종료 이벤트
-
-        # self.HoldSwitch = 0
-        # self.Page_Use_ing.setEnabled(False)  # 캐릭터 세부정보창 비활성화(우측 상단 index-1)
-        # # self.Page_Equip.setEnabled(False)
-        # self.Btn_Equip.clicked.connect(lambda y: self.use_uiABC(4))  # 우측 상단 장비 버튼 클릭하면 장비창 이동
-        # self.Btn_Portion.clicked.connect(lambda y: self.use_uiABC(0))  # 포션버튼 클릭하면 포션 이동
-        # self.Btn_Status.clicked.connect(lambda y: self.use_uiABC(2))  # 캐릭터 세부 장비 활성화
-
-        # # 여기서부터 봐야 함
-        # for num in range(1, 6):  # 액션버튼 1~4 시그널 슬롯 연결
-        #     getattr(self, f'Status{num}_Action1_Attack').clicked.connect(
-        #         lambda x, y=num: self.nomalact(y))  # 일반공격함수로 연결
-        #     getattr(self, f'Status{num}_Action2_Skill').clicked.connect(self.skillopen)  # 스킬옵션 함수로 연결
-        #     getattr(self, f'Status{num}_Action3_Item').clicked.connect(lambda y: self.use_uiABC(1))
 
         # 클래스 스킬 버튼들 리스트화 /
         # #미하일 도발스킬 / #루미너스 스킬: 힐, 그레이트힐, 힐올, 공격력업, 방어력업, 맵핵 / #알렉스 스킬: 파이어볼, 파이어월, 블리자드, 썬더브레이커 / # 메르데스 집중타, 듀얼샷, 마스터샷 / #샐리멘더 힐, 그레이트힐, 힐올, 파이어볼 파이어월, 블리자드 썬더브레이커
@@ -693,6 +680,7 @@ class WindowClass(QMainWindow, game):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setFont(QFont('neodgm.ttf'))
     myWindow = WindowClass()
     myWindow.show()
     app.exec_()

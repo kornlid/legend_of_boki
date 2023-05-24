@@ -10,7 +10,7 @@ class Player:
         self.x = x
         self.y = y
         self.size = size
-        self.speed = 10
+        self.speed = 5
 
     def move(self, direction):
         if direction == 'W':
@@ -46,7 +46,7 @@ class GameWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Avoidance Game")
+        self.setWindowTitle("피하기 게임")
         self.setGeometry(100, 100, 600, 400)
 
         self.player = Player(50, 200, 20)
@@ -81,14 +81,14 @@ class GameWindow(QMainWindow):
             obstacle.draw(painter)
 
     def updateGame(self):
-        # Move player
+        # 플레이어 움직이게 하기
         self.update()
 
-        # Move obstacles
+        # 장애물 움직이게 하기
         for obstacle in self.obstacles:
             obstacle.move()
 
-            # Check collision with player
+            # 겹치는지 확인
             if self.checkCollision(obstacle, self.player):
                 self.lives -= 1
                 self.obstacles.remove(obstacle)
@@ -96,19 +96,21 @@ class GameWindow(QMainWindow):
                     self.timer.stop()
                     self.showGameOverDialog()
 
-        # Generate new obstacle randomly
+        # 장애물 랜덤으로 생성
         if random.random() < 0.05:
             y = random.randint(0, self.height() - 20)
             obstacle = Obstacle(self.width(), y, 20)
             self.obstacles.append(obstacle)
 
-    def checkCollision(self, obj1, obj2):
-        if (abs(obj1.x - obj2.x) < obj1.size and abs(obj1.y - obj2.y) < obj1.size) or \
-                (abs(obj1.x - obj2.x) < obj2.size and abs(obj1.y - obj2.y) < obj2.size):
+    def checkCollision(self, a, b):
+        """겹치면 True값 반환하는 함수"""
+        if (abs(a.x - b.x) < a.size and abs(a.y - b.y) < a.size) or \
+                (abs(a.x - b.x) < b.size and abs(a.y - b.y) < b.size):
             return True
         return False
 
     def showGameOverDialog(self):
+        """게임 오버되면 메세지 출력"""
         message = f"Game Over!\nScore: {self.score}"
         QMessageBox.information(self, "Game Over", message, QMessageBox.Ok)
         sys.exit()

@@ -181,9 +181,7 @@ class WindowClass(QMainWindow, game):
         self.ghost_img_left_top = QPixmap('./ghost_img/ghost_left_top.png')  # 좌상
         self.ghost_img_left_bottom = QPixmap('./ghost_img/ghost_left_bottom.png')  # 좌하
         self.ghost_img_right_bottom = QPixmap('./ghost_img/ghost_right_bottom.png')  # 좌하
-        self.random_num = None
-
-
+        self.random_num = 1 # 유령 움직임 초기설정
 
 
         #  이 부분은 아래와 중복

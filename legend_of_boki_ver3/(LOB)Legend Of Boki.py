@@ -197,6 +197,8 @@ class WindowClass(QMainWindow, game):
         self.ghost_img_right_bottom = QPixmap('./ghost_img/ghost_right_bottom.png')  # 좌하
         self.random_num = 1  # 유령 움직임 초기설정
 
+
+
         #  이 부분은 아래와 중복
         # # 캐릭터의 위치에 따라 포탈 위치 변경 / 유저의 x, y값 지정하기
         # positions = {
@@ -453,8 +455,8 @@ class WindowClass(QMainWindow, game):
 
         # 던전에서 돌아다닐 유령 담길 라벨 만들어주기
         self.ghost_label = QLabel(self.Page_Dungeon_Field)
-        self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                                               aspectRatioMode=Qt.IgnoreAspectRatio)) #이미지 고정
+        self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),aspectRatioMode=Qt.IgnoreAspectRatio)) #이미지 고정
+        self.ghost_label.setStyleSheet('background-color: green')
 
         # 유령 방향 타이머
         self.position = QTimer()
@@ -497,6 +499,8 @@ class WindowClass(QMainWindow, game):
             self.dungeon_number = 4
             self.dungeon_img_label.setPixmap(dungeon_img_4)
             self.Character_QLabel_2.move(504, 674)  # 캐릭터 던전 입구로 보내기
+
+
 
         # 던전 입구 만들기
         self.Show_Dungeon_Entrance(random_dungeon_num)
@@ -575,6 +579,11 @@ class WindowClass(QMainWindow, game):
             self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
                                                                    aspectRatioMode=Qt.IgnoreAspectRatio))
 
+        if self.checkCollision(self.Character_QLabel_2, self.ghost_label):
+            reply = QMessageBox()
+            reply.setText("만났습니다!")
+            reply.exec_()
+
     def move_label(self):
         """유령 움직임 조정 함수"""
 
@@ -626,6 +635,19 @@ class WindowClass(QMainWindow, game):
         # 유령라벨 새 포지션으로 옮기기
         self.ghost_label.move(new_x, new_y)
 
+    def checkCollision(self, obj1, obj2):
+        """라벨끼리 겹치면 true반환"""
+        x1, y1, w1, h1 = abs(obj1.x()), abs(obj1.y()), abs(obj1.width()), abs(obj1.height())
+        x2, y2, w2, h2 = abs(obj2.x()), abs(obj2.y()), abs(obj2.width()), abs(obj2.height())
+        if x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2:
+            return True
+        return False
+
+    # def check_ghost_moving(self):
+    #     if self.checkCollision(self.ghost_label, self.Character_QLabel_2):
+    #         reply = QMessageBox()
+    #         reply.setText("만났습니다.")
+    #         reply.exec_()
     # 소연 함수 끝 ==========================================================================================================
 
     def skillbox(self):
@@ -939,18 +961,12 @@ class WindowClass(QMainWindow, game):
             # 왼쪽 상단에 변경된 죄표 값 출력
             self.TopUI_Coordinate_Label.setText(f"x좌표: {lab_x_} y좌표: {lab_y_}")
 
-            # (미궁 포탈 위치 - 캐릭터 위치)를 절대값으로 만듬 <= 왜 절대값으로 만들죠?!?!
-            ## 임시 주석처리
-            # if ((abs(self.Potal_QLabel.pos().x() - self.Character_QLabel.pos().x()) < 20)
-            #         and (abs(self.Potal_QLabel.pos().y() - self.Character_QLabel.pos().y()) < 20)):
-            #     # 미궁 이동
-            #     self.StackWidget_Field.setCurrentIndex(1)
-            #     self.Log_textEdit.append("포탈을 탔습니다.")  # 미궁 이동시 출력문
-            #     self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
 
             # 일반필드에서 포탈 만났을 때
-            if self.Character_QLabel.geometry().intersects(self.portal_sample.geometry()):  # 포탈 만나면
+            if self.checkCollision(self.Character_QLabel, self.portal_sample):
                 self.move_to_dungeon()  # 랜덤으로 던전으로 이동
+
+
 
         ## 던전필드일때
         elif current_index == 1:
@@ -989,6 +1005,8 @@ class WindowClass(QMainWindow, game):
                 # 전투함수로 이동
                 self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
 
+
+
             # 던전에서 미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
             if self.Character_QLabel_2.geometry().intersects(
                     self.entrance.geometry()) and self.user_can_enter_dungeon == True:
@@ -997,6 +1015,12 @@ class WindowClass(QMainWindow, game):
             # 던전 벽 캐릭터가 벗어나지 못하게
 
             # 15*15 사이즈 맵에 들어갔을 때
+
+            if self.checkCollision(self.ghost_label, self.Character_QLabel_2):
+                reply = QMessageBox()
+                reply.setText("만났습니다!")
+                reply.exec_()
+
             if self.dungeon_number == 1:
                 # 던전 벽을 벗어나지 못하게 함
                 if not ((self.map_size[1][0] <= new_position.x() <= self.map_size[1][1]) and (

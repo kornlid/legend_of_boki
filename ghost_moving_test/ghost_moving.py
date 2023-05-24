@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):
         # 유령 크기 고정해주기
         self.ghost_fixed_size = 100
 
+        #캐릭터 만들어주기
         self.character = QLabel(self)
         self.character.setStyleSheet('border: 4px solid yellow')
         self.character.setFixedSize(300, 300)
@@ -38,8 +39,6 @@ class MainWindow(QMainWindow):
         self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
         self.ghost_label.move(10, 10)
         self.ghost_label.setFixedSize(100, 100)
-
-
 
         self.random_num = 1
 
@@ -59,58 +58,22 @@ class MainWindow(QMainWindow):
         random_num = random.randint(1, 8)
         self.random_num = random_num
 
+
+    def checkCollision(self, obj1, obj2):
+        """라벨끼리 겹치면 true반환"""
+        x1, y1, w1, h1 = abs(obj1.x()), abs(obj1.y()), abs(obj1.width()), abs(obj1.height())
+        x2, y2, w2, h2 = abs(obj2.x()), abs(obj2.y()), abs(obj2.width()), abs(obj2.height())
+        if x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2:
+            return True
+        return False
+
+    def check_ghost_moving(self):
+        if self.checkCollision(self.ghost_label, self.character):
+            reply = QMessageBox()
+            reply.setText("만났습니다.")
+            reply.exec_()
     def move_label(self):
         """유령 움직임 조정 함수"""
-        # # 현재 라벨 포지션 받기
-        # current_pos = self.ghost_label.pos()
-        #
-        # # 창의 최대값 - 현재 라벨 길이값(약간 수정 필요)
-        # max_x = self.width() - self.ghost_label.width()
-        # max_y = self.height() - self.ghost_label.height()
-        #
-        #
-        #
-        # # 새 위치 계산
-        # if self.random_num == 1:  # 우하
-        #     self.ghost_label.setPixmap(
-        #         self.ghost_img_right_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
-        #     new_x = min(current_pos.x() + 1, max_x)
-        #     new_y = min(current_pos.y() + 1, max_y)
-        # elif self.random_num == 2:  # 우상
-        #     self.ghost_label.setPixmap(
-        #         self.ghost_img_right_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
-        #     new_x = min(current_pos.x() + 1, max_x)
-        #     new_y = max(current_pos.y() - 1, 0)
-        # elif self.random_num == 3:  # 좌상
-        #     self.ghost_label.setPixmap(
-        #         self.ghost_img_left_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
-        #     new_x = max(current_pos.x() - 1, 0)
-        #     new_y = max(current_pos.y() - 1, 0)
-        # elif self.random_num == 4:  # 좌하
-        #     self.ghost_label.setPixmap(
-        #         self.ghost_img_left_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
-        #     new_x = max(current_pos.x() - 1, 0)
-        #     new_y = min(current_pos.y() + 1, max_y)
-        # elif self.random_num == 5:  # 왼쪽
-        #     self.ghost_label.setPixmap(self.ghost_img_left.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
-        #     new_x = max(current_pos.x() - 1, 0)
-        #     new_y = current_pos.y()
-        # elif self.random_num == 6:  # 오른쪽
-        #     self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
-        #     new_x = min(current_pos.x() + 1, max_x)
-        #     new_y = current_pos.y()
-        # elif self.random_num == 7:  # 상
-        #     self.ghost_label.setPixmap(self.ghost_img_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
-        #     new_x = current_pos.x()
-        #     new_y = max(current_pos.y() - 1, 0)
-        # else:  # 하
-        #     self.ghost_label.setPixmap(
-        #         self.ghost_img_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size), aspectRatioMode=Qt.IgnoreAspectRatio))
-        #     new_x = current_pos.x()
-        #     new_y = min(current_pos.y() + 1, max_y)
-        #
-        # # Set the new position of the label
-        # self.ghost_label.move(new_x, new_y)
 
 
         # Get the current position of the label
@@ -185,10 +148,13 @@ class MainWindow(QMainWindow):
         #     reply.exec_()
         # # 충돌을 구현을 해야 한다.. -> 객체와 객체
         # if label_x_positon
-        if label_x_positon - 70 < x_positon < label_x_positon + 70 and label_y_positoin - 70 < y_position < label_y_positoin + 70:
-            reply = QMessageBox()
-            reply.setText("만났습니다!")
-            reply.exec_()
+        # if label_x_positon - 70 < x_positon < label_x_positon + 70 and label_y_positoin - 70 < y_position < label_y_positoin + 70:
+        #     reply = QMessageBox()
+        #     reply.setText("만났습니다!")
+        #     reply.exec_()
+
+        self.check_ghost_moving()
+
 
 
 # Create an instance of QApplication and your MainWindow class:
