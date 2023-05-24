@@ -267,6 +267,8 @@ class WindowClass(QMainWindow, game):
 
         # 소연 파일 취합 2차 =========================================================================================================
 
+        self.battle_cnt = 0 # 총 경기횟수 세는 함수(일반필드)
+
         # 클래스 값 넣어줄 리스트 mp / hp
         self.class_hp_mp_present_value_list = [
             [self.Status1_2_HpValue, self.Status1_3_MpValue],
@@ -305,18 +307,18 @@ class WindowClass(QMainWindow, game):
         self.dungeon_img_label.show()
 
         # 유령 이미지 불러오기
-        self.ghost_img_top = QPixmap('./ghost_img/ghost_top.png')  # 귀신 이미지 상
-        self.ghost_img_right = QPixmap('./ghost_img/ghost_right.png')  # 우
-        self.ghost_img_left = QPixmap('./ghost_img/ghost_left.png')  # 좌
-        self.ghost_img_bottom = QPixmap('./ghost_img/ghost_bottom.png')  # 하
-        self.ghost_img_right_top = QPixmap('./ghost_img/ghost_right_top.png')  # 우상
-        self.ghost_img_left_top = QPixmap('./ghost_img/ghost_left_top.png')  # 좌상
-        self.ghost_img_left_bottom = QPixmap('./ghost_img/ghost_left_bottom.png')  # 좌하
-        self.ghost_img_right_bottom = QPixmap('./ghost_img/ghost_right_bottom.png')  # 좌하
+        self.ghost_img_top = QPixmap('./image/ghost_img/ghost_top.png')  # 귀신 이미지 상
+        self.ghost_img_right = QPixmap('./image/ghost_img/ghost_right.png')  # 우
+        self.ghost_img_left = QPixmap('./image/ghost_img/ghost_left.png')  # 좌
+        self.ghost_img_bottom = QPixmap('./image/ghost_img/ghost_bottom.png')  # 하
+        self.ghost_img_right_top = QPixmap('./image/ghost_img/ghost_right_top.png')  # 우상
+        self.ghost_img_left_top = QPixmap('./image/ghost_img/ghost_left_top.png')  # 좌상
+        self.ghost_img_left_bottom = QPixmap('./image/ghost_img/ghost_left_bottom.png')  # 좌하
+        self.ghost_img_right_bottom = QPixmap('./image/ghost_img/ghost_right_bottom.png')  # 좌하
         self.random_num = 1  # 유령 움직임 초기설정
 
         #라벨 이미지 가져오기
-        self.mark_img = QPixmap('mark.png')
+        self.mark_img = QPixmap('./image/mark.png')
 
         # 느낌표 담을 라벨 만들어주기
         self.mark_label = QLabel(self)
@@ -599,91 +601,91 @@ class WindowClass(QMainWindow, game):
         # 몬스터 상속 - 몬스터 필드/ 이름/ 이미지/ 레벨/ hp/ 공격력(임시로100)
         # 변경사항""""""""변경사항""""""""변경사항""""""""변경사항""""""""변경사항""""""""변경사항""""""""변경사항""""""""
         """배경 모음"""
-        self.nomalfield_fire_background = ["./배경/fire_1.png", "./배경/fire_2.png", "./배경/fire_3.png"]
-        self.nomalfield_ice_background = ["./배경/ice_1.png", "./배경/ice_2.png", "./배경/ice_3.png"]
-        self.nomalfield_forest_background = ["./배경/forest_1.png", "./배경/forest_2.png", "./배경/forest_3.png"]
-        self.nomalfield_water_background = ["./배경/water_1.png", "./배경/water_2.png", "./배경/water_3.png"]
+        self.nomalfield_fire_background = ["./image/배경/fire_1.png", "./image/배경/fire_2.png", "./image/배경/fire_3.png"]
+        self.nomalfield_ice_background = ["./image/배경/ice_1.png", "./image/배경/ice_2.png", "./image/배경/ice_3.png"]
+        self.nomalfield_forest_background = ["./image/배경/forest_1.png", "./image/배경/forest_2.png", "./image/배경/forest_3.png"]
+        self.nomalfield_water_background = ["./image/배경/water_1.png", "./image/배경/water_2.png", "./image/배경/water_3.png"]
         self.nomalfield_backgroundBox = [self.nomalfield_fire_background, self.nomalfield_ice_background,
                                          self.nomalfield_forest_background, self.nomalfield_water_background]
         """불의 지역 몬스터들"""
-        self.nomalfield_fire_monster1 = MonsterOption("불의 지역", "흔하게 생긴 불돼지", "./MonsterImage/fire_1.png", 1,
+        self.nomalfield_fire_monster1 = MonsterOption("불의 지역", "흔하게 생긴 불돼지", "./image/MonsterImage/fire_1.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.nomalfield_fire_monster2 = MonsterOption("불의 지역", "불의 골렘", "./MonsterImage/fire_2.png", 1,
+        self.nomalfield_fire_monster2 = MonsterOption("불의 지역", "불의 골렘", "./image/MonsterImage/fire_2.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.nomalfield_fire_monster3 = MonsterOption("불의 지역", "불의 정령", "./MonsterImage/fire_3.png", 1,
+        self.nomalfield_fire_monster3 = MonsterOption("불의 지역", "불의 정령", "./image/MonsterImage/fire_3.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.nomalfield_fire_monster4 = MonsterOption("불의 지역", "불에 익지않는 크랩", "./MonsterImage/fire_4.png", 1,
+        self.nomalfield_fire_monster4 = MonsterOption("불의 지역", "불에 익지않는 크랩", "./image/MonsterImage/fire_4.png", 1,
                                                       random.randrange(200, 1000), 50)
 
         """눈의 지역 몬스터들"""
-        self.nomalfield_ice_monster1 = MonsterOption("눈의 지역", "눈의 정령", "./MonsterImage/ice_1.png", 1,
+        self.nomalfield_ice_monster1 = MonsterOption("눈의 지역", "눈의 정령", "./image/MonsterImage/ice_1.png", 1,
                                                      random.randrange(200, 1000), 50)
-        self.nomalfield_ice_monster2 = MonsterOption("눈의 지역", "눈속에서 타오르는 불", "./MonsterImage/ice_2.png", 1,
+        self.nomalfield_ice_monster2 = MonsterOption("눈의 지역", "눈속에서 타오르는 불", "./image/MonsterImage/ice_2.png", 1,
                                                      random.randrange(200, 1000), 50)
-        self.nomalfield_ice_monster3 = MonsterOption("눈의 지역", "몰루판다", "./MonsterImage/ice_3.png", 1,
+        self.nomalfield_ice_monster3 = MonsterOption("눈의 지역", "몰루판다", "./image/MonsterImage/ice_3.png", 1,
                                                      random.randrange(200, 1000), 50)
-        self.nomalfield_ice_monster4 = MonsterOption("눈의 지역", "눈보라를 날리는 양", "./MonsterImage/ice_4.png", 1,
+        self.nomalfield_ice_monster4 = MonsterOption("눈의 지역", "눈보라를 날리는 양", "./image/MonsterImage/ice_4.png", 1,
                                                      random.randrange(200, 1000), 50)
 
         """대지의 지역 몬스터들"""
-        self.nomalfield_forest_monster1 = MonsterOption("대지의 지역", "흔한 번데기", "./MonsterImage/forest_1.png", 1,
+        self.nomalfield_forest_monster1 = MonsterOption("대지의 지역", "흔한 번데기", "./image/MonsterImage/forest_1.png", 1,
                                                         random.randrange(200, 1000), 50)
-        self.nomalfield_forest_monster2 = MonsterOption("대지의 지역", "늙은 장수풍뎅이", "./MonsterImage/forest_2.png", 1,
+        self.nomalfield_forest_monster2 = MonsterOption("대지의 지역", "늙은 장수풍뎅이", "./image/MonsterImage/forest_2.png", 1,
                                                         random.randrange(200, 1000), 50)
-        self.nomalfield_forest_monster3 = MonsterOption("대지의 지역", "억울한 슬라임", "./MonsterImage/forest_3.png", 1,
+        self.nomalfield_forest_monster3 = MonsterOption("대지의 지역", "억울한 슬라임", "./image/MonsterImage/forest_3.png", 1,
                                                         random.randrange(200, 1000), 50)
-        self.nomalfield_forest_monster4 = MonsterOption("대지의 지역", "어딘가 위험한 식물", "./MonsterImage/forest_4.png", 1,
+        self.nomalfield_forest_monster4 = MonsterOption("대지의 지역", "어딘가 위험한 식물", "./image/MonsterImage/forest_4.png", 1,
                                                         random.randrange(200, 1000), 50)
 
         """물의 지역 몬스터들"""
-        self.nomalfield_water_monster1 = MonsterOption("물의 지역", "탁한 기운의 도룡뇽", "./MonsterImage/water_1.png", 1,
+        self.nomalfield_water_monster1 = MonsterOption("물의 지역", "탁한 기운의 도룡뇽", "./image/MonsterImage/water_1.png", 1,
                                                        random.randrange(200, 1000), 50)
-        self.nomalfield_water_monster2 = MonsterOption("물의 지역", "단단한 붕어", "./MonsterImage/water_2.png", 1,
+        self.nomalfield_water_monster2 = MonsterOption("물의 지역", "단단한 붕어", "./image/MonsterImage/water_2.png", 1,
                                                        random.randrange(200, 1000), 50)
-        self.nomalfield_water_monster3 = MonsterOption("물의 지역", "위험해보이는 붕어", "./MonsterImage/water_3.png", 1,
+        self.nomalfield_water_monster3 = MonsterOption("물의 지역", "위험해보이는 붕어", "./image/MonsterImage/water_3.png", 1,
                                                        random.randrange(200, 1000), 50)
-        self.nomalfield_water_monster4 = MonsterOption("물의 지역", "그냥 상어", "./MonsterImage/water_4.png", 1,
+        self.nomalfield_water_monster4 = MonsterOption("물의 지역", "그냥 상어", "./image/MonsterImage/water_4.png", 1,
                                                        random.randrange(200, 1000), 50)
 
         """던전 필드 몬스터들"""
-        self.dugeonfield_1st_monster1 = MonsterOption("던전 1층", "킬러비", "./MonsterImage/dugeonmonster_1.png", 1,
+        self.dugeonfield_1st_monster1 = MonsterOption("던전 1층", "킬러비", "./image/MonsterImage/dugeonmonster_1.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster2 = MonsterOption("던전 1층", "던전 박쥐", "./MonsterImage/dugeonmonster_2.png", 1,
+        self.dugeonfield_1st_monster2 = MonsterOption("던전 1층", "던전 박쥐", "./image/MonsterImage/dugeonmonster_2.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster3 = MonsterOption("던전 2층", "평범한 슬라임", "./MonsterImage/dugeonmonster_3.png", 1,
+        self.dugeonfield_1st_monster3 = MonsterOption("던전 2층", "평범한 슬라임", "./image/MonsterImage/dugeonmonster_3.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster4 = MonsterOption("던전 2층", "차가운 슬라임", "./MonsterImage/dugeonmonster_4.png", 1,
+        self.dugeonfield_1st_monster4 = MonsterOption("던전 2층", "차가운 슬라임", "./image/MonsterImage/dugeonmonster_4.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster5 = MonsterOption("던전 3층", "외눈박이 촉수 문어", "./MonsterImage/dugeonmonster_5.png", 1,
+        self.dugeonfield_1st_monster5 = MonsterOption("던전 3층", "외눈박이 촉수 문어", "./image/MonsterImage/dugeonmonster_5.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster6 = MonsterOption("던전 3층", "푸른 킬러 플라워", "./MonsterImage/dugeonmonster_6.png", 1,
+        self.dugeonfield_1st_monster6 = MonsterOption("던전 3층", "푸른 킬러 플라워", "./image/MonsterImage/dugeonmonster_6.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster7 = MonsterOption("던전 4층", "그린 드래곤", "./MonsterImage/dugeonmonster_7.png", 1,
+        self.dugeonfield_1st_monster7 = MonsterOption("던전 4층", "그린 드래곤", "./image/MonsterImage/dugeonmonster_7.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster8 = MonsterOption("던전 4층", "히드라", "./MonsterImage/dugeonmonster_8.png", 1,
+        self.dugeonfield_1st_monster8 = MonsterOption("던전 4층", "히드라", "./image/MonsterImage/dugeonmonster_8.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster9 = MonsterOption("던전 5층", "레드 드래곤", "./MonsterImage/dugeonmonster_9.png", 1,
+        self.dugeonfield_1st_monster9 = MonsterOption("던전 5층", "레드 드래곤", "./image/MonsterImage/dugeonmonster_9.png", 1,
                                                       random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster10 = MonsterOption("던전 5층", "붉은 킬러 플라워", "./MonsterImage/dugeonmonster_10.png", 1,
+        self.dugeonfield_1st_monster10 = MonsterOption("던전 5층", "붉은 킬러 플라워", "./image/MonsterImage/dugeonmonster_10.png", 1,
                                                        random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster11 = MonsterOption("던전 6층", "독침 전갈", "./MonsterImage/dugeonmonster_11.png", 1,
+        self.dugeonfield_1st_monster11 = MonsterOption("던전 6층", "독침 전갈", "./image/MonsterImage/dugeonmonster_11.png", 1,
                                                        random.randrange(200, 1000), 50)
-        self.dugeonfield_1st_monster12 = MonsterOption("던전 6층", "베젤부부의 하수인", "./MonsterImage/dugeonmonster_12.png", 1,
+        self.dugeonfield_1st_monster12 = MonsterOption("던전 6층", "베젤부부의 하수인", "./image/MonsterImage/dugeonmonster_12.png", 1,
                                                        random.randrange(200, 1000), 50)
         """던전 보스 몬스터"""
-        self.dugeonfield_Boss1 = MonsterOption("던전 1층", "이동려크", "./MonsterImage/dugeonBoss_1.png", 1,
+        self.dugeonfield_Boss1 = MonsterOption("던전 1층", "이동려크", "./image/MonsterImage/dugeonBoss_1.png", 1,
                                                random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss2 = MonsterOption("던전 2층", "조동혀니", "./MonsterImage/dugeonBoss_2.png", 1,
+        self.dugeonfield_Boss2 = MonsterOption("던전 2층", "조동혀니", "./image/MonsterImage/dugeonBoss_2.png", 1,
                                                random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss3 = MonsterOption("던전 3층", "류홍보기", "./MonsterImage/dugeonBoss_3.png", 1,
+        self.dugeonfield_Boss3 = MonsterOption("던전 3층", "류홍보기", "./image/MonsterImage/dugeonBoss_3.png", 1,
                                                random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss4 = MonsterOption("던전 4층", "코로나 공주", "./MonsterImage/dugeonBoss_4.png", 1,
+        self.dugeonfield_Boss4 = MonsterOption("던전 4층", "코로나 공주", "./image/MonsterImage/dugeonBoss_4.png", 1,
                                                random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss5 = MonsterOption("던전 5층", "이땅보키", "./MonsterImage/dugeonBoss_5.png", 1,
+        self.dugeonfield_Boss5 = MonsterOption("던전 5층", "이땅보키", "./image/MonsterImage/dugeonBoss_5.png", 1,
                                                random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss6 = MonsterOption("던전 6층", "환생한 보키", "./MonsterImage/dugeonBoss_6.png", 1,
+        self.dugeonfield_Boss6 = MonsterOption("던전 6층", "환생한 보키", "./image/MonsterImage/dugeonBoss_6.png", 1,
                                                random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss7 = MonsterOption("던전 7층", "로드 오브 보키", "./MonsterImage/dugeonBoss_7.png", 1,
+        self.dugeonfield_Boss7 = MonsterOption("던전 7층", "로드 오브 보키", "./image/MonsterImage/dugeonBoss_7.png", 1,
                                                random.randrange(200, 1000), 50)
 
         """상속받은 이미지와 이미지값을 담은 리스트들을 한곳에 담아주기"""
@@ -719,11 +721,11 @@ class WindowClass(QMainWindow, game):
 
         ## 임시 캐릭터 설정
 
-        self.character_left_img = QPixmap('character_left.png')  # 캐릭터 왼쪽 이미지
-        self.character_right_img = QPixmap('character_right.png')  # 캐릭터 오른쪽 이미지
+        self.character_left_img = QPixmap('./image/character_left.png')  # 캐릭터 왼쪽 이미지
+        self.character_right_img = QPixmap('./image/character_right.png')  # 캐릭터 오른쪽 이미지
 
         ## 배경 및 위젯 설정
-        self.back_ground_label.setPixmap(QtGui.QPixmap("용암.png"))  # 임시 일반 필드 배경 이미지
+        self.back_ground_label.setPixmap(QtGui.QPixmap("./image/용암.png"))  # 임시 일반 필드 배경 이미지
         self.back_ground_label.move(0, -1)  # 배경 위치 조정
         self.Widget_Skill.move(826, -1)  # 전투중 스킬 선택시 생성되는 스킬 위젯 위치
         self.Widget_Skill.hide()  # 위젯창은 숨겨 둠
@@ -792,24 +794,25 @@ class WindowClass(QMainWindow, game):
             f"x좌표: {self.Character_QLabel.pos().x()} y좌표: {self.Character_QLabel.pos().y()}")
 
         # 강제승리버튼
-        # self.win_btn.setWindowFlags(Qt.WindowStaysOnTopHint)
-        # self.win_btn.clicked.connect(self.force_win)
+        self.win_btn.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.win_btn.clicked.connect(self.force_win)
 
     def force_win(self):
         """강제승리버튼"""
         for i in range(1, len(self.monster_hp_dict.keys())+1):
            self.monster_hp_dict[i] = 0
         print(self.monster_hp_dict)
+        self.go_to_normalfield()
 
 
     def guardoption(self):
         """캐릭터 생성 및 hp/mp 저장"""
-        self.class_1 = Status('전사', '미하일', 300, 0, self.guardLevel, "./캐릭터 및 수호대/class_1.png")
-        self.class_2 = Status('백법사', '루미너스', 200, 150, self.guardLevel, "./캐릭터 및 수호대/class_2.png")
-        self.class_3 = Status('흑법사', '알렉스', 200, 150, self.guardLevel, "./캐릭터 및 수호대/class_3.png")
-        self.class_4 = Status('적법사', '샐러맨더', 150, 150, self.guardLevel, "./캐릭터 및 수호대/class_4.png")
-        self.class_5 = Status('궁수', '메르데스', 150, 150, self.guardLevel, "./캐릭터 및 수호대/class_5.png")
-        self.class_6 = Status('검사', '랜슬롯', 150, 150, self.guardLevel, "./캐릭터 및 수호대/class_6.png")
+        self.class_1 = Status('전사', '미하일', 300, 0, self.guardLevel, "./image/캐릭터 및 수호대/class_1.png")
+        self.class_2 = Status('백법사', '루미너스', 200, 150, self.guardLevel, "../image/캐릭터 및 수호대/class_2.png")
+        self.class_3 = Status('흑법사', '알렉스', 200, 150, self.guardLevel, "./image/캐릭터 및 수호대/class_3.png")
+        self.class_4 = Status('적법사', '샐러맨더', 150, 150, self.guardLevel, "./image/캐릭터 및 수호대/class_4.png")
+        self.class_5 = Status('궁수', '메르데스', 150, 150, self.guardLevel, "./image/캐릭터 및 수호대/class_5.png")
+        self.class_6 = Status('검사', '랜슬롯', 150, 150, self.guardLevel, "./image/캐릭터 및 수호대/class_6.png")
 
         self.class1_nowhp = self.class_1.get_maxhp()
         self.class2_nowhp = self.class_2.get_maxhp()
@@ -907,10 +910,10 @@ class WindowClass(QMainWindow, game):
 
         self.dungeon_number = random_dungeon_num # 던전 사이즈마다 다르게 이동
         dungen_map_dict = {
-            1: ['./배경/던전_1.png', 592, 631],
-            2: ['./배경/던전_2.png', 567, 644],
-            3: ['./배경/던전_3.png', 558, 657],
-            4: ['./배경/던전_4.png', 504, 674],
+            1: ['./image/배경/던전_1.png', 592, 631],
+            2: ['./image/배경/던전_2.png', 567, 644],
+            3: ['./image/배경/던전_3.png', 558, 657],
+            4: ['./image/배경/던전_4.png', 504, 674],
         }
         self.dungeon_img_label.setPixmap(QPixmap(dungen_map_dict[random_dungeon_num][0]))
         self.Character_QLabel_2.move(dungen_map_dict[random_dungeon_num][1], dungen_map_dict[random_dungeon_num][2])
@@ -1045,7 +1048,7 @@ class WindowClass(QMainWindow, game):
         # paper_img = QPixmap('구겨진_종이조각-removebg-preview.png')
 
         msg_box = QMessageBox()
-        msg_box.setIconPixmap(QPixmap("구겨진_종이조각-removebg-preview.png"))
+        msg_box.setIconPixmap(QPixmap("./image/paper.png"))
         msg_box.setText("구겨진 종이조각을 유령이 주었습니다... 보시겠습니까?")
         msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         result = msg_box.exec_()
@@ -1064,7 +1067,7 @@ class WindowClass(QMainWindow, game):
         msg_box.setWindowFlags(Qt.FramelessWindowHint)
         msg_box.setStyleSheet('background-color: rgb(242, 238, 203)')
         if ranodm_num == 3:
-            msg_box.setIconPixmap(QPixmap('모야.jpg'))
+            pass # 일단 패스 msg_box.setIconPixmap(QPixmap('./image/모야.jpg'))
         msg_box.setText(f"쪽지에 작성된 내용은...\n{self.msg_sample_list[ranodm_num]}")
         msg_box.exec_()
         self.mark_label.hide()
@@ -1151,20 +1154,33 @@ class WindowClass(QMainWindow, game):
         else:
             self.User_Turn()  # 0보다 작으면 다시 User_Turn 돌아감 (재귀함수)
 
+
+    def change_the_portal_location(self, index, num):
+        """포탈 위치 랜덤 배정"""
+        self.battle_cnt += 1
+        if self.battle_cnt % num == 0 and index == 1: #노말필드일 경우
+            self.Log_textEdit.append(f'전투가 {num}번 되었습니다. 포탈 위치를 변경합니다.')
+            print(f"############################전투가 {num}번 되었습니다. 포탈 위치를 변경합니다.")
+            self.portal_sample.move(random.randint(0, 1580), random.randint(0, 760))  # 포탈 위치 랜덤으로 배정
+
     def go_to_normalfield(self):
+
         # 사용하지말아봐
         # 만약 모든 유저 hp가 0이면 일반필드로 나가게 함
         if all(h == 0 for h in self.class_hp_dict.values()):
+            self.change_the_portal_location(1, 7)
             print("유저체력 부족해서 죽은 경우")
             self.Log_textEdit.append('유저 체력이 부족하여 후퇴합니다...한 발자국만 움직여 보자...')
             self.set_actions_enabled(5, False)  # 클래스들의 모든 버튼 비활성화 시켜줌 <= 지금 작동 안함 살려조ㅁ
             self.current_index = 0
             self.return_user_state() #유저들의 체력 초기화
             self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
-            return True
+            self.portal_sample.show()
+
 
         if all(v == 0 for v in self.monster_hp_dict.values()):
             self.guardLevel += 1
+            self.change_the_portal_location(1, 7)
             print("현재 레벨 %d(몬스터 처치한 경우)" % self.guardLevel)
             self.TopUI_Level_Label.setText("%s의 수호대 Level : %d" % ("땅", self.guardLevel))
             print("몬스터 체력이 0입니다.")
@@ -1175,8 +1191,14 @@ class WindowClass(QMainWindow, game):
             self.Character_QLabel.move(self.normal_previous_position.x(), self.normal_previous_position.y())
             self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
             print('몬스터 다 죽이고 나왔을 때 유저턴', self.user_turn)
+            self.portal_sample.show()
             return True
         return False
+
+    def go_to_dungeonfield(self):
+        """던전에서 싸우고 다시 던전으로 돌아가는 함수"""
+        ## 980625 수정해야됨 수정해야됨 수정해야됨 수정해야됨 기억해라 박소연
+
 
     def skillopen(self, num):
         """스킬 함수(스킬 버튼 외 다른 버튼 비활성화, 몬스터 공격 버튼 활성화) # 일단 기존 함수 제외하고 쓰는중"""
@@ -1551,7 +1573,7 @@ class WindowClass(QMainWindow, game):
         ## 일반필드일 때
         if current_index == 0:
 
-            self.portal_sample.show()
+            # self.portal_sample.show()
             # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
             self.normal_previous_position = self.Character_QLabel.geometry()
 
@@ -1567,60 +1589,41 @@ class WindowClass(QMainWindow, game):
                 #벽 안나가게 하기
                 if self.block_normal_field(new_position.x(), new_position.y()):
                     self.Character_QLabel.setGeometry(self.normal_previous_position)
+                    return
 
                 # 왼쪽 상단에 변경된 죄표 값 출력
                 self.TopUI_Coordinate_Label.setText(
                     f"x좌표: {self.Character_QLabel.pos().x()} y좌표: {self.Character_QLabel.pos().y()}")
 
-            # if ((event.key() == Qt.Key_A)  # "a"키를 누를경우 캐릭터 현재 x값을 -20
-            #         and (self.Character_QLabel.x() > 0)):
-            #     self.Character_QLabel.setPixmap(self.character_left_img)
-            #     self.Character_QLabel.move(self.Character_QLabel.x() - 20, self.Character_QLabel.y())
-            #
-            # elif ((event.key() == Qt.Key_D)  # "d"키를 누를경우 캐릭터 현재 x값을 +20
-            #       and (self.Character_QLabel.x() < 1560)):
-            #     self.Character_QLabel.setPixmap(self.character_right_img)
-            #     self.Character_QLabel.move(self.Character_QLabel.x() + 20, self.Character_QLabel.y())
-            #
-            # elif ((event.key() == Qt.Key_W)  # "w"키를 누를경우 캐릭터 현재 y값을 -20
-            #       and (self.Character_QLabel.y() > -20)):
-            #     self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() - 20)
-            #
-            # elif ((event.key() == Qt.Key_S)  # "s"키를 누를경우 캐릭터 현재 y값을 +20
-            #       and (self.Character_QLabel.y() < 740)):
-            #     self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() + 20)
             else:  # 방향키 이외의 키를 눌렀을때를 위한 예외처리
                 return
 
-            rand_event = random.randrange(1, 11) #랜덤값 추출
-            # if ((self.Character_QLabel.x() >= 0)  # 캐릭터가 다음칸으로 이동했을때 나오는 분기점 및 예외처리
-            #         and (self.Character_QLabel.x() <= 1580)
-            #         and (self.Character_QLabel.y() >= 0)
-            #         and (self.Character_QLabel.y() <= 780)):
-            # 확률 33.33%
+            # 랜덤값 추출 (이동, 전투, 수호대, 포션겟)
+            rand_event = random.randrange(1, 11)
+
+            # 50% 확률로 절반 이동
             if rand_event <= 5:
                 self.Log_textEdit.append("1칸 이동하였습니다.")
-
 
             elif rand_event <= 7:
                 self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
                 enemy_rand = random.randrange(4)
                 if enemy_rand < 3:
                     pass #실험용 pass
-                    # self.Log_textEdit.setText("적을 만났습니다.")
-                    # self.portal_sample.hide()
-                    # self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
-                    # self.Add_Monster_info()
-                    # self.User_Turn()
-                    # """
-                    # 적을 만났을때 설정값
-                    # """
-                    # #나중에 삭제
-                    # self.win_btn.show()
-                    #
-                    # # 인벤토리 ui를 소비창으로 변경
-                    # self.StackWidget_Item.setCurrentWidget(self.Page_Use)
-                    # self.Page_Use.setEnabled(False)
+                    self.Log_textEdit.setText("적을 만났습니다.")
+                    self.portal_sample.hide()
+                    self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
+                    self.Add_Monster_info()
+                    self.User_Turn()
+                    """
+                    적을 만났을때 설정값
+                    """
+                    #나중에 삭제
+                    self.win_btn.show()
+
+                    # 인벤토리 ui를 소비창으로 변경
+                    self.StackWidget_Item.setCurrentWidget(self.Page_Use)
+                    self.Page_Use.setEnabled(False)
 
                 else:
                     self.Log_textEdit.append("타 수호대를 만났습니다.")

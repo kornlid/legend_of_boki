@@ -297,7 +297,7 @@
                   <string/>
                  </property>
                  <property name="pixmap">
-                  <pixmap>background_img.png</pixmap>
+                  <pixmap>image/background_img.png</pixmap>
                  </property>
                  <property name="scaledContents">
                   <bool>true</bool>
@@ -316,7 +316,7 @@
                   <string/>
                  </property>
                  <property name="pixmap">
-                  <pixmap>character_right.png</pixmap>
+                  <pixmap>image/character_right.png</pixmap>
                  </property>
                  <property name="scaledContents">
                   <bool>true</bool>

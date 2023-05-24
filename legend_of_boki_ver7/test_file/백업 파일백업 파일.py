@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from PyQt5 import uic, Qt
 from PyQt5 import QtGui
-from PyQt5.QtGui import QPixmap, QMovie, QFontDatabase, QFont
+from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5.QtCore import Qt, QByteArray, QSize, QTimer
 
 from maingame import Ui_Maingame as game
@@ -255,7 +255,6 @@ list_consumable = [item_consumable_hp_S, item_consumable_hp_M, item_consumable_h
                    item_consumable_all_S, item_consumable_all_M, item_consumable_all_L,
                    item_consumable_resurrection, item_consumable_tent, item_consumable_change,
                    item_consumable_enhancement_low, item_consumable_enhancement_high]
-
 class WindowClass(QMainWindow, game):
     """
     메인 게임 진행
@@ -264,118 +263,6 @@ class WindowClass(QMainWindow, game):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-
-        # 소연 파일 취합 2차 =========================================================================================================
-
-        # 클래스 값 넣어줄 리스트 mp / hp
-        self.class_hp_mp_present_value_list = [
-            [self.Status1_2_HpValue, self.Status1_3_MpValue],
-            [self.Status2_2_HpValue, self.Status2_3_MpValue],
-            [self.Status3_2_HpValue, self.Status3_3_MpValue],
-            [self.Status4_2_HpValue, self.Status4_3_MpValue],
-            [self.Status5_2_HpValue, self.Status5_3_MpValue],
-        ]
-
-
-        # QFont 객체를 만든다.
-        # font = QFont('Neo둥근모', 12)
-        font_style = 'font-family: Neo둥근모;'
-        self.setStyleSheet(font_style)
-
-        # 유저는 보스를 이길 때까지 던전에 입장하지 못함
-        self.user_can_enter_dungeon = False
-
-        # 랜덤 던전 스팟 번호
-        self.dungeon_number = 0
-
-        # 처음 게임 시작했을 때 시작 화면 보여주기
-        # self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
-
-        # 임시로 포탈 하나 만들기
-        self.portal_sample = QLabel(self)
-        self.portal_sample.setFixedSize(40, 40)
-        self.portal_sample.setText("포탈")
-        self.portal_sample.setStyleSheet('background-color: blue')
-        self.portal_sample.show()
-        self.portal_sample.move(random.randint(0, 1580), random.randint(0, 760))  # 포탈 위치 랜덤으로 배정
-
-        # 던전필드에 던전 이미지 들어갈 라벨 만들기
-        self.dungeon_img_label = QLabel(self.Page_Dungeon_Field)  # 던전필드에 던전이미지 들어갈 라벨 추가, 던전필드를 부모로 설정
-        self.dungeon_img_label.setGeometry(0, 0, 1580, 780)
-        self.dungeon_img_label.show()
-
-        # 유령 이미지 불러오기
-        self.ghost_img_top = QPixmap('./ghost_img/ghost_top.png')  # 귀신 이미지 상
-        self.ghost_img_right = QPixmap('./ghost_img/ghost_right.png')  # 우
-        self.ghost_img_left = QPixmap('./ghost_img/ghost_left.png')  # 좌
-        self.ghost_img_bottom = QPixmap('./ghost_img/ghost_bottom.png')  # 하
-        self.ghost_img_right_top = QPixmap('./ghost_img/ghost_right_top.png')  # 우상
-        self.ghost_img_left_top = QPixmap('./ghost_img/ghost_left_top.png')  # 좌상
-        self.ghost_img_left_bottom = QPixmap('./ghost_img/ghost_left_bottom.png')  # 좌하
-        self.ghost_img_right_bottom = QPixmap('./ghost_img/ghost_right_bottom.png')  # 좌하
-        self.random_num = 1  # 유령 움직임 초기설정
-
-        #라벨 이미지 가져오기
-        self.mark_img = QPixmap('mark.png')
-
-        # 느낌표 담을 라벨 만들어주기
-        self.mark_label = QLabel(self)
-        self.mark_label.setPixmap(self.mark_img.scaled(QSize(50, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
-        self.mark_label.setStyleSheet('background-color: transparent')
-        self.mark_label.hide()
-
-        # 응답 상태(동시다발적으로 유령만날 때마다 메세지 뜨지 않게)
-        self.reply_state = False
-
-        # 이스터에그 리스트
-        self.msg_sample_list = {
-            1: "그거 아시나요? 우리반에는 점심시간만 되면 배드민턴을 하는 사람들이 있다고 합니다.",
-            2: "그거아시나요? 개발원 식당에서 나오는 라면은 물 70퍼 스프 30퍼로 구성되어있습니다.",
-            3: "그거 아시나요? 옆팀 팀장님 >시연< 은 가위손 스킬을 지녔습니다.",
-            4: "아이템 Hp(소)는 Hp(소) 만큼의 회복량을 가지고있습니다",
-            5: "Tip. 그거 아시나요? 스킬 버튼을 누르면 스킬창이 뜹니다",
-            6: "사실 미하일은 이혼 전적이 있습니다...",
-            7: " 그거 아시나요? 게임 제작자도 엔딩을 못 봤습니다",
-            8: "그거 아시나요?? 랜슬롯은 남자를..",
-            9: "우리 낭만코더 리보키의 팀장은 커피를 한번에 세잔을 마실 수 있습니다.",
-            10: "Tip. 깡깡.... 깡 (파스락)",
-            11: "그거 아시나요? 우리반에는 매일 달리는 경주마가 있습니다.",
-            12: "그거 아시나요? 이동녀크는 1층의 보스입니다."
-        }
-
-
-
-        # 던전 맵 사이즈(크기별)
-        self.map_size = {
-            1: [529, 1049, 129, 649],  # 맵 1번 x시작, x끝, y시작, y끝
-            2: [505, 1063, 115, 664],  # 맵 2번 x시작, x끝, y시작, y끝
-            3: [491, 1088, 91, 688],  # 맵 3번 x시작, x끝, y시작, y끝
-            4: [475, 1104, 73, 703],  # 맵 4번 x시작, x끝, y시작, y끝
-        }
-
-        # 던전맵 벽 값 지정
-        self.wall_list = {
-            1: [(530, 631, 383, 397),  # 던전 맵 1
-                (650, 670, 455, 657),
-                (871, 885, 127, 320),
-                (800, 1051, 449, 470), ],
-            2: [(781, 798, 108, 322),  # 던전 맵 2
-                (502, 935, 451, 470)],
-            3: [(490, 708, 395, 417),  # 던전 맵 3
-                (694, 708, 401, 518),
-                (871, 887, 440, 696),
-                (870, 885, 89, 306),
-                (872, 953, 295, 307)],
-            4: [(475, 545, 311, 430),  # 던전 맵 4
-                (675, 720, 526, 535),
-                (650, 691, 207, 537),
-                (675, 939, 206, 219),
-                (904, 940, 204, 536),
-                (894, 940, 526, 538),
-                (928, 1109, 384, 397), ]
-        }
-
-
 
         # 일단 임시로 옮겨놓음
         # for i in range(1, 6):
@@ -446,17 +333,13 @@ class WindowClass(QMainWindow, game):
 
         # 유저 체력을 리스트에 담아준다.
         self.class_hp_dict = {}
-        self.class_hp_dict_last = {}
         self.class_mp_dict = {}
-        self.class_mp_dict_last = {}
-        for i in range(1, 6):  # 서플로 돌려준 클래스유저들의 체력을 빈 딕셔너리에 1부터 5까지 담아줌 <- 수정함
+        for i in range(1, 7):  # 서플로 돌려준 클래스유저들의 체력을 빈 딕셔너리에 1부터 6까지 담아줌 <- 수정함
             self.class_hp_dict[i] = self.list_class[i - 1][1]
-        self.class_hp_dict_last[0] = self.list_class[-1][1]
-        for i in range(1, 6):  # 서플로 돌려준 클래스유저들의 마나를 빈 딕셔너리에 1부터 5까지 담아줌 <- 수정함
+        for i in range(1, 7):  # 서플로 돌려준 클래스유저들의 마나를 빈 딕셔너리에 1부터 6까지 담아줌 <- 수정함
             self.class_mp_dict[i] = self.list_class[i - 1][2]
-        self.class_mp_dict_last[0] = self.list_class[-1][2]
-        print('유저 HP체력 확인용', self.class_hp_dict)
-        print('유저 MP마나 확인용', self.class_mp_dict)
+
+        print('유저 체력 확인용', self.class_hp_dict)
 
         # 위에서 섞은 list_class을 프레임에 1부터 5까지 가져와 담아줌
         for i in range(1, 6):
@@ -522,6 +405,8 @@ class WindowClass(QMainWindow, game):
                           self.enhancement_low, self.enhancement_high]
 
         self.class_item_list()
+        print(self.class_item[0][4].name)
+
         self.class_name_reset()
 
         for i in range(len(self.list_class)):
@@ -759,48 +644,27 @@ class WindowClass(QMainWindow, game):
                         self.Class6_Skill1_Btn, self.Class1_Skill1_Btn]  # 강타
 
         # 수호대 스폰 지역 랜덤 설정 및 미궁 랜덤 생성 (조건 = 무조건 수호대 스폰 지역 반대 편에 포탈 나오게함)========================
-        # 소연수정 딕셔너리 이용
-        locations = {1: ("숲의 지역", 100, 520),
-                     2: ("불의 지역", 360, 40),
-                     3: ("눈의 지역", 1280, 20),
-                     4: ("물의 지역", 1320, 540)}
         random_spot = random.randrange(1, 5)
-        location = locations[random_spot]
-        self.Character_QLabel.setPixmap(self.character_left_img)
-        self.Character_QLabel.move(location[1], location[2])
-        self.TopUI_Map_Label.setText(location[0])
-
-        # if random_spot == 1:  # 숲의 지역 스폰 장소
-        #     self.Character_QLabel.setPixmap(self.character_left_img)
-        #     self.Character_QLabel.move(100, 520)
-        #     self.TopUI_Map_Label.setText("숲의 지역")
-        # elif random_spot == 2:  # 불의 지역 스폰 장소
-        #     self.Character_QLabel.setPixmap(self.character_left_img)
-        #     self.Character_QLabel.move(360, 40)
-        #     self.TopUI_Map_Label.setText("불의 지역")
-        # elif random_spot == 3:  # 눈의 지역 스폰 장소
-        #     self.Character_QLabel.setPixmap(self.character_left_img)
-        #     self.Character_QLabel.move(1280, 20)
-        #     self.TopUI_Map_Label.setText("눈의 지역")
-        # elif random_spot == 4:  # 물의 지역 스폰 장소
-        #     self.Character_QLabel.setPixmap(self.character_left_img)
-        #     self.Character_QLabel.move(1320, 540)
-        #     self.TopUI_Map_Label.setText("물의 지역")
+        if random_spot == 1:  # 숲의 지역 스폰 장소
+            self.Character_QLabel.setPixmap(self.character_left_img)
+            self.Character_QLabel.move(100, 520)
+            self.TopUI_Map_Label.setText("숲의 지역")
+        elif random_spot == 2:  # 불의 지역 스폰 장소
+            self.Character_QLabel.setPixmap(self.character_left_img)
+            self.Character_QLabel.move(360, 40)
+            self.TopUI_Map_Label.setText("불의 지역")
+        elif random_spot == 3:  # 눈의 지역 스폰 장소
+            self.Character_QLabel.setPixmap(self.character_left_img)
+            self.Character_QLabel.move(1280, 20)
+            self.TopUI_Map_Label.setText("눈의 지역")
+        elif random_spot == 4:  # 물의 지역 스폰 장소
+            self.Character_QLabel.setPixmap(self.character_left_img)
+            self.Character_QLabel.move(1320, 540)
+            self.TopUI_Map_Label.setText("물의 지역")
 
         # 왼쪽 상단에 초기 죄표 값 출력
         self.TopUI_Coordinate_Label.setText(
             f"x좌표: {self.Character_QLabel.pos().x()} y좌표: {self.Character_QLabel.pos().y()}")
-
-        # 강제승리버튼
-        # self.win_btn.setWindowFlags(Qt.WindowStaysOnTopHint)
-        # self.win_btn.clicked.connect(self.force_win)
-
-    def force_win(self):
-        """강제승리버튼"""
-        for i in range(1, len(self.monster_hp_dict.keys())+1):
-           self.monster_hp_dict[i] = 0
-        print(self.monster_hp_dict)
-
 
     def guardoption(self):
         """캐릭터 생성 및 hp/mp 저장"""
@@ -864,217 +728,9 @@ class WindowClass(QMainWindow, game):
         # 스킬들을 담아서 return 해줌
         return self.skillall
 
-
-    # 소연 함수 추가 ==================================================================================================================
-
-
-    def move_to_dungeon(self):
-        """던전으로 랜덤 이동하는 부분"""
-        self.StackWidget_Field.setCurrentIndex(1)  # 던전필드로 이동
-        self.portal_sample.hide()  # 던전 필드로 이동할 때 포탈 숨겨주기
-        # 던전에서 움직일 캐릭터 라벨 만들어주기
-        self.Character_QLabel_2 = QLabel(self)
-        self.Character_QLabel_2.setFixedSize(30, 50)  # 임시 라벨크기 지정
-        self.Character_QLabel_2.setPixmap(
-            self.character_right_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
-        self.Character_QLabel_2.show()
-        # 유령 크기 고정해주기
-        self.ghost_fixed_size = 100
-        # 던전에서 돌아다닐 유령 담길 라벨 만들어주기
-        self.ghost_label = QLabel(self.Page_Dungeon_Field)
-        self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                                               aspectRatioMode=Qt.IgnoreAspectRatio))  # 이미지 고정
-        # 유령 방향 타이머
-        self.position = QTimer()
-        self.position.setInterval(3000)
-        self.position.timeout.connect(self.ghost_direction)
-        self.position.start()
-
-        # 유령 타이머
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.move_label)
-        self.timer.start(40)
-
-        # 던전 랜덤으로 가는 부분
-        random_dungeon_num = random.randint(1, 4)
-        # 유령 위치 던전 내로 고정하기
-        self.ghost_label.move(
-            random.randint(self.map_size[random_dungeon_num][0], self.map_size[random_dungeon_num][1]),
-            random.randint(self.map_size[random_dungeon_num][2], self.map_size[random_dungeon_num][3]))
-        # 유령 라벨 show()시키기
-        self.ghost_label.show()
-        print('던전번호는', random_dungeon_num)  # 확인용
-
-        self.dungeon_number = random_dungeon_num # 던전 사이즈마다 다르게 이동
-        dungen_map_dict = {
-            1: ['./배경/던전_1.png', 592, 631],
-            2: ['./배경/던전_2.png', 567, 644],
-            3: ['./배경/던전_3.png', 558, 657],
-            4: ['./배경/던전_4.png', 504, 674],
-        }
-        self.dungeon_img_label.setPixmap(QPixmap(dungen_map_dict[random_dungeon_num][0]))
-        self.Character_QLabel_2.move(dungen_map_dict[random_dungeon_num][1], dungen_map_dict[random_dungeon_num][2])
-
-        # 던전 입구 만들기
-        self.Show_Dungeon_Entrance(random_dungeon_num)
-
-    def Show_Dungeon_Entrance(self, map_num):
-        """던전 입구 랜덤으로 만들어주는 함수"""
-        # 미궁 버튼 임시로 만들어주기
-        self.entrance = QLabel(self)
-        self.entrance.setText("미궁")  # 임시지정(이미지 씌우기는 나중에)
-        self.entrance.setFixedSize(30, 30)  # 임시 라벨 크기 지정
-        self.entrance.setStyleSheet('background-color: blue')  # 임시 라벨 색 지정
-        self.entrance.move(random.randint(self.map_size[map_num][0], self.map_size[map_num][1]),
-                           random.randint(self.map_size[map_num][2], self.map_size[map_num][3]))  # 던전 15*15 사이즈
-        self.entrance.show()  # 미궁 띄우기
-
-        # 보스 MonsterImage 위치 임시로 만들어주기
-        self.boss_monster = QLabel(self)  # 보스 MonsterImage 나타날 포탈 임시
-        self.boss_monster.setText("MonsterImage")
-        self.boss_monster.setFixedSize(30, 30)  # 임시 라벨크기지정
-        self.boss_monster.setStyleSheet('background-color: red')  # 임시로 빨간색으로
-        self.boss_monster.move(random.randint(self.map_size[map_num][0], self.map_size[map_num][1]),
-                               random.randint(self.map_size[map_num][2],
-                                              self.map_size[map_num][3]))  # 보스 MonsterImage 랜덤으로 등장
-        self.boss_monster.show()  # 보스몬스터 띄우기
-
-        # 검은 라벨 만들어서 위에 덮기(유저가 플레이할 때 던전이 안보이게)
-        # black_label = QLabel(self)
-        # black_label.move(0, 30)
-        # black_label.setStyleSheet('background-color: rgba(0, 0, 0, 100)')  # 100으로 설정되어 있는 투명도 높이면 어두워짐
-        # black_label.setFixedSize(1580, 780)  # 사이즈고정
-        # black_label.show()
-
-    def block_dungeon_for_type(self, character, dungeon_num, new_x, new_y, new_p, before_p):
-        """던전 크기별로 맵에서 나가지 못하게 하기"""
-        if not ((self.map_size[dungeon_num][0] <= new_x <= self.map_size[dungeon_num][1]) and (
-                self.map_size[dungeon_num][2] <= new_y <= self.map_size[dungeon_num][3])):
-            character.setGeometry(before_p)
-        if self.block_dungeon_wall(new_p, before_p, self.wall_list, dungeon_num):
-            character.setGeometry(before_p)
-
-    def block_dungeon_wall(self, new_position, previous_position, wall_list, num):
-        """유저가 던전벽에서 나아가지 못하게 하기"""
-        for key, value in wall_list.items():
-            if key == num:  # 특정 던전 사이즈일때
-                for i in value:  # 딕셔너리 내 리스트 x, y값 가져와서 비교(self.wall_list 검색해보면 됨)
-                    if i[0] < new_position.x() < i[1] and i[2] < new_position.y() < i[3]:  # 벽 x, y값 사이에 들어가면
-                        self.Character_QLabel_2.setGeometry(previous_position)  # 이전 위치로 이동
-                        return True  # True 반환
-        return False
-
-    def block_normal_field(self, now_x, now_y):
-        """일반필드 맵에서 벗어나지 못하게 하기"""
-        # 일반필드 맵 사이즈
-        normal_field_size = [-20, 1580, -20, 780]
-
-        if not ((normal_field_size[0] < now_x < normal_field_size[1]) and
-                (normal_field_size[2] < now_y < normal_field_size[3])):
-            return True
-        return False
-
-    def show_messagebox(self, text):
-        """특정 문구 메세지박스 띄워주기"""
-        reply = QMessageBox()
-        reply.setText(text)
-        reply.exec_()
-
-    def ghost_direction(self):
-        """유령 방향 랜덤으로 지정 및 변환"""
-        # 랜덤값 따라 방향지정
-        self.random_num = random.randint(1, 6)
-        # print('유령랜덤값: ',self.random_num)
-        ghost_direction = {
-            1: self.ghost_img_right_bottom,  # 우하
-            2: self.ghost_img_right_top,  # 우상
-            3: self.ghost_img_left_top,  # 좌상
-            4: self.ghost_img_left_bottom,  # 좌하
-            5: self.ghost_img_left,  # 왼쪽
-            6: self.ghost_img_right,  # 오른쪽
-        }
-        self.ghost_label.setPixmap(
-            ghost_direction[self.random_num].scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                                    aspectRatioMode=Qt.IgnoreAspectRatio))
-
-    def move_label(self):
-        """유령 움직임 조정 함수"""
-        # 현재 라벨 포지션 받기
-        current_pos = self.ghost_label.pos()
-        # x, y값 조정
-        x_start, x_end = self.map_size[self.dungeon_number][0], self.map_size[self.dungeon_number][1]
-        y_start, y_end = self.map_size[self.dungeon_number][2], self.map_size[self.dungeon_number][3]
-
-        # 새 위치 계산
-        new_positions = {
-            1: (min(current_pos.x() + 1, x_end), min(current_pos.y() + 1, y_end)),  # 우하
-            2: (min(current_pos.x() + 1, x_end), max(current_pos.y() - 1, y_start)),  # 우상
-            3: (max(current_pos.x() - 1, x_start), max(current_pos.y() - 1, y_start)),  # 좌상
-            4: (max(current_pos.x() - 1, x_start), min(current_pos.y() + 1, y_end)),  # 좌하
-            5: (max(current_pos.x() - 1, x_start), current_pos.y()),  # 왼쪽
-            6: (min(current_pos.x() + 1, x_end), current_pos.y())  # 오른쪽
-        }
-        new_x, new_y = new_positions[self.random_num]
-
-        # 유령라벨 새 포지션으로 옮기기
-        self.ghost_label.move(new_x, new_y)
-
-    def return_user_state(self):
-        """유저턴 초기화 시켜주기"""
-        self.user_turn = 0
-        for i in range(1, 6):  # 서플로 돌려준 클래스유저들의 체력을 빈 딕셔너리에 1부터 5까지 다시 담아주고
-            self.class_hp_dict[i] = self.list_class[i - 1][1]
-            self.class_mp_dict[i] = self.list_class[i - 1][2]
-        for i in range(1, 6):  #유저가 죽으면 체력회복
-            self.class_hp_mp_present_value_list[i - 1][0].setText(
-                f'{self.class_hp_dict[i]}/{self.Statusclass[i - 1].get_maxhp()}')  # hp판에 변경된 값 넣어주기
-            self.class_hp_mp_present_value_list[i - 1][1].setText(
-                f'{self.class_mp_dict[i]}/{self.Statusclass[i - 1].get_maxmp()}')  # mp판에 변경된 값 넣어주기
-
-    def checkCollision(self, obj1, obj2):
-        """겹치면 true반환"""
-        x1, y1, w1, h1 = abs(obj1.x()), abs(obj1.y()), abs(obj1.width()), abs(obj1.height())
-        x2, y2, w2, h2 = abs(obj2.x()), abs(obj2.y()), abs(obj2.width()), abs(obj2.height())
-        if x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2:
-            return True
-        return False
-
-    def show_messagebox_easter_egg(self):
-        """이스터에그 메세지 박스 보여주기 (질문하는 메세지박스 띄우기)"""
-        self.reply_state = True
-        # paper_img = QPixmap('구겨진_종이조각-removebg-preview.png')
-
-        msg_box = QMessageBox()
-        msg_box.setIconPixmap(QPixmap("구겨진_종이조각-removebg-preview.png"))
-        msg_box.setText("구겨진 종이조각을 유령이 주었습니다... 보시겠습니까?")
-        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        result = msg_box.exec_()
-
-        if result == QMessageBox.Yes:
-            self.show_second_messagebox()
-        else:
-            self.mark_label.hide()
-            pass
-
-        self.reply_state = False
-
-    def show_second_messagebox(self):
-        ranodm_num = random.randint(1, len(self.msg_sample_list.keys()))
-        msg_box = QMessageBox()
-        msg_box.setWindowFlags(Qt.FramelessWindowHint)
-        msg_box.setStyleSheet('background-color: rgb(242, 238, 203)')
-        if ranodm_num == 3:
-            msg_box.setIconPixmap(QPixmap('모야.jpg'))
-        msg_box.setText(f"쪽지에 작성된 내용은...\n{self.msg_sample_list[ranodm_num]}")
-        msg_box.exec_()
-        self.mark_label.hide()
-
-    # 소연 함수 끝 ===================================================================================================================
-
-
     # 신규함수 ========================================================================================================================
 
-    # 몬스터가 랜덤 등장하는 부분
+        # 몬스터가 랜덤 등장하는 부분
     def Add_Monster_info(self):
         # MonsterRand
         """MonsterImage 랜덤 등장 구현"""
@@ -1084,13 +740,13 @@ class WindowClass(QMainWindow, game):
         list_fieldname = ["불", "눈", "숲", "물"]
         list_namecolor = ["Color : white", "Color : red", "Color : white", "Color : white"]
         for idx, fieldname in enumerate(list_fieldname):
-            if fieldname == self.user_location(self.Character_QLabel.x(), self.Character_QLabel.y()): #소연수정
+            if fieldname == self.user_location(self.lab_x_, self.lab_y_):
                 self.monrand = random.randrange(0, 3)
                 self.back_ground_label.setPixmap(QtGui.QPixmap(self.nomalfield_backgroundBox[idx][self.monrand]))
                 self.namecolor = list_namecolor[idx]
         for num in range(1, monster_random_num):
             for idx, field in enumerate(list_fieldname):
-                if field == self.user_location(self.Character_QLabel.x(), self.Character_QLabel.y()):
+                if field == self.user_location(self.lab_x_, self.lab_y_):
                     self.monrand = random.randrange(0, 4)
                     self.monster = self.nomalfieldallBox[idx][self.monrand]
             getattr(self, f'Monster_{num}_Name').setText(self.monster.name)  # MonsterImage 이름
@@ -1136,7 +792,6 @@ class WindowClass(QMainWindow, game):
 
         if self.user_turn >= 5:  # 만약 유저 턴이 5보다 크다면
             self.user_turn = 1  # 1로 만들어준다.
-            print("여기서 오류가 나나요 여기는 유저턴임 몬스터가 유저 띠리기 전임")
             self.monster_attack_users()  # 이거 여기다 넣으니까 (동시 다발적으로 캐릭터가 죽으면 턴이 넘어가도 몬스터가 공격을안함) 이 현상이 해결됨..
 
         else:
@@ -1155,28 +810,29 @@ class WindowClass(QMainWindow, game):
         # 사용하지말아봐
         # 만약 모든 유저 hp가 0이면 일반필드로 나가게 함
         if all(h == 0 for h in self.class_hp_dict.values()):
-            print("유저체력 부족해서 죽은 경우")
-            self.Log_textEdit.append('유저 체력이 부족하여 후퇴합니다...한 발자국만 움직여 보자...')
-            self.set_actions_enabled(5, False)  # 클래스들의 모든 버튼 비활성화 시켜줌 <= 지금 작동 안함 살려조ㅁ
-            self.current_index = 0
-            self.return_user_state() #유저들의 체력 초기화
+            #
+            #     self.class_turn = [1, 2, 3, 4, 5]  # class_turn 초기화 해주고
+            #     for i in range(1, 6):  # 서플로 돌려준 클래스유저들의 체력을 빈 딕셔너리에 1부터 5까지 다시 담아주고
+            #         self.class_hp_dict[i] = self.list_class[i - 1][1]
+            #         self.class_mp_dict[i] = self.list_class[i - 1][2]
+            #         getattr(self, f'Status{i}_2_HpValue').setText(
+            #             str(self.class_hp_dict[i]) + "/" + str(self.list_class[i - 1][1].get_maxhp()))  # hp(기본 값/변하는 값)
+            #         getattr(self, f'Status{i}_3_MpValue').setText(
+            #             str(self.class_mp_dict[i]) + "/" + str(self.list_class[i - 1][0].get_maxmp()))  # mp(기본 값/변하는 값)
+            #     print('유저 체력 확인용', self.class_hp_dict) #해줘 응애
+
+            self.Log_textEdit.append('유저 체력이 부족하여 후퇴합니다...')
             self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
-            return True
+            return
 
         if all(v == 0 for v in self.monster_hp_dict.values()):
             self.guardLevel += 1
-            print("현재 레벨 %d(몬스터 처치한 경우)" % self.guardLevel)
-            self.TopUI_Level_Label.setText("%s의 수호대 Level : %d" % ("땅", self.guardLevel))
+            print("현재 레벨 %d"%self.guardLevel)
+            self.TopUI_Level_Label.setText("%s의 수호대 Level : %d"%("땅", self.guardLevel))
             print("몬스터 체력이 0입니다.")
             self.Log_textEdit.append('몬스터를 모두 처치했습니다....')
-            # noraml_previous_position
-            self.user_turn = 0
-            self.set_actions_enabled(5, False) #클래스들의 모든 버튼 비활성화 시키기
-            self.Character_QLabel.move(self.normal_previous_position.x(), self.normal_previous_position.y())
             self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
-            print('몬스터 다 죽이고 나왔을 때 유저턴', self.user_turn)
-            return True
-        return False
+            return
 
     def skillopen(self, num):
         """스킬 함수(스킬 버튼 외 다른 버튼 비활성화, 몬스터 공격 버튼 활성화) # 일단 기존 함수 제외하고 쓰는중"""
@@ -1244,68 +900,35 @@ class WindowClass(QMainWindow, game):
                     return 0
 
     def skill_heal(self, num):
-        # find:123412341234
-        if self.user_turn >= 5:
-            self.user_turn = 0
-            self.monster_attack_users()
-            return
-        print("힐썼을때 유저턴 ", self.user_turn)
-        self.User_Turn()
-        for i in range(6):
-            if self.list_class[i][0].character_name == '루미너스':
-                healer = i+1
         if self.choice_btn == '힐':
             heal_rate = self.skill_1.value/100
-
-            if self.class_mp_dict[healer] < 10:
-                self.Log_textEdit.append('마나가 부족합니다')
-
-            else:
-                self.class_mp_dict[healer] = self.class_mp_dict[healer] - self.skill_1.mp
-                self.class_hp_dict[num] = self.class_hp_dict[num] + (self.list_class[num-1][0].get_maxhp() * heal_rate)
-                if self.class_hp_dict[num] > self.list_class[num-1][0].get_maxhp():
-                    self.class_hp_dict[num] = self.list_class[num-1][0].get_maxhp()
-                self.Log_textEdit.append('%s의 체력을 %d%% 회복하였습니다' %
-                                         (self.list_class[num-1][0].character_name, int(heal_rate*100)))
-
+            self.class_hp_dict[num] = self.class_hp_dict[num] + (self.list_class[num-1][0].get_maxhp() * heal_rate)
+            print(self.list_class[num-1][0].get_maxhp() * heal_rate)
+            print(self.list_class[num-1][0].get_maxhp())
+            if self.class_hp_dict[num] > self.list_class[num-1][0].get_maxhp():
+                self.class_hp_dict[num] = self.list_class[num-1][0].get_maxhp()
+            self.Log_textEdit.append('%s의 체력을 %d%% 회복하였습니다' %
+                                     (self.list_class[num-1][0].character_name, int(heal_rate*100)))
         elif self.choice_btn == '그레이트 힐':
             great_heal_rate = self.skill_2.value/100
-            if self.class_mp_dict[2] < 20:
-                self.Log_textEdit.append('마나가 부족합니다')
-
-            else:
-                self.class_mp_dict[healer] = self.class_mp_dict[healer] - self.skill_2.mp
-                self.class_hp_dict[num] = self.class_hp_dict[num] + (self.list_class[num-1][0].get_maxhp() * great_heal_rate)
-                if self.class_hp_dict[num] > self.list_class[num-1][0].get_maxhp():
-                    self.class_hp_dict[num] = self.list_class[num-1][0].get_maxhp()
-                self.Log_textEdit.append('%s의 체력을 %d%% 회복하였습니다' %
-                                         (self.list_class[num - 1][0].character_name, int(great_heal_rate * 100)))
-
+            self.class_hp_dict[num] = self.class_hp_dict[num] + (self.list_class[num-1][0].get_maxhp() * great_heal_rate)
+            if self.class_hp_dict[num] > self.list_class[num-1][0].get_maxhp():
+                self.class_hp_dict[num] = self.list_class[num-1][0].get_maxhp()
+            self.Log_textEdit.append('%s의 체력을 %d%% 회복하였습니다' %
+                                     (self.list_class[num - 1][0].character_name, int(great_heal_rate * 100)))
         elif self.choice_btn == '힐 올':
             all_heal_rate = self.skill_3.value/100
-            if self.class_mp_dict[healer] < 10:
-                self.Log_textEdit.append('마나가 부족합니다')
-
-            else:
-                self.class_mp_dict[healer] = self.class_mp_dict[healer] - self.skill_3.mp
-                alive_class = [key for key, value in self.class_hp_dict.items() if value > 0]
-                for i in range(len(alive_class)):
-                    if self.class_hp_dict[i+1] == 0:
-                        pass
-                    else:
-                        self.class_hp_dict[i+1] = \
-                            self.class_hp_dict[i+1] + (self.list_class[i][0].get_maxhp() * all_heal_rate)
-                        if self.class_hp_dict[i+1] > self.list_class[i][0].get_maxhp():
-                            self.class_hp_dict[i+1] = self.list_class[i][0].get_maxhp()
+            alive_class = [key for key, value in self.class_hp_dict.items() if value > 0]
+            for i in range(len(alive_class)):
+                if self.class_hp_dict[i] == 0:
+                    pass
+                else:
+                    self.class_hp_dict[i] = self.class_hp_dict[i] + (self.list_class[i][0].get_maxhp() * all_heal_rate)
+                if self.class_hp_dict[i] > self.list_class[i][0].get_maxhp():
+                    self.class_hp_dict[i] = self.list_class[i][0].get_maxhp()
                 self.Log_textEdit.append('아군 전체의 체력을 %d%% 회복하였습니다' % int(all_heal_rate * 100))
         self.status_page_reset()
         self.low_ui_reset()
-        self.Widget_Skill.close()
-        for i in range(6):
-            getattr(self, f'Class_{i + 1}_Btn').disconnect()
-
-
-
 
 
     def attack_function(self, num):
@@ -1376,8 +999,7 @@ class WindowClass(QMainWindow, game):
 
         print(f'{num}번 몬스터의 맞은 후 체력: {self.monster_hp_dict[num]}')  # 확인용
 
-        if self.go_to_normalfield():
-            return
+        self.go_to_normalfield()
 
         # 체력 0인 얘들은 안보여주기
         for m, n in self.monster_hp_dict.items():
@@ -1394,15 +1016,13 @@ class WindowClass(QMainWindow, game):
                 getattr(self, f'Monster_{m}_QButton').hide()
                 getattr(self, f'Monster_{m}_QProgressBar').hide()
 
-        if self.go_to_normalfield():
-            return
-        # if all(v == 0 for v in self.monster_hp_dict.values()):
-        #     self.guardLevel += 1  # 적을 모두처치하면 레벨업 +1
-        #     print("현재 레벨 %d" % self.guardLevel)
-        #     self.TopUI_Level_Label.setText("%s의 수호대 Level : %d" % ("땅", self.guardLevel))
-        #     print("몬스터 체력이 0입니다.")
-        #     self.Log_textEdit.append('몬스터를 모두 처치했습니다....')
-        #     self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
+        if all(v == 0 for v in self.monster_hp_dict.values()):
+            self.guardLevel += 1 # 적을 모두처치하면 레벨업 +1
+            print("현재 레벨 %d" % self.guardLevel)
+            self.TopUI_Level_Label.setText("%s의 수호대 Level : %d" % ("땅", self.guardLevel))
+            print("몬스터 체력이 0입니다.")
+            self.Log_textEdit.append('몬스터를 모두 처치했습니다....')
+            self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
 
         # 프로그래스바에 유저가 때린 몬스터 체력 넣어주기
         getattr(self, f'Monster_{num}_QProgressBar').setValue(self.monster_hp_dict[num])  # 몬스터 체력
@@ -1418,9 +1038,14 @@ class WindowClass(QMainWindow, game):
 
         if self.user_turn == 5:
             self.user_turn = 0  # 유저 턴 0으로 만들어주고 다른 버튼들 비활성화 시켜줌(나중에 단축시킬 것)
-            self.set_actions_enabled(5, False)  # 비활성화 시켜주고 소연수정
+            self.set_actions_enabled(1, False)  # 비활성화 시켜주고
+            self.set_actions_enabled(2, False)  # 비활성화 시켜주고
+            self.set_actions_enabled(3, False)  # 비활성화 시켜주고
+            self.set_actions_enabled(4, False)  # 비활성화 시켜주고
+            self.set_actions_enabled(5, False)  # 비활성화 시켜주고
+            # if all(h == 0 for h in self.class_hp_dict.values()):
+            #     print("유저체력 모두 0")
             ### 몬스터 공격 함수로 넘어가야됨
-            print("몬스터 데미지 입는 곳 가기 전임")
             self.monster_attack_users()
 
         else:  # 유저턴이 5 미만이면 다시 유저턴으로 돌아감
@@ -1456,14 +1081,16 @@ class WindowClass(QMainWindow, game):
         attacked_class_list = []
         for i in range(1, len(self.alive_monster) + 1):
             attacked_class_list.append(random.choice(self.alive_class))
+            while True:
+                if attacked_class_list[-1] == 6:
+                    del attacked_class_list[-1]
+                    attacked_class_list.append(random.choice(self.alive_class))
+                else:
+                    break
 
         print("attacked_class_list", attacked_class_list)
 
         # 클래스의 hp 깎아준다
-
-        # 클래스 라벨들
-        class_label_list = [self.Class_1_QLabel, self.Class_2_QLabel, self.Class_3_QLabel, self.Class_4_QLabel,
-                            self.Class_5_QLabel]
 
         class_hp_present_value_list = [  # 클래스 값 넣어줄 리스트
             self.Status1_2_HpValue,
@@ -1490,9 +1117,6 @@ class WindowClass(QMainWindow, game):
                         print(f"{attacked_class_list[m - 1]}번 클래스가 사망했습니다.")
                     else:
                         self.class_hp_dict[attacked_class_list[m - 1]] = 0
-        #비석
-        for j in death_class:
-            class_label_list[j - 1].setPixmap(QtGui.QPixmap('비석.png'))
 
         for i in range(1, 6):
             class_hp_present_value_list[i - 1].setText(
@@ -1500,7 +1124,6 @@ class WindowClass(QMainWindow, game):
 
         print("몬스터 공격이 종료되었습니다.")
         self.status_page_reset()    #페이지 리셋 추가
-        #여기에서 일반필드로 가는 부분 추가 980625
 
         self.User_Turn()
 
@@ -1536,97 +1159,69 @@ class WindowClass(QMainWindow, game):
     def keyPressEvent(self, event):
 
         # 소연 keypressevent 함수 내 수정(current_index값 받아오기)===========================================================
-        # 소연수정추가 - 딕셔너리로 수정
-        # 방향키와 좌표 변화값을 저장하는 딕셔너리
-        directions = {
-            Qt.Key_A: (-20, 0),  # 왼쪽
-            Qt.Key_D: (20, 0),  # 오른쪽
-            Qt.Key_W: (0, -20),  # 위로
-            Qt.Key_S: (0, 20)  # 아래로
-        }
 
         # 현재 스택위젯 값 가져오기
         current_index = self.StackWidget_Field.currentIndex()
 
         ## 일반필드일 때
         if current_index == 0:
-
-            self.portal_sample.show()
             # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
-            self.normal_previous_position = self.Character_QLabel.geometry()
+            previous_position = self.Character_QLabel.geometry()
 
-            if event.key() in directions:  # 방향키 눌렀을 때
-                if event.key() == list(directions.keys())[0]:
-                    self.Character_QLabel.setPixmap(self.character_left_img)
-                if event.key() == list(directions.keys())[1]:
-                    self.Character_QLabel.setPixmap(self.character_right_img)
-                dx, dy = directions[event.key()]  # 방향키에 해당하는 좌표 변화값을 가져옴
-                new_position = self.Character_QLabel.geometry().translated(dx, dy)  # 새 위치 계산
-                self.Character_QLabel.move(new_position.x(), new_position.y())  # 새 위치로 이동
+            rand_event = random.randrange(1, 11)
+            if ((event.key() == Qt.Key_A)  # "a"키를 누를경우 캐릭터 현재 x값을 -20
+                    and (self.Character_QLabel.x() > 0)):
+                self.Character_QLabel.setPixmap(self.character_left_img)
+                self.Character_QLabel.move(self.Character_QLabel.x() - 20, self.Character_QLabel.y())
 
-                #벽 안나가게 하기
-                if self.block_normal_field(new_position.x(), new_position.y()):
-                    self.Character_QLabel.setGeometry(self.normal_previous_position)
+            elif ((event.key() == Qt.Key_D)  # "d"키를 누를경우 캐릭터 현재 x값을 +20
+                  and (self.Character_QLabel.x() < 1560)):
+                self.Character_QLabel.setPixmap(self.character_right_img)
+                self.Character_QLabel.move(self.Character_QLabel.x() + 20, self.Character_QLabel.y())
 
-                # 왼쪽 상단에 변경된 죄표 값 출력
-                self.TopUI_Coordinate_Label.setText(
-                    f"x좌표: {self.Character_QLabel.pos().x()} y좌표: {self.Character_QLabel.pos().y()}")
+            elif ((event.key() == Qt.Key_W)  # "w"키를 누를경우 캐릭터 현재 y값을 -20
+                  and (self.Character_QLabel.y() > -20)):
+                self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() - 20)
 
-            # if ((event.key() == Qt.Key_A)  # "a"키를 누를경우 캐릭터 현재 x값을 -20
-            #         and (self.Character_QLabel.x() > 0)):
-            #     self.Character_QLabel.setPixmap(self.character_left_img)
-            #     self.Character_QLabel.move(self.Character_QLabel.x() - 20, self.Character_QLabel.y())
-            #
-            # elif ((event.key() == Qt.Key_D)  # "d"키를 누를경우 캐릭터 현재 x값을 +20
-            #       and (self.Character_QLabel.x() < 1560)):
-            #     self.Character_QLabel.setPixmap(self.character_right_img)
-            #     self.Character_QLabel.move(self.Character_QLabel.x() + 20, self.Character_QLabel.y())
-            #
-            # elif ((event.key() == Qt.Key_W)  # "w"키를 누를경우 캐릭터 현재 y값을 -20
-            #       and (self.Character_QLabel.y() > -20)):
-            #     self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() - 20)
-            #
-            # elif ((event.key() == Qt.Key_S)  # "s"키를 누를경우 캐릭터 현재 y값을 +20
-            #       and (self.Character_QLabel.y() < 740)):
-            #     self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() + 20)
+            elif ((event.key() == Qt.Key_S)  # "s"키를 누를경우 캐릭터 현재 y값을 +20
+                  and (self.Character_QLabel.y() < 740)):
+                self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() + 20)
+
             else:  # 방향키 이외의 키를 눌렀을때를 위한 예외처리
                 return
 
-            rand_event = random.randrange(1, 11) #랜덤값 추출
-            # if ((self.Character_QLabel.x() >= 0)  # 캐릭터가 다음칸으로 이동했을때 나오는 분기점 및 예외처리
-            #         and (self.Character_QLabel.x() <= 1580)
-            #         and (self.Character_QLabel.y() >= 0)
-            #         and (self.Character_QLabel.y() <= 780)):
-            # 확률 33.33%
-            if rand_event <= 5:
-                self.Log_textEdit.append("1칸 이동하였습니다.")
+            self.lab_x_ = self.Character_QLabel.pos().x()  # 캐릭터의 현재 x값을 구한 후 lab_x_변수에 담음
+            self.lab_y_ = self.Character_QLabel.pos().y()  # 캐릭터의 현재 y값을 구한 후 lab_y_변수에 담음
+
+            if ((self.Character_QLabel.x() >= 0)  # 캐릭터가 다음칸으로 이동했을때 나오는 분기점 및 예외처리
+                    and (self.Character_QLabel.x() <= 1580)
+                    and (self.Character_QLabel.y() >= 0)
+                    and (self.Character_QLabel.y() <= 780)):
+                # 확률 33.33%
+                if rand_event <= 5:
+                    self.Log_textEdit.append("1칸 이동하였습니다.")
 
 
-            elif rand_event <= 7:
-                self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
-                enemy_rand = random.randrange(4)
-                if enemy_rand < 3:
-                    pass #실험용 pass
-                    # self.Log_textEdit.setText("적을 만났습니다.")
-                    # self.portal_sample.hide()
-                    # self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
-                    # self.Add_Monster_info()
-                    # self.User_Turn()
-                    # """
-                    # 적을 만났을때 설정값
-                    # """
-                    # #나중에 삭제
-                    # self.win_btn.show()
-                    #
-                    # # 인벤토리 ui를 소비창으로 변경
-                    # self.StackWidget_Item.setCurrentWidget(self.Page_Use)
-                    # self.Page_Use.setEnabled(False)
+                elif rand_event <= 7:
+                    self.HoldSwitch = 1  # 스택 위젯 페이지 이동후에도 캐릭터 이동하는 현상 예외처리
+                    enemy_rand = random.randrange(4)
+                    if enemy_rand < 3:
+                        self.Log_textEdit.setText("적을 만났습니다.")
+                        self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
+                        self.Add_Monster_info()
+                        self.User_Turn()
+                        """
+                        적을 만났을때 설정값
+                        """
+                        # 인벤토리 ui를 소비창으로 변경
+                        self.StackWidget_Item.setCurrentWidget(self.Page_Use)
+                        self.Page_Use.setEnabled(False)
 
-                else:
-                    self.Log_textEdit.append("타 수호대를 만났습니다.")
+                    else:
+                        self.Log_textEdit.append("타 수호대를 만났습니다.")
 
 
-            elif rand_event > 7:
+                elif rand_event > 7:
                     tent_rate = random.randint(1, 100)
                     if tent_rate < 10:
                         self.item_list[10].stack += 1
@@ -1666,68 +1261,15 @@ class WindowClass(QMainWindow, game):
                         self.Log_textEdit.append("%s 를 획득하였습니다."
                                                  % self.item_list[8].name)
                         self.consumable_reset()
-
-
-            # 일반필드에서 포탈 만났을 때
-            if self.Character_QLabel.geometry().intersects(self.portal_sample.geometry()):  # 포탈 만나면
-                self.move_to_dungeon()  # 랜덤으로 던전으로 이동
-
+            # 왼쪽 상단에 변경된 죄표 값 출력
+            self.TopUI_Coordinate_Label.setText(f"x좌표: {self.lab_x_} y좌표: {self.lab_y_}")
+            self.TopUI_Map_Label.setText("%s의 지역" % self.user_location(self.lab_x_, self.lab_y_))
 
         ## 던전필드일때
         elif current_index == 1:
-            previous_position = self.Character_QLabel_2.geometry()  # 이전 위치
-
-            if event.key() in directions:  # 방향키가 눌렸을 때
-                if event.key() == list(directions.keys())[0]:
-                    self.Character_QLabel_2.setPixmap(self.character_left_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
-                if event.key() == list(directions.keys())[1]:
-                    self.Character_QLabel_2.setPixmap(self.character_right_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
-                dx, dy = directions[event.key()]  # 방향키에 해당하는 좌표 변화값을 가져옴
-                new_position = self.Character_QLabel_2.geometry().translated(dx, dy)  # 새 위치 계산
-                self.Character_QLabel_2.move(new_position.x(), new_position.y())  # 새 위치로 이동
-            else:
-                return
-
-            # 좌표 위에 찍어주기
-            self.TopUI_Coordinate_Label.setText(
-                f"x좌표: {self.Character_QLabel_2.pos().x()}, y좌표:{self.Character_QLabel_2.pos().y()}")
-
-            # 던전에서 MonsterImage 만났을 때 전투 이동
-            if self.Character_QLabel_2.geometry().intersects(self.boss_monster.geometry()):
-                self.show_messagebox("보스몬스터를 만났습니다!\n전투에 진입합니다.")
-                # 전투로 스택위젯 이동 / 전투함수로 이동
-                self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
-
-            if self.reply_state == False and self.checkCollision(self.Character_QLabel_2, self.ghost_label):
-                self.mark_label.move(self.Character_QLabel_2.x() + 10, self.Character_QLabel_2.y())
-                self.mark_label.show()
-                self.show_messagebox_easter_egg()
-
-            # 보스 몬스터 이기면 던전으로 다시 이동
-            #  던전에서 미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
-            if self.Character_QLabel_2.geometry().intersects(
-                    self.entrance.geometry()) and self.user_can_enter_dungeon == True:
-                self.show_messagebox("미궁을 만났습니다!")
-
-                #수정필요 수정필요 980625
-                self.user_can_enter_dungeon = False
-                self.boss_monster.hide()
-                self.entrance.hide()
-                self.ghost_label.hide()
-                self.Character_QLabel_2.hide()
-                self.move_to_dungeon()
-
-            # 던전 벽 캐릭터가 벗어나지 못하게
-            self.block_dungeon_for_type(self.Character_QLabel_2, self.dungeon_number, new_position.x(),
-                                        new_position.y(), new_position, previous_position)
-
             pass
         else:
             return
-
-
-
-
     def user_location(self, x, y):
         """유저의 위치값 반환함"""
         user_present_location = {
@@ -1736,11 +1278,11 @@ class WindowClass(QMainWindow, game):
             '숲': [0, 760, 380, 740],  # 숲의지역
             '물': [780, 1560, 380, 740]  # 물의지역
         }
+
         for key, value in user_present_location.items():
+
             if value[0] <= x <= value[1] and value[2] <= y <= value[3]:
                 return key
-
-
     """길준이 형님 코드 취합 - 함수"""
     def hp_using_1(self):
         self.StackWidget_Item.setCurrentWidget(self.Page_Use_ing)
@@ -1847,30 +1389,27 @@ class WindowClass(QMainWindow, game):
 
     def hp_recovery_1(self, num):
         before = self.class_hp_dict[num]
-        if before == 0:
-            self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
+        self.class_hp_dict[num] = self.class_hp_dict[num] + self.hp_s.recovery
+        after = self.class_hp_dict[num]
+        # str(self.list_class[i - 1][0].get_maxhp())
+        # self.list_class[i - 1][1]
+        if before < self.list_class[num - 1][0].get_maxhp() <= after:
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
+                                     % getattr(self, f'class_{num}').character_name)
             self.item_list[0].stack -= 1
-        else:
-            self.class_hp_dict[num] = self.class_hp_dict[num] + self.hp_s.recovery
-            after = self.class_hp_dict[num]
-            # str(self.list_class[i - 1][0].get_maxhp())
-            # self.list_class[i - 1][1]
-            if before < self.list_class[num - 1][0].get_maxhp() <= after:
-                self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
-                                         % getattr(self, f'class_{num}').character_name)
-                self.item_list[0].stack -= 1
 
-            elif self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp():
-                self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                self.Log_textEdit.append('이미 체력이 최대치입니다. 포션님이 가출하였습니다')
-                self.item_list[0].stack -= 1
-            else:
-                self.Log_textEdit.append("%s 의 체력을 %s 만큼 회복했습니다" %
-                                         (self.list_class[num - 1][0].character_name, self.hp_s.recovery))
-                self.item_list[0].stack -= 1
+        elif self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp():
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.Log_textEdit.append('이미 체력이 최대치입니다')
+
+        else:
+            self.Log_textEdit.append("%s 의 체력을 %s 만큼 회복했습니다" %
+                                     (self.list_class[num - 1][0].character_name, self.hp_s.recovery))
+            self.item_list[0].stack -= 1
 
         self.consumable_reset()
+
         self.low_ui_reset()
         self.status_page_reset()
         self.Page_Use_ing.setEnabled(False)
@@ -1880,30 +1419,26 @@ class WindowClass(QMainWindow, game):
 
     def hp_recovery_2(self, num):
         before = self.class_hp_dict[num]
-        if before == 0:
-            self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
+        self.class_hp_dict[num] = self.class_hp_dict[num] + self.hp_m.recovery
+        after = self.class_hp_dict[num]
+
+        if before < self.list_class[num - 1][0].get_maxhp() <= after:
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
+                                     % getattr(self, f'class_{num}').character_name)
             self.item_list[1].stack -= 1
+
+        elif self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp():
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.Log_textEdit.append('이미 체력이 최대치입니다')
+
         else:
-            self.class_hp_dict[num] = self.class_hp_dict[num] + self.hp_m.recovery
-            after = self.class_hp_dict[num]
-
-            if before < self.list_class[num - 1][0].get_maxhp() <= after:
-                self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
-                                         % getattr(self, f'class_{num}').character_name)
-                self.item_list[1].stack -= 1
-
-            elif self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp():
-                self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                self.Log_textEdit.append('이미 체력이 최대치입니다. 포션님이 가출하였습니다')
-                self.item_list[1].stack -= 1
-
-            else:
-                self.Log_textEdit.append("%s 의 체력을 %s 만큼 회복했습니다" %
-                                         (self.list_class[num - 1][0].character_name, self.hp_m.recovery))
-                self.item_list[1].stack -= 1
+            self.Log_textEdit.append("%s 의 체력을 %s 만큼 회복했습니다" %
+                                     (self.list_class[num - 1][0].character_name, self.hp_m.recovery))
+            self.item_list[1].stack -= 1
 
         self.consumable_reset()
+
         self.low_ui_reset()
         self.status_page_reset()
         self.Page_Use_ing.setEnabled(False)
@@ -1913,30 +1448,26 @@ class WindowClass(QMainWindow, game):
 
     def hp_recovery_3(self, num):
         before = self.class_hp_dict[num]
-        if before == 0:
-            self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
+        self.class_hp_dict[num] = self.class_hp_dict[num] + self.hp_l.recovery
+        after = self.class_hp_dict[num]
+
+        if before < self.list_class[num - 1][0].get_maxhp() <= after:
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
+                                     % getattr(self, f'class_{num}').character_name)
             self.item_list[2].stack -= 1
+
+        elif self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp():
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.Log_textEdit.append('이미 체력이 최대치입니다')
+
         else:
-            self.class_hp_dict[num] = self.class_hp_dict[num] + self.hp_l.recovery
-            after = self.class_hp_dict[num]
-
-            if before < self.list_class[num - 1][0].get_maxhp() <= after:
-                self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
-                                         % getattr(self, f'class_{num}').character_name)
-                self.item_list[2].stack -= 1
-
-            elif self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp():
-                self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                self.Log_textEdit.append('이미 체력이 최대치입니다. 포션님이 가출하였습니다')
-                self.item_list[2].stack -= 1
-
-            else:
-                self.Log_textEdit.append("%s 의 체력을 %s 만큼 회복했습니다" %
-                                         (self.list_class[num - 1][0].character_name, self.hp_l.recovery))
-                self.item_list[2].stack -= 1
+            self.Log_textEdit.append("%s 의 체력을 %s 만큼 회복했습니다" %
+                                     (self.list_class[num - 1][0].character_name, self.hp_l.recovery))
+            self.item_list[2].stack -= 1
 
         self.consumable_reset()
+
         self.low_ui_reset()
         self.status_page_reset()
         self.Page_Use_ing.setEnabled(False)
@@ -1948,33 +1479,30 @@ class WindowClass(QMainWindow, game):
     def mp_recovery_1(self, num):
         if getattr(self, f'class_{num}').class_name == '전사':
             self.Log_textEdit.append("전사는 회복시킬 마나가 없습니다")
-            self.item_list[3].stack -= 1
+            pass
         else:
             before = self.class_mp_dict[num]
-            if before == 0:
-                self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
+            self.class_mp_dict[num] = self.class_mp_dict[num] + self.mp_s.recovery
+            after = self.class_mp_dict[num]
+
+            if before < self.list_class[num - 1][0].get_maxmp() <= after:
+                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+                self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
+                                         % getattr(self, f'class_{num}').character_name)
                 self.item_list[3].stack -= 1
+
+            elif self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
+                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+                self.Log_textEdit.append('이미 마나가 최대치입니다')
+                pass
+
             else:
-                self.class_mp_dict[num] = self.class_mp_dict[num] + self.mp_s.recovery
-                after = self.class_mp_dict[num]
-
-                if before < self.list_class[num - 1][0].get_maxmp() <= after:
-                    self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                    self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
-                                             % getattr(self, f'class_{num}').character_name)
-                    self.item_list[3].stack -= 1
-
-                elif self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
-                    self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                    self.Log_textEdit.append('이미 마나가 최대치입니다. 포션님이 가출하였습니다')
-                    self.item_list[3].stack -= 1
-
-                else:
-                    self.Log_textEdit.append("%s 의 마나를 %s 만큼 회복했습니다" % (
-                        getattr(self, f'class_{num}').character_name, self.mp_s.recovery))
-                    self.item_list[3].stack -= 1
+                self.Log_textEdit.append("%s 의 마나를 %s 만큼 회복했습니다" % (
+                    getattr(self, f'class_{num}').character_name, self.mp_s.recovery))
+                self.item_list[3].stack -= 1
 
         self.consumable_reset()
+
         self.low_ui_reset()
         self.status_page_reset()
         self.Page_Use_ing.setEnabled(False)
@@ -1985,31 +1513,27 @@ class WindowClass(QMainWindow, game):
     def mp_recovery_2(self, num):
         if getattr(self, f'class_{num}').class_name == '전사':
             self.Log_textEdit.append("전사는 회복시킬 마나가 없습니다")
-            self.item_list[4].stack -= 1
+            pass
         else:
             before = self.class_mp_dict[num]
-            if before == 0:
-                self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
+            self.class_mp_dict[num] = self.class_mp_dict[num] + self.mp_m.recovery
+            after = self.class_mp_dict[num]
+
+            if before < self.list_class[num - 1][0].get_maxmp() <= after:
+                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+                self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
+                                         % getattr(self, f'class_{num}').character_name)
                 self.item_list[4].stack -= 1
+
+            elif self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
+                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+                self.Log_textEdit.append('이미 마나가 최대치입니다')
+                pass
+
             else:
-                self.class_mp_dict[num] = self.class_mp_dict[num] + self.mp_m.recovery
-                after = self.class_mp_dict[num]
-
-                if before < self.list_class[num - 1][0].get_maxmp() <= after:
-                    self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                    self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
-                                             % getattr(self, f'class_{num}').character_name)
-                    self.item_list[4].stack -= 1
-
-                elif self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
-                    self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                    self.Log_textEdit.append('이미 마나가 최대치입니다. 포션님이 가출하였습니다')
-                    self.item_list[4].stack -= 1
-
-                else:
-                    self.Log_textEdit.append("%s 의 마나를 %s 만큼 회복했습니다" % (
-                        getattr(self, f'class_{num}').character_name, self.mp_m.recovery))
-                    self.item_list[4].stack -= 1
+                self.Log_textEdit.append("%s 의 마나를 %s 만큼 회복했습니다" % (
+                    getattr(self, f'class_{num}').character_name, self.mp_m.recovery))
+                self.item_list[4].stack -= 1
 
         self.consumable_reset()
         self.low_ui_reset()
@@ -2023,31 +1547,27 @@ class WindowClass(QMainWindow, game):
     def mp_recovery_3(self, num):
         if getattr(self, f'class_{num}').class_name == '전사':
             self.Log_textEdit.append("전사는 회복시킬 마나가 없습니다")
-            self.item_list[5].stack -= 1
+            pass
         else:
             before = self.class_mp_dict[num]
-            if before == 0:
-                self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
+            self.class_mp_dict[num] = self.class_mp_dict[num] + self.mp_l.recovery
+            after = self.class_mp_dict[num]
+
+            if before < self.list_class[num - 1][0].get_maxmp() <= after:
+                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+                self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
+                                         % getattr(self, f'class_{num}').character_name)
                 self.item_list[5].stack -= 1
+
+            elif self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
+                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+                self.Log_textEdit.append('이미 마나가 최대치입니다')
+                pass
+
             else:
-                self.class_mp_dict[num] = self.class_mp_dict[num] + self.mp_l.recovery
-                after = self.class_mp_dict[num]
-
-                if before < self.list_class[num - 1][0].get_maxmp() <= after:
-                    self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                    self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
-                                             % getattr(self, f'class_{num}').character_name)
-                    self.item_list[5].stack -= 1
-
-                elif self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
-                    self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                    self.Log_textEdit.append('이미 마나가 최대치입니다. 포션님이 가출하였습니다')
-                    self.item_list[5].stack -= 1
-
-                else:
-                    self.Log_textEdit.append("%s 의 마나를 %s 만큼 회복했습니다" % (
-                        getattr(self, f'class_{num}').character_name, self.mp_l.recovery))
-                    self.item_list[5].stack -= 1
+                self.Log_textEdit.append("%s 의 마나를 %s 만큼 회복했습니다" % (
+                    getattr(self, f'class_{num}').character_name, self.mp_l.recovery))
+                self.item_list[5].stack -= 1
 
         self.consumable_reset()
 
@@ -2067,47 +1587,44 @@ class WindowClass(QMainWindow, game):
         #     getattr(self, f'class_{num}').mp = (마나 최대치)
 
         before_hp = self.class_hp_dict[num]
-        if before_hp == 0:
-            self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
-            self.item_list[6].stack -= 1
-        else:
-            self.class_hp_dict[num] = self.class_hp_dict[num] + int(
-                    self.list_class[num - 1][0].get_maxhp() * self.all_s.recovery)
-            after_hp = self.class_hp_dict[num]
-            before_mp = self.class_mp_dict[num]
-            self.class_mp_dict[num] = self.list_class[num - 1][2] + int(
-                    self.list_class[num - 1][0].get_maxmp() * self.all_s.recovery)
-            after_mp = self.class_mp_dict[num]
+        self.class_hp_dict[num] = self.class_hp_dict[num] + int(
+                self.list_class[num - 1][0].get_maxhp() * self.all_s.recovery)
+        after_hp = self.class_hp_dict[num]
+        before_mp = self.class_mp_dict[num]
+        self.class_mp_dict[num] = self.list_class[num - 1][2] + int(
+                self.list_class[num - 1][0].get_maxmp() * self.all_s.recovery)
+        after_mp = self.class_mp_dict[num]
 
-            if self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp() \
-                    and self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
+        if self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp() \
+                and self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+            self.Log_textEdit.append('이미 체력과 마나가 최대치입니다')
+            pass
+
+        else:
+            if before_hp < self.list_class[num - 1][0].get_maxhp() <= after_hp:
                 self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                self.Log_textEdit.append('이미 체력과 마나가 최대치입니다. 포션은 하늘위로')
-                self.item_list[6].stack -= 1
+                self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
+                                         % getattr(self, f'class_{num}').character_name)
 
             else:
-                if before_hp < self.list_class[num - 1][0].get_maxhp() <= after_hp:
-                    self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                    self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
-                                             % getattr(self, f'class_{num}').character_name)
+                self.Log_textEdit.append("%s 의 체력를 %s %% 만큼 회복했습니다" % (
+                    getattr(self, f'class_{num}').character_name, self.all_s.recovery*100))
 
-                else:
-                    self.Log_textEdit.append("%s 의 체력를 %s %% 만큼 회복했습니다" % (
-                        getattr(self, f'class_{num}').character_name, self.all_s.recovery*100))
+            if before_mp < self.list_class[num - 1][0].get_maxmp() <= after_mp:
+                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+                self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
+                                         % getattr(self, f'class_{num}').character_name)
 
-                if before_mp < self.list_class[num - 1][0].get_maxmp() <= after_mp:
-                    self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                    self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
-                                             % getattr(self, f'class_{num}').character_name)
+            else:
+                self.Log_textEdit.append("%s 의 마나를 %s %% 만큼 회복했습니다" % (
+                    getattr(self, f'class_{num}').character_name, self.all_s.recovery * 100))
 
-                else:
-                    self.Log_textEdit.append("%s 의 마나를 %s %% 만큼 회복했습니다" % (
-                        getattr(self, f'class_{num}').character_name, self.all_s.recovery * 100))
-
-                self.item_list[6].stack -= 1
+            self.item_list[6].stack -= 1
 
         self.consumable_reset()
+
         self.low_ui_reset()
         self.status_page_reset()
         self.Page_Use_ing.setEnabled(False)
@@ -2123,45 +1640,41 @@ class WindowClass(QMainWindow, game):
         # if getattr(self, f'class_{num}').mp > (마나 최대치)
         #     getattr(self, f'class_{num}').mp = (마나 최대치)
         before_hp = self.list_class[num - 1][1]
-        if before_hp == 0:
-            self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
-            self.item_list[7].stack -= 1
+        self.list_class[num - 1][1] = self.list_class[num - 1][1] + (
+                self.list_class[num - 1][0].get_maxhp() * self.all_m.recovery)
+        after_hp = self.list_class[num - 1][1]
+        before_mp = self.list_class[num - 1][2]
+        self.list_class[num - 1][2] = self.list_class[num - 1][2] + (
+                self.list_class[num - 1][0].get_maxmp() * self.all_m.recovery)
+        after_mp = self.list_class[num - 1][2]
+
+        if self.list_class[num - 1][1] >= self.list_class[num - 1][0].get_maxhp() \
+                and self.list_class[num - 1][2] >= self.list_class[num - 1][0].get_maxmp():
+            self.list_class[num - 1][1] = self.list_class[num - 1][0].get_maxhp()
+            self.list_class[num - 1][2] = self.list_class[num - 1][0].get_maxmp()
+            self.Log_textEdit.append('이미 체력과 마나가 최대치입니다')
+            pass
+
+        if before_hp < self.list_class[num - 1][0].get_maxhp() <= after_hp:
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
+                                      % getattr(self, f'class_{num}').character_name)
+
         else:
-            self.list_class[num - 1][1] = self.list_class[num - 1][1] + (
-                    self.list_class[num - 1][0].get_maxhp() * self.all_m.recovery)
-            after_hp = self.list_class[num - 1][1]
-            before_mp = self.list_class[num - 1][2]
-            self.list_class[num - 1][2] = self.list_class[num - 1][2] + (
-                    self.list_class[num - 1][0].get_maxmp() * self.all_m.recovery)
-            after_mp = self.list_class[num - 1][2]
+            self.Log_textEdit.append("%s 의 체력를 %s %% 만큼 회복했습니다" % (
+                getattr(self, f'class_{num}').character_name, self.all_s.recovery * 100))
 
-            if self.list_class[num - 1][1] >= self.list_class[num - 1][0].get_maxhp() \
-                    and self.list_class[num - 1][2] >= self.list_class[num - 1][0].get_maxmp():
-                self.list_class[num - 1][1] = self.list_class[num - 1][0].get_maxhp()
-                self.list_class[num - 1][2] = self.list_class[num - 1][0].get_maxmp()
-                self.Log_textEdit.append('이미 체력과 마나가 최대치입니다. 포션은 하늘위로')
-                self.item_list[7].stack -= 1
-            else:
-                if before_hp < self.list_class[num - 1][0].get_maxhp() <= after_hp:
-                    self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                    self.Log_textEdit.append("%s 의 체력을 최대치까지 회복했습니다"
-                                              % getattr(self, f'class_{num}').character_name)
+        if before_mp < self.list_class[num - 1][0].get_maxmp() <= after_mp:
+            self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+            self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
+                                     % getattr(self, f'class_{num}').character_name)
+        else:
+            self.Log_textEdit.append("%s 의 마나를 %s %% 만큼 회복했습니다" % (
+            getattr(self, f'class_{num}').character_name, self.all_s.recovery * 100))
 
-                else:
-                    self.Log_textEdit.append("%s 의 체력를 %s %% 만큼 회복했습니다" % (
-                        getattr(self, f'class_{num}').character_name, self.all_s.recovery * 100))
-
-                if before_mp < self.list_class[num - 1][0].get_maxmp() <= after_mp:
-                    self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                    self.Log_textEdit.append("%s 의 마나를 최대치까지 회복했습니다"
-                                             % getattr(self, f'class_{num}').character_name)
-                else:
-                    self.Log_textEdit.append("%s 의 마나를 %s %% 만큼 회복했습니다" % (
-                    getattr(self, f'class_{num}').character_name, self.all_s.recovery * 100))
-
-            self.item_list[7].stack -= 1
-
+        self.item_list[7].stack -= 1
         self.consumable_reset()
+
         self.low_ui_reset()
         self.status_page_reset()
         self.Page_Use_ing.setEnabled(False)
@@ -2170,19 +1683,14 @@ class WindowClass(QMainWindow, game):
             getattr(self, f'Class_{i}_Btn').disconnect()
 
     def all_recovery_3(self, num):
-        before_hp = self.list_class[num - 1][1]
-        if before_hp == 0:
-            self.Log_textEdit.append('죽은자는 먹을수가 없어요. 포션님이 가출하였습니다')
-            self.item_list[8].stack -= 1
+        if self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp() \
+                and self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
+            self.Log_textEdit.append('이미 체력과 마나가 최대치입니다')
+            pass
         else:
-            if self.class_hp_dict[num] >= self.list_class[num - 1][0].get_maxhp() \
-                    and self.class_mp_dict[num] >= self.list_class[num - 1][0].get_maxmp():
-                self.Log_textEdit.append('이미 체력과 마나가 최대치입니다')
-                pass
-            else:
-                self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
-                self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
-                self.Log_textEdit.append("체력과 마나를 전부 회복했습니다")
+            self.class_hp_dict[num] = self.list_class[num - 1][0].get_maxhp()
+            self.class_mp_dict[num] = self.list_class[num - 1][0].get_maxmp()
+            self.Log_textEdit.append("체력과 마나를 전부 회복했습니다")
 
         self.item_list[8].stack -= 1
         self.consumable_reset()
@@ -2240,16 +1748,12 @@ class WindowClass(QMainWindow, game):
         out_battle = self.list_class.pop(num-1)  # 빠질 캐릭터를 이름 리스트에서 추출
         self.list_class.insert(num-1, go_battle)  # 들어갈 캐릭터를 빠진 캐릭터 위치로 이동
         self.list_class.append(out_battle)  # 빠질 캐릭터를 대기 위치로 이동
-        temp_stat_in_hp = self.class_hp_dict_last.pop(0)
-        temp_stat_out_hp = self.class_hp_dict.pop(num)
-        self.class_hp_dict[num] = temp_stat_in_hp
-        self.class_hp_dict_last[0] = temp_stat_out_hp
-
-        temp_stat_in_mp = self.class_mp_dict_last.pop(0)
-        temp_stat_out_mp = self.class_mp_dict.pop(num)
-        self.class_mp_dict[num] = temp_stat_in_mp
-        self.class_mp_dict_last[0] = temp_stat_out_mp
-
+        self.class_hp_dict.clear()
+        self.class_mp_dict.clear()
+        for i in range(1, 7):  # 서플로 돌려준 클래스유저들의 체력을 빈 딕셔너리에 1부터 6까지 담아줌 <- 수정함
+            self.class_hp_dict[i] = self.list_class[i - 1][1]
+        for i in range(1, 7):  # 서플로 돌려준 클래스유저들의 마나를 빈 딕셔너리에 1부터 6까지 담아줌 <- 수정함
+            self.class_mp_dict[i] = self.list_class[i - 1][2]
         self.Statusclass.clear()
         self.StautsHpall.clear()
         self.StautsMpall.clear()
@@ -2683,18 +2187,53 @@ class WindowClass(QMainWindow, game):
                                       self.class_item[i][2].armor + self.class_item[i][3].armor +
                                       self.class_item[i][5].damage + self.class_item[i][6].armor) * self.guardLevel)
             getattr(self, f'Class{i+1}_DetailsStatus_ShieldValue').setText(defence_status)
-        for j in range(len(self.list_class) - 1):
-            getattr(self, f'Class{j + 1}_DetailsStatus_ConditionValue').setText('출전중')
-        self.Class6_DetailsStatus_ConditionValue.setText('휴식중')
-        for k in range(len(self.list_class) - 1):
+
             getattr(self, f'Class{i + 1}_DetailsStatus_HpValue').setText(str(self.class_hp_dict.get(i+1)) +
                                                                          "/" + str(self.list_class[i][0].get_maxhp()))
             getattr(self, f'Class{i + 1}_DetailsStatus_MpValue').setText(str(self.class_mp_dict.get(i+1)) +
                                                                          "/" + str(self.list_class[i][0].get_maxmp()))
-        self.Class6_DetailsStatus_HpValue.setText((str(self.class_hp_dict_last.get(0)) +
-                                                                         "/" + str(self.list_class[5][0].get_maxhp())))
-        self.Class6_DetailsStatus_MpValue.setText((str(self.class_mp_dict_last.get(0)) +
-                                                   "/" + str(self.list_class[5][0].get_maxmp())))
+        # status_list = []
+        # for mihail in range(len(self.list_class)):
+        #     if self.list_class[mihail][0].character_name == '미하일':
+        #         status_list.append(self.list_class[mihail])
+        # for ruminus in range(len(self.list_class)):
+        #     if self.list_class[ruminus][0].character_name == '루미너스':
+        #         status_list.append(self.list_class[ruminus])
+        # for alex in range(len(self.list_class)):
+        #     if self.list_class[alex][0].character_name == '알렉스':
+        #         status_list.append(self.list_class[alex])
+        # for salamander in range(len(self.list_class)):
+        #     if self.list_class[salamander][0].character_name == '샐러맨더':
+        #         status_list.append(self.list_class[salamander])
+        # for merdes in range(len(self.list_class)):
+        #     if self.list_class[merdes][0].character_name == '메르데스':
+        #         status_list.append(self.list_class[merdes])
+        # for lancelot in range(len(self.list_class)):
+        #     if self.list_class[lancelot][0].character_name == '랜슬롯':
+        #         status_list.append(self.list_class[lancelot])
+
+
+
+        # UI 오타 고칠때까지 작동 불가(해결)
+
+        # 캐릭터 기본 공격력과 방어력 수치가 없음(해결)
+        #     damage_status = str(self.class_item[i][4].damage * self.guardLevel)
+        #     getattr(self, f'Class{i + 1}_DetailsStatus_AtkValue').setText(damage_status)
+        #
+        #     if self.class_item[i][5] is None:
+        #         defence_status = str((self.class_item[i][0].armor + self.class_item[i][1].armor +
+        #                              self.class_item[i][2].armor + self.class_item[i][3].armor +
+        #                              self.class_item[i][6].armor) * self.guardLevel)
+        #     else:
+        #         defence_status = str((self.class_item[i][0].armor + self.class_item[i][1].armor +
+        #                              self.class_item[i][2].armor + self.class_item[i][3].armor +
+        #                              self.class_item[i][5].damage + self.class_item[i][6].armor) * self.guardLevel)
+        #
+        #     getattr(self, f'Class{i + 1}_DetailsStatus_ShieldValue').setText(defence_status)
+
+        for o in range(len(self.list_class)-1):
+            getattr(self, f'Class{o + 1}_DetailsStatus_ConditionValue').setText('출전중')
+            self.Class6_DetailsStatus_ConditionValue.setText('휴식중')
 
     def low_ui_reset(self):
         for i in range(1, 6):
