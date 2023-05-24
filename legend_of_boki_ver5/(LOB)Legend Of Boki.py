@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from PyQt5 import uic, Qt
 from PyQt5 import QtGui
-from PyQt5.QtGui import QPixmap, QMovie
+from PyQt5.QtGui import QPixmap, QMovie, QFontDatabase, QFont
 from PyQt5.QtCore import Qt, QByteArray, QSize, QTimer
 
 from maingame import Ui_Maingame as game
@@ -182,6 +182,16 @@ class WindowClass(QMainWindow, game):
 
         # 소연 취합 시작 ==================================================================================================
 
+        # 수정함
+        # 폰트 지정
+        # TTF 파일을 추가
+        QFontDatabase.addApplicationFont('neodgm.ttf')
+
+        # QFont 객체를 만든다.
+        font = QFont('Neo둥근모', 12)
+        font_style = 'font-family: Neo둥근모;'
+        self.setStyleSheet(font_style)
+
         # 유저는 보스를 이길 때까지 던전에 입장하지 못함
         self.user_can_enter_dungeon = False
 
@@ -214,18 +224,6 @@ class WindowClass(QMainWindow, game):
         self.ghost_img_left_bottom = QPixmap('./ghost_img/ghost_left_bottom.png')  # 좌하
         self.ghost_img_right_bottom = QPixmap('./ghost_img/ghost_right_bottom.png')  # 좌하
         self.random_num = 1  # 유령 움직임 초기설정
-
-        #  이 부분은 아래와 중복
-        # # 캐릭터의 위치에 따라 포탈 위치 변경 / 유저의 x, y값 지정하기
-        # positions = {
-        #     1: (790, 0),  # 상단
-        #     2: (0, 390),  # 왼쪽 중앙
-        #     3: (790, 780),  # 하단
-        #     4: (1580, 390)  # 오른쪽 중앙
-        # }
-        #
-        # random_spot = random.randint(1, 4)  # 시작 캐릭터 위치 랜덤으로 위치시키기
-        # self.Character_QLabel.move(positions[random_spot][0], positions[random_spot][1])  # 캐릭터를 상하좌우로 위치시키기
 
         # 던전 맵 사이즈(크기별)
         self.map_size = {
@@ -335,25 +333,36 @@ class WindowClass(QMainWindow, game):
 
         self.cnt = 0
         # 수호대 스폰 지역 랜덤 설정 및 미궁 랜덤 생성 (조건 = 무조건 수호대 스폰 지역 반대 편에 포탈 나오게함)========================
+        # 수정함
+        locations = {1: ("숲의 지역", 100, 520),
+                     2: ("불의 지역", 360, 40),
+                     3: ("눈의 지역", 1280, 20),
+                     4: ("물의 지역", 1320, 540)}
+
         random_spot = random.randrange(1, 5)
-        if random_spot == 1:  # 숲의 지역 스폰 장소
-            self.Character_QLabel.setPixmap(self.character_left_img)
-            self.Character_QLabel.move(100, 520)
-            self.TopUI_Map_Label.setText("숲의 지역")
-
-        elif random_spot == 2:  # 불의 지역 스폰 장소
-            self.Character_QLabel.setPixmap(self.character_left_img)
-            self.Character_QLabel.move(360, 40)
-            self.TopUI_Map_Label.setText("불의 지역")
-
-        elif random_spot == 3:  # 눈의 지역 스폰 장소
-            self.Character_QLabel.setPixmap(self.character_left_img)
-            self.Character_QLabel.move(1280, 20)
-            self.TopUI_Map_Label.setText("눈의 지역")
-        elif random_spot == 4:  # 물의 지역 스폰 장소
-            self.Character_QLabel.setPixmap(self.character_left_img)
-            self.Character_QLabel.move(1320, 540)
-            self.TopUI_Map_Label.setText("물의 지역")
+        location = locations[random_spot]
+        self.Character_QLabel.setPixmap(self.character_left_img)
+        self.Character_QLabel.move(location[1], location[2])
+        self.TopUI_Map_Label.setText(location[0])
+        # random_spot = random.randrange(1, 5)
+        # if random_spot == 1:  # 숲의 지역 스폰 장소
+        #     self.Character_QLabel.setPixmap(self.character_left_img)
+        #     self.Character_QLabel.move(100, 520)
+        #     self.TopUI_Map_Label.setText("숲의 지역")
+        #
+        # elif random_spot == 2:  # 불의 지역 스폰 장소
+        #     self.Character_QLabel.setPixmap(self.character_left_img)
+        #     self.Character_QLabel.move(360, 40)
+        #     self.TopUI_Map_Label.setText("불의 지역")
+        #
+        # elif random_spot == 3:  # 눈의 지역 스폰 장소
+        #     self.Character_QLabel.setPixmap(self.character_left_img)
+        #     self.Character_QLabel.move(1280, 20)
+        #     self.TopUI_Map_Label.setText("눈의 지역")
+        # elif random_spot == 4:  # 물의 지역 스폰 장소
+        #     self.Character_QLabel.setPixmap(self.character_left_img)
+        #     self.Character_QLabel.move(1320, 540)
+        #     self.TopUI_Map_Label.setText("물의 지역")
 
         # 왼쪽 상단에 초기 죄표 값 출력
         self.TopUI_Coordinate_Label.setText(
@@ -485,9 +494,6 @@ class WindowClass(QMainWindow, game):
             self.Monster_Turn()
             return
 
-
-
-
     def Monster_Turn(self):
         self.num = 0
         self.guardoption()
@@ -517,10 +523,6 @@ class WindowClass(QMainWindow, game):
             self.StackWidget_Field.setCurrentIndex(0)
         # find1234
 
-
-
-
-
     # 혜빈 파일 함수===================================================================================================끝끝
     # 혜빈 파일 함수===================================================================================================끝끝
     # 혜빈 파일 함수===================================================================================================끝끝
@@ -528,12 +530,6 @@ class WindowClass(QMainWindow, game):
     # 소연 파일 함수 시작===============================================================================================시작시작
     def move_to_dungeon(self):
         """던전으로 랜덤 이동하는 부분"""
-
-        # 던전 이미지 불러오기
-        dungeon_img_1 = QPixmap('./배경/던전_1.png')
-        dungeon_img_2 = QPixmap('./배경/던전_2.png')
-        dungeon_img_3 = QPixmap('./배경/던전_3.png')
-        dungeon_img_4 = QPixmap('./배경/던전_4.png')
 
         self.StackWidget_Field.setCurrentIndex(1)  # 던전필드로 이동
         self.portal_sample.hide()  # 던전 필드로 이동할 때 포탈 숨겨주기
@@ -552,11 +548,10 @@ class WindowClass(QMainWindow, game):
         self.ghost_label = QLabel(self.Page_Dungeon_Field)
         self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
                                                                aspectRatioMode=Qt.IgnoreAspectRatio))  # 이미지 고정
-
         # 유령 방향 타이머
         self.position = QTimer()
         self.position.setInterval(3000)
-        self.position.timeout.connect(self.direction)
+        self.position.timeout.connect(self.ghost_direction)
         self.position.start()
 
         # 유령 타이머
@@ -577,23 +572,34 @@ class WindowClass(QMainWindow, game):
 
         print('던전번호는', random_dungeon_num)  # 확인용
 
+        self.dungeon_number = random_dungeon_num
+        dungen_map_dict = {
+            1: ['./배경/던전_1.png', 592, 631],
+            2: ['./배경/던전_2.png', 567, 644],
+            3: ['./배경/던전_3.png', 558, 657],
+            4: ['./배경/던전_4.png', 504, 674],
+        }
+        self.dungeon_img_label.setPixmap(QPixmap(dungen_map_dict[random_dungeon_num][0]))
+        self.Character_QLabel_2.move(dungen_map_dict[random_dungeon_num][1], dungen_map_dict[random_dungeon_num][2])
+
+
         # 던전 사이즈에 따라 다르게 이동
-        if random_dungeon_num == 1:  # 15*15 던전일 때
-            self.dungeon_number = 1  # 키프레스가 인식해야할 값에 1로 넣어줌
-            self.dungeon_img_label.setPixmap(dungeon_img_1)
-            self.Character_QLabel_2.move(592, 631)  # 캐릭터 던전 입구로 보내기
-        elif random_dungeon_num == 2:  # 16*16 던전일 때
-            self.dungeon_number = 2
-            self.dungeon_img_label.setPixmap(dungeon_img_2)
-            self.Character_QLabel_2.move(567, 644)  # 캐릭터 던전 입구로 보내기
-        elif random_dungeon_num == 3:  # 17*17 던전일 때
-            self.dungeon_number = 3
-            self.dungeon_img_label.setPixmap(dungeon_img_3)
-            self.Character_QLabel_2.move(558, 657)  # 캐릭터 던전 입구로 보내기
-        elif random_dungeon_num == 4:  # 18*18 던전일 때
-            self.dungeon_number = 4
-            self.dungeon_img_label.setPixmap(dungeon_img_4)
-            self.Character_QLabel_2.move(504, 674)  # 캐릭터 던전 입구로 보내기
+        # if random_dungeon_num == 1:  # 15*15 던전일 때
+        #     # self.dungeon_number = 1  # 키프레스가 인식해야할 값에 1로 넣어줌
+        #     self.dungeon_img_label.setPixmap(QPixmap('./배경/던전_1.png'))
+        #     self.Character_QLabel_2.move(592, 631)  # 캐릭터 던전 입구로 보내기
+        # elif random_dungeon_num == 2:  # 16*16 던전일 때
+        #     # self.dungeon_number = 2
+        #     self.dungeon_img_label.setPixmap(QPixmap('./배경/던전_2.png'))
+        #     self.Character_QLabel_2.move(567, 644)  # 캐릭터 던전 입구로 보내기
+        # elif random_dungeon_num == 3:  # 17*17 던전일 때
+        #     # self.dungeon_number = 3
+        #     self.dungeon_img_label.setPixmap(QPixmap('./배경/던전_3.png'))
+        #     self.Character_QLabel_2.move(558, 657)  # 캐릭터 던전 입구로 보내기
+        # elif random_dungeon_num == 4:  # 18*18 던전일 때
+        #     # self.dungeon_number = 4
+        #     self.dungeon_img_label.setPixmap(QPixmap('./배경/던전_4.png'))
+        #     self.Character_QLabel_2.move(504, 674)  # 캐릭터 던전 입구로 보내기
 
         # 던전 입구 만들기
         self.Show_Dungeon_Entrance(random_dungeon_num)
@@ -620,11 +626,19 @@ class WindowClass(QMainWindow, game):
         self.boss_monster.show()  # 보스몬스터 띄우기
 
         # 검은 라벨 만들어서 위에 덮기(유저가 플레이할 때 던전이 안보이게)
-        black_label = QLabel(self)
-        black_label.move(0, 30)
-        black_label.setStyleSheet('background-color: rgba(0, 0, 0, 100)')  # 100으로 설정되어 있는 투명도 높이면 어두워짐
-        black_label.setFixedSize(1580, 780)  # 사이즈고정
-        black_label.show()
+        # black_label = QLabel(self)
+        # black_label.move(0, 30)
+        # black_label.setStyleSheet('background-color: rgba(0, 0, 0, 100)')  # 100으로 설정되어 있는 투명도 높이면 어두워짐
+        # black_label.setFixedSize(1580, 780)  # 사이즈고정
+        # black_label.show()
+
+    def block_dungeon_for_type(self, character, dungeon_num, new_x, new_y, new_p, before_p ):
+        """던전 크기별로 맵에서 나가지 못하게 하기"""
+        if not ((self.map_size[dungeon_num][0] <= new_x <= self.map_size[dungeon_num][1]) and (
+            self.map_size[dungeon_num][2] <= new_y <= self.map_size[dungeon_num][3])):
+            character.setGeometry(before_p)
+        if self.block_dungeon_wall(new_p, before_p, self.wall_list, dungeon_num):
+            character.setGeometry(before_p)
 
     def block_dungeon_wall(self, new_position, previous_position, wall_list, num):
         """유저가 던전벽에서 나아가지 못하게 하기"""
@@ -642,35 +656,46 @@ class WindowClass(QMainWindow, game):
         reply.setText(text)
         reply.exec_()
 
-    def direction(self):
+    def ghost_direction(self):
         """유령 방향 랜덤으로 지정 및 변환"""
 
         # 랜덤값 따라 방향지정
         self.random_num = random.randint(1, 6)
-
-        # 랜덤값 따라 이미지 변환
-        if self.random_num == 1:  # 우하
-            self.ghost_label.setPixmap(
-                self.ghost_img_right_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                                   aspectRatioMode=Qt.IgnoreAspectRatio))
-        elif self.random_num == 2:  # 우상
-            self.ghost_label.setPixmap(
-                self.ghost_img_right_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                                aspectRatioMode=Qt.IgnoreAspectRatio))
-        elif self.random_num == 3:  # 좌상
-            self.ghost_label.setPixmap(
-                self.ghost_img_left_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                               aspectRatioMode=Qt.IgnoreAspectRatio))
-        elif self.random_num == 4:  # 좌하
-            self.ghost_label.setPixmap(
-                self.ghost_img_left_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                                  aspectRatioMode=Qt.IgnoreAspectRatio))
-        elif self.random_num == 5:  # 왼쪽
-            self.ghost_label.setPixmap(self.ghost_img_left.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                                                  aspectRatioMode=Qt.IgnoreAspectRatio))
-        elif self.random_num == 6:  # 오른쪽
-            self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
-                                                                   aspectRatioMode=Qt.IgnoreAspectRatio))
+        # print('유령랜덤값: ',self.random_num)
+        ghost_direction = {
+            1: self.ghost_img_right_bottom, # 우하
+            2: self.ghost_img_right_top, # 우상
+            3: self.ghost_img_left_top, # 좌상
+            4: self.ghost_img_left_bottom, # 좌하
+            5: self.ghost_img_left, # 왼쪽
+            6: self.ghost_img_right, #오른쪽
+        }
+        self.ghost_label.setPixmap(
+            ghost_direction[self.random_num].scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
+                                                         aspectRatioMode=Qt.IgnoreAspectRatio))
+        # # 랜덤값 따라 이미지 변환
+        # if self.random_num == 1:  # 우하
+        #     self.ghost_label.setPixmap(
+        #         self.ghost_img_right_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
+        #                                            aspectRatioMode=Qt.IgnoreAspectRatio))
+        # elif self.random_num == 2:  # 우상
+        #     self.ghost_label.setPixmap(
+        #         self.ghost_img_right_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
+        #                                         aspectRatioMode=Qt.IgnoreAspectRatio))
+        # elif self.random_num == 3:  # 좌상
+        #     self.ghost_label.setPixmap(
+        #         self.ghost_img_left_top.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
+        #                                        aspectRatioMode=Qt.IgnoreAspectRatio))
+        # elif self.random_num == 4:  # 좌하
+        #     self.ghost_label.setPixmap(
+        #         self.ghost_img_left_bottom.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
+        #                                           aspectRatioMode=Qt.IgnoreAspectRatio))
+        # elif self.random_num == 5:  # 왼쪽
+        #     self.ghost_label.setPixmap(self.ghost_img_left.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
+        #                                                           aspectRatioMode=Qt.IgnoreAspectRatio))
+        # elif self.random_num == 6:  # 오른쪽
+        #     self.ghost_label.setPixmap(self.ghost_img_right.scaled(QSize(self.ghost_fixed_size, self.ghost_fixed_size),
+        #                                                            aspectRatioMode=Qt.IgnoreAspectRatio))
 
     def move_label(self):
         """유령 움직임 조정 함수"""
@@ -679,34 +704,39 @@ class WindowClass(QMainWindow, game):
         current_pos = self.ghost_label.pos()
 
         # x, y값 조정
-        x_start = self.map_size[self.dungeon_number][0]
-        x_end = self.map_size[self.dungeon_number][1]
-        y_start = self.map_size[self.dungeon_number][2]
-        y_end = self.map_size[self.dungeon_number][3]
-
-        # 새 위치 변수 초기화
-        new_x = current_pos.x()
-        new_y = current_pos.y()
+        x_start, x_end = self.map_size[self.dungeon_number][0], self.map_size[self.dungeon_number][1]
+        y_start, y_end = self.map_size[self.dungeon_number][2], self.map_size[self.dungeon_number][3]
 
         # 새 위치 계산
-        if self.random_num == 1:  # 우하
-            new_x = min(current_pos.x() + 1, x_end)
-            new_y = min(current_pos.y() + 1, y_end)
-        elif self.random_num == 2:  # 우상
-            new_x = min(current_pos.x() + 1, x_end)
-            new_y = max(current_pos.y() - 1, y_start)
-        elif self.random_num == 3:  # 좌상
-            new_x = max(current_pos.x() - 1, x_start)
-            new_y = max(current_pos.y() - 1, y_start)
-        elif self.random_num == 4:  # 좌하
-            new_x = max(current_pos.x() - 1, x_start)
-            new_y = min(current_pos.y() + 1, y_end)
-        elif self.random_num == 5:  # 왼쪽
-            new_x = max(current_pos.x() - 1, x_start)
-            new_y = current_pos.y()
-        elif self.random_num == 6:  # 오른쪽
-            new_x = min(current_pos.x() + 1, x_end)
-            new_y = current_pos.y()
+        new_positions = {
+            1: (min(current_pos.x() + 1, x_end), min(current_pos.y() + 1, y_end)),  # 우하
+            2: (min(current_pos.x() + 1, x_end), max(current_pos.y() - 1, y_start)),  # 우상
+            3: (max(current_pos.x() - 1, x_start), max(current_pos.y() - 1, y_start)),  # 좌상
+            4: (max(current_pos.x() - 1, x_start), min(current_pos.y() + 1, y_end)),  # 좌하
+            5: (max(current_pos.x() - 1, x_start), current_pos.y()),  # 왼쪽
+            6: (min(current_pos.x() + 1, x_end), current_pos.y())  # 오른쪽
+        }
+        new_x, new_y = new_positions[self.random_num]
+
+        # # 새 위치 계산 # 수정필요
+        # if self.random_num == 1:  # 우하
+        #     new_x = min(current_pos.x() + 1, x_end)
+        #     new_y = min(current_pos.y() + 1, y_end)
+        # elif self.random_num == 2:  # 우상
+        #     new_x = min(current_pos.x() + 1, x_end)
+        #     new_y = max(current_pos.y() - 1, y_start)
+        # elif self.random_num == 3:  # 좌상
+        #     new_x = max(current_pos.x() - 1, x_start)
+        #     new_y = max(current_pos.y() - 1, y_start)
+        # elif self.random_num == 4:  # 좌하
+        #     new_x = max(current_pos.x() - 1, x_start)
+        #     new_y = min(current_pos.y() + 1, y_end)
+        # elif self.random_num == 5:  # 왼쪽
+        #     new_x = max(current_pos.x() - 1, x_start)
+        #     new_y = current_pos.y()
+        # elif self.random_num == 6:  # 오른쪽
+        #     new_x = min(current_pos.x() + 1, x_end)
+        #     new_y = current_pos.y()
 
         # 유령라벨 새 포지션으로 옮기기
         self.ghost_label.move(new_x, new_y)
@@ -946,34 +976,51 @@ class WindowClass(QMainWindow, game):
     # 캐릭터 방향키로 움직이기===============================================================================================
     def keyPressEvent(self, event):
 
+        # 방향키와 좌표 변화값을 저장하는 딕셔너리
+        directions = {
+            Qt.Key_A: (-20, 0),  # 왼쪽
+            Qt.Key_D: (20, 0),  # 오른쪽
+            Qt.Key_W: (0, -20),  # 위로
+            Qt.Key_S: (0, 20)  # 아래로
+        }
+
         # 소연 keypressevent 함수 내 수정(current_index값 받아오기)===========================================================
 
         # 현재 스택위젯 값 가져오기
         current_index = self.StackWidget_Field.currentIndex()
 
         ## 일반필드일 때
+
         if current_index == 0:
-            # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
-            previous_position = self.Character_QLabel.geometry()
+            previous_position = self.Character_QLabel.geometry()  # 이전 위치
+            rand_event = random.randrange(1, 11) #랜덤값
 
-            rand_event = random.randrange(1, 11)
-            if ((event.key() == Qt.Key_A)  # "a"키를 누를경우 캐릭터 현재 x값을 -20
-                    and (self.Character_QLabel.x() > 0)):
-                self.Character_QLabel.setPixmap(self.character_left_img)
-                self.Character_QLabel.move(self.Character_QLabel.x() - 20, self.Character_QLabel.y())
+            if event.key() in directions:  # 방향키가 눌렸을 때
+                if event.key() == list(directions.keys())[0]:
+                    self.Character_QLabel.setPixmap(self.character_left_img)
+                if event.key() == list(directions.keys())[1]:
+                    self.Character_QLabel.setPixmap(self.character_right_img)
+                dx, dy = directions[event.key()]  # 방향키에 해당하는 좌표 변화값을 가져옴
+                new_position = self.Character_QLabel.geometry().translated(dx, dy)  # 새 위치 계산
+                self.Character_QLabel.move(new_position.x(), new_position.y())  # 새 위치로 이동
 
-            elif ((event.key() == Qt.Key_D)  # "d"키를 누를경우 캐릭터 현재 x값을 +20
-                  and (self.Character_QLabel.x() < 1560)):
-                self.Character_QLabel.setPixmap(self.character_right_img)
-                self.Character_QLabel.move(self.Character_QLabel.x() + 20, self.Character_QLabel.y())
-
-            elif ((event.key() == Qt.Key_W)  # "w"키를 누를경우 캐릭터 현재 y값을 -20
-                  and (self.Character_QLabel.y() > -20)):
-                self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() - 20)
-
-            elif ((event.key() == Qt.Key_S)  # "s"키를 누를경우 캐릭터 현재 y값을 +20
-                  and (self.Character_QLabel.y() < 740)):
-                self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() + 20)
+            # if ((event.key() == Qt.Key_A)  # "a"키를 누를경우 캐릭터 현재 x값을 -20
+            #         and (self.Character_QLabel.x() > 0)):
+            #     self.Character_QLabel.setPixmap(self.character_left_img)
+            #     self.Character_QLabel.move(self.Character_QLabel.x() - 20, self.Character_QLabel.y())
+            #
+            # elif ((event.key() == Qt.Key_D)  # "d"키를 누를경우 캐릭터 현재 x값을 +20
+            #       and (self.Character_QLabel.x() < 1560)):
+            #     self.Character_QLabel.setPixmap(self.character_right_img)
+            #     self.Character_QLabel.move(self.Character_QLabel.x() + 20, self.Character_QLabel.y())
+            #
+            # elif ((event.key() == Qt.Key_W)  # "w"키를 누를경우 캐릭터 현재 y값을 -20
+            #       and (self.Character_QLabel.y() > -20)):
+            #     self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() - 20)
+            #
+            # elif ((event.key() == Qt.Key_S)  # "s"키를 누를경우 캐릭터 현재 y값을 +20
+            #       and (self.Character_QLabel.y() < 740)):
+            #     self.Character_QLabel.move(self.Character_QLabel.x(), self.Character_QLabel.y() + 20)
 
             else:  # 방향키 이외의 키를 눌렀을때를 위한 예외처리
                 return
@@ -1002,86 +1049,86 @@ class WindowClass(QMainWindow, game):
                         # # 아이템 사용시 전체 트루로 만들어줘야해요 그래야 꺼졌을때 다시 켜지니까
                         # for usebtn in self.itemusebox:
                         #     usebtn.setEnabled(True)
-
-                        self.user_turn = 0 # 유저 턴 중간에 끝나면 초기화 안된상태로 넘어감 그래서 예외처리함
-
-                        for rockbtn in self.frame_class_list:
-                            rockbtn.setEnabled(False)
-                        self.frame_class_list[self.user_turn].setEnabled(True)
-                        self.portal_sample.hide()
-
-                        # 인벤토리 ui를 소비창으로 변경
-                        self.StackWidget_Item.setCurrentWidget(self.Page_Use)
-
-                        # 인벤토리 선택 버튼 및 소비 아이템 버튼 비활성화
-                        self.Btn_Equip.setEnabled(False)
-                        self.Btn_Portion.setEnabled(False)
-                        self.Btn_Status.setEnabled(False)
-
-                        # 소비 아이템 클릭 비활성화
-                        for btn in range(1, 15):
-                            getattr(self, f'Portion_{btn}_Btn').setEnabled(False)
-                        # 하단 ui 버튼 클릭 시 다른 버튼 비활성화 시키기
-
-                        # 1번 턴만 활성화 나머지 비활성화
-                        for i in range(1,6):
-                            getattr(self, f'Status{i}_Action1_Attack').setEnabled(True)
-                            getattr(self, f'Status{i}_Action2_Skill').setEnabled(True)
-                            getattr(self, f'Status{i}_Action3_Item').setEnabled(True)
-                            getattr(self, f'Status{i}_Action4_Run').setEnabled(True)
-
-                        for btn in range(1, 6):  # 추후 삭제 대상
-                            getattr(self, f'Status{btn}_Action1_Attack').clicked.connect(lambda x, z=btn: self.change('1',z))
-                            getattr(self, f'Status{btn}_Action2_Skill').clicked.connect(lambda x, z=btn: self.change('2',z))
-                            getattr(self, f'Status{btn}_Action3_Item').clicked.connect(lambda x, z=btn: self.change('3',z))
-                            getattr(self, f'Status{btn}_Action4_Run').clicked.connect(lambda x, z=btn: self.change('4',z))
-
-                        # # 캐릭터 창 초기 [0] 빼고 비활성화 상태
-                        # for FCS in self.frame_class_list[1:]:
-                        #     FCS.setEnabled(False)
-
-                        skills = {'미하일': 1, '루미너스': 2, '알렉스': 3, '샐러맨더': 4, '메르데스': 5,
-                                  '랜슬롯': 6}  # 각 이름에 대한 인덱스를 찾아서 람다 함수 내에서 스킬 버튼을 연결
-                        name_text = self.Status1_1_Name.text()
-                        name_text2 = self.Status2_1_Name.text()
-                        name_text3 = self.Status3_1_Name.text()
-                        name_text4 = self.Status4_1_Name.text()
-                        name_text5 = self.Status5_1_Name.text()
-                        self.Status1_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text): self.skill_btn(index))
-                        self.Status2_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text2): self.skill_btn(index))
-                        self.Status3_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text3): self.skill_btn(index))
-                        self.Status4_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text4): self.skill_btn(index))
-                        self.Status5_Action2_Skill.clicked.connect(
-                            lambda x, index=skills.get(name_text5): self.skill_btn(index))
-
-                        # MonsterImage 랜덤 등장 구현
-                        self.j = 1
-                        for num in range(1, random.randrange(2, 11)):
-                            getattr(self, f'Monster_{num}_Name').setText(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').name)  # MonsterImage 이름
-                            getattr(self, f'Monster_{num}_Name').setStyleSheet("Color : white")
-                            getattr(self, f'Monster_{num}_QLabel').setPixmap(
-                                QPixmap(getattr(self, f'nomalfield_fire_monster{self.j}').image))  # MonsterImage 이미지
-                            getattr(self, f'Monster_{num}_QProgressBar').setMaximum(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # MonsterImage 체력
-                            getattr(self, f'Monster_{num}_QProgressBar').setValue(
-                                getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # MonsterImage 체력
-                            getattr(self, f'Monster_{num}_QButton').setEnabled(False)
-                            getattr(self, f'Monster_{num}_Name').show()
-                            getattr(self, f'Monster_{num}_QLabel').show()
-                            getattr(self, f'Monster_{num}_QButton').show()
-                            getattr(self, f'Monster_{num}_QProgressBar').show()
-                            if self.j < 3:
-                                self.j += 1
-                            else:
-                                self.j = 1
-
-                        self.StackWidget_Field.setCurrentIndex(2)
-                        self.Page_Use.setEnabled(False)
+                        #
+                        # self.user_turn = 0 # 유저 턴 중간에 끝나면 초기화 안된상태로 넘어감 그래서 예외처리함
+                        #
+                        # for rockbtn in self.frame_class_list:
+                        #     rockbtn.setEnabled(False)
+                        # self.frame_class_list[self.user_turn].setEnabled(True)
+                        # self.portal_sample.hide()
+                        #
+                        # # 인벤토리 ui를 소비창으로 변경
+                        # self.StackWidget_Item.setCurrentWidget(self.Page_Use)
+                        #
+                        # # 인벤토리 선택 버튼 및 소비 아이템 버튼 비활성화
+                        # self.Btn_Equip.setEnabled(False)
+                        # self.Btn_Portion.setEnabled(False)
+                        # self.Btn_Status.setEnabled(False)
+                        #
+                        # # 소비 아이템 클릭 비활성화
+                        # for btn in range(1, 15):
+                        #     getattr(self, f'Portion_{btn}_Btn').setEnabled(False)
+                        # # 하단 ui 버튼 클릭 시 다른 버튼 비활성화 시키기
+                        #
+                        # # 1번 턴만 활성화 나머지 비활성화
+                        # for i in range(1,6):
+                        #     getattr(self, f'Status{i}_Action1_Attack').setEnabled(True)
+                        #     getattr(self, f'Status{i}_Action2_Skill').setEnabled(True)
+                        #     getattr(self, f'Status{i}_Action3_Item').setEnabled(True)
+                        #     getattr(self, f'Status{i}_Action4_Run').setEnabled(True)
+                        #
+                        # for btn in range(1, 6):  # 추후 삭제 대상
+                        #     getattr(self, f'Status{btn}_Action1_Attack').clicked.connect(lambda x, z=btn: self.change('1',z))
+                        #     getattr(self, f'Status{btn}_Action2_Skill').clicked.connect(lambda x, z=btn: self.change('2',z))
+                        #     getattr(self, f'Status{btn}_Action3_Item').clicked.connect(lambda x, z=btn: self.change('3',z))
+                        #     getattr(self, f'Status{btn}_Action4_Run').clicked.connect(lambda x, z=btn: self.change('4',z))
+                        #
+                        # # # 캐릭터 창 초기 [0] 빼고 비활성화 상태
+                        # # for FCS in self.frame_class_list[1:]:
+                        # #     FCS.setEnabled(False)
+                        #
+                        # skills = {'미하일': 1, '루미너스': 2, '알렉스': 3, '샐러맨더': 4, '메르데스': 5,
+                        #           '랜슬롯': 6}  # 각 이름에 대한 인덱스를 찾아서 람다 함수 내에서 스킬 버튼을 연결
+                        # name_text = self.Status1_1_Name.text()
+                        # name_text2 = self.Status2_1_Name.text()
+                        # name_text3 = self.Status3_1_Name.text()
+                        # name_text4 = self.Status4_1_Name.text()
+                        # name_text5 = self.Status5_1_Name.text()
+                        # self.Status1_Action2_Skill.clicked.connect(
+                        #     lambda x, index=skills.get(name_text): self.skill_btn(index))
+                        # self.Status2_Action2_Skill.clicked.connect(
+                        #     lambda x, index=skills.get(name_text2): self.skill_btn(index))
+                        # self.Status3_Action2_Skill.clicked.connect(
+                        #     lambda x, index=skills.get(name_text3): self.skill_btn(index))
+                        # self.Status4_Action2_Skill.clicked.connect(
+                        #     lambda x, index=skills.get(name_text4): self.skill_btn(index))
+                        # self.Status5_Action2_Skill.clicked.connect(
+                        #     lambda x, index=skills.get(name_text5): self.skill_btn(index))
+                        #
+                        # # MonsterImage 랜덤 등장 구현
+                        # self.j = 1
+                        # for num in range(1, random.randrange(2, 11)):
+                        #     getattr(self, f'Monster_{num}_Name').setText(
+                        #         getattr(self, f'nomalfield_fire_monster{self.j}').name)  # MonsterImage 이름
+                        #     getattr(self, f'Monster_{num}_Name').setStyleSheet("Color : white")
+                        #     getattr(self, f'Monster_{num}_QLabel').setPixmap(
+                        #         QPixmap(getattr(self, f'nomalfield_fire_monster{self.j}').image))  # MonsterImage 이미지
+                        #     getattr(self, f'Monster_{num}_QProgressBar').setMaximum(
+                        #         getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # MonsterImage 체력
+                        #     getattr(self, f'Monster_{num}_QProgressBar').setValue(
+                        #         getattr(self, f'nomalfield_fire_monster{self.j}').hp)  # MonsterImage 체력
+                        #     getattr(self, f'Monster_{num}_QButton').setEnabled(False)
+                        #     getattr(self, f'Monster_{num}_Name').show()
+                        #     getattr(self, f'Monster_{num}_QLabel').show()
+                        #     getattr(self, f'Monster_{num}_QButton').show()
+                        #     getattr(self, f'Monster_{num}_QProgressBar').show()
+                        #     if self.j < 3:
+                        #         self.j += 1
+                        #     else:
+                        #         self.j = 1
+                        #
+                        # self.StackWidget_Field.setCurrentIndex(2)
+                        # self.Page_Use.setEnabled(False)
 
                     else:
                         self.Log_textEdit.append("타 수호대를 만났습니다.")
@@ -1102,29 +1149,40 @@ class WindowClass(QMainWindow, game):
             if self.Character_QLabel.geometry().intersects(self.portal_sample.geometry()):  # 포탈 만나면
                 self.move_to_dungeon()  # 랜덤으로 던전으로 이동
 
-        ## 던전필드일때
-        elif current_index == 1:
-            previous_position = self.Character_QLabel_2.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
-            if event.key() == Qt.Key_A:  # A 눌렀을 때
-                self.Character_QLabel_2.setPixmap(
-                    self.character_left_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
-                new_position = self.Character_QLabel_2.geometry().translated(-20, 0)  # 새 포지션 값 저장
-                self.Character_QLabel_2.move(self.Character_QLabel_2.x() - 20,
-                                             self.Character_QLabel_2.y())  # 왼쪽으로 20  이동
-            elif event.key() == Qt.Key_D:  # D 눌렀을 때
-                self.Character_QLabel_2.setPixmap(
-                    self.character_right_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
-                new_position = self.Character_QLabel_2.geometry().translated(20, 0)  # 이하동일
-                self.Character_QLabel_2.move(self.Character_QLabel_2.x() + 20,
-                                             self.Character_QLabel_2.y())  # 오른쪽으로 20 이동
-            elif event.key() == Qt.Key_W:  # W눌렀을 때
-                new_position = self.Character_QLabel_2.geometry().translated(0, -20)
-                self.Character_QLabel_2.move(self.Character_QLabel_2.x(),
-                                             self.Character_QLabel_2.y() - 20)  # 위로 20 이동
-            elif event.key() == Qt.Key_S:  # S눌렀을 때
-                new_position = self.Character_QLabel_2.geometry().translated(0, 20)
-                self.Character_QLabel_2.move(self.Character_QLabel_2.x(),
-                                             self.Character_QLabel_2.y() + 20)  # 아래로 20 이동
+
+
+        elif current_index == 1: # 던전 필드일때
+            previous_position = self.Character_QLabel_2.geometry()  # 이전 위치
+            if event.key() in directions:  # 방향키가 눌렸을 때
+                if event.key() == list(directions.keys())[0]:
+                    self.Character_QLabel_2.setPixmap(self.character_left_img)
+                if event.key() == list(directions.keys())[1]:
+                    self.Character_QLabel_2.setPixmap(self.character_right_img)
+                dx, dy = directions[event.key()]  # 방향키에 해당하는 좌표 변화값을 가져옴
+                new_position = self.Character_QLabel_2.geometry().translated(dx, dy)  # 새 위치 계산
+                self.Character_QLabel_2.move(new_position.x(), new_position.y())  # 새 위치로 이동
+        # elif current_index == 1:
+        #     previous_position = self.Character_QLabel_2.geometry()  # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
+        #     if event.key() == Qt.Key_A:  # A 눌렀을 때
+        #         self.Character_QLabel_2.setPixmap(
+        #             self.character_left_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
+        #         new_position = self.Character_QLabel_2.geometry().translated(-20, 0)  # 새 포지션 값 저장
+        #         self.Character_QLabel_2.move(self.Character_QLabel_2.x() - 20,
+        #                                      self.Character_QLabel_2.y())  # 왼쪽으로 20  이동
+        #     elif event.key() == Qt.Key_D:  # D 눌렀을 때
+        #         self.Character_QLabel_2.setPixmap(
+        #             self.character_right_img.scaled(QSize(30, 50), aspectRatioMode=Qt.IgnoreAspectRatio))
+        #         new_position = self.Character_QLabel_2.geometry().translated(20, 0)  # 이하동일
+        #         self.Character_QLabel_2.move(self.Character_QLabel_2.x() + 20,
+        #                                      self.Character_QLabel_2.y())  # 오른쪽으로 20 이동
+        #     elif event.key() == Qt.Key_W:  # W눌렀을 때
+        #         new_position = self.Character_QLabel_2.geometry().translated(0, -20)
+        #         self.Character_QLabel_2.move(self.Character_QLabel_2.x(),
+        #                                      self.Character_QLabel_2.y() - 20)  # 위로 20 이동
+        #     elif event.key() == Qt.Key_S:  # S눌렀을 때
+        #         new_position = self.Character_QLabel_2.geometry().translated(0, 20)
+        #         self.Character_QLabel_2.move(self.Character_QLabel_2.x(),
+        #                                      self.Character_QLabel_2.y() + 20)  # 아래로 20 이동
             else:
                 return
 
@@ -1135,50 +1193,25 @@ class WindowClass(QMainWindow, game):
             if self.Character_QLabel_2.geometry().intersects(self.boss_monster.geometry()):
                 # 던전에서 MonsterImage 만났을 때 전투 이동
                 self.show_messagebox("보스몬스터를 만났습니다!\n전투에 진입합니다.")
-                # 전투로 스택위젯 이동
-                # 전투함수로 이동
+                # 전투로 스택위젯 이동 / 전투함수로 이동
                 self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
+                #보스 몬스터 이기면 던전으로 다시 이동
 
             # 던전에서 미궁 만났을 때 메세지 출력(임시) -> 코드 합치면 메세지 뜬 후 전투상황으로 이동하도록 하기
             if self.Character_QLabel_2.geometry().intersects(
                     self.entrance.geometry()) and self.user_can_enter_dungeon == True:
                 self.show_messagebox("미궁을 만났습니다!")
+                self.user_can_enter_dungeon = False
+                self.boss_monster.hide()
+                self.entrance.hide()
+                self.ghost_label.hide()
+                self.Character_QLabel_2.hide()
+                self.move_to_dungeon()
+
 
             # 던전 벽 캐릭터가 벗어나지 못하게
+            self.block_dungeon_for_type(self.Character_QLabel_2, self.dungeon_number, new_position.x(), new_position.y(), new_position, previous_position)
 
-            # 15*15 사이즈 맵에 들어갔을 때
-            if self.dungeon_number == 1:
-                # 던전 벽을 벗어나지 못하게 함
-                if not ((self.map_size[1][0] <= new_position.x() <= self.map_size[1][1]) and (
-                        self.map_size[1][2] < new_position.y() < self.map_size[1][3])):  # 미궁 x값, 미궁 y값 설정
-                    self.Character_QLabel_2.setGeometry(previous_position)
-                # 던전 내에 위치한 벽을 벗어나지 못하게 함
-                if self.block_dungeon_wall(new_position, previous_position, self.wall_list, 1):
-                    self.Character_QLabel_2.setGeometry(previous_position)
-
-            # 16 * 16 사이즈 맵에 들어갔을 때
-            elif self.dungeon_number == 2:
-                if not ((self.map_size[2][0] <= new_position.x() <= self.map_size[2][1]) and (
-                        self.map_size[2][2] < new_position.y() < self.map_size[2][3])):  # 미궁 x값, 미궁 y값 설정
-                    self.Character_QLabel_2.setGeometry(previous_position)
-                if self.block_dungeon_wall(new_position, previous_position, self.wall_list, 2):
-                    self.Character_QLabel_2.setGeometry(previous_position)
-
-            # 17 * 17 사이즈 맵에 들어갔을 때
-            elif self.dungeon_number == 3:
-                if not ((self.map_size[3][0] <= new_position.x() <= self.map_size[3][1]) and (
-                        self.map_size[3][2] < new_position.y() < self.map_size[3][3])):  # 미궁 x값, 미궁 y값 설정
-                    self.Character_QLabel_2.setGeometry(previous_position)
-                if self.block_dungeon_wall(new_position, previous_position, self.wall_list, 3):
-                    self.Character_QLabel_2.setGeometry(previous_position)
-
-            # 18 * 18 사이즈 맵에 들어갔을 때
-            elif self.dungeon_number == 4:
-                if not ((self.map_size[4][0] <= new_position.x() <= self.map_size[4][1]) and (
-                        self.map_size[4][2] < new_position.y() < self.map_size[4][3])):  # 미궁 x값, 미궁 y값 설정
-                    self.Character_QLabel_2.setGeometry(previous_position)
-                if self.block_dungeon_wall(new_position, previous_position, self.wall_list, 4):
-                    self.Character_QLabel_2.setGeometry(previous_position)
 
         # # 이외 필드일때(전투일때) pass
         # else:
