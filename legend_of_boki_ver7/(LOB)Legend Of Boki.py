@@ -267,7 +267,9 @@ class WindowClass(QMainWindow, game):
 
         # 소연 파일 취합 2차 =========================================================================================================
 
-        self.battle_cnt = 0 # 총 경기횟수 세는 함수(일반필드)
+        self.dungeon_floor = 1 #던전 층수 세는 변수
+        self.battle_cnt = 0 # 총 경기횟수 세는 변수(일반필드)
+        self.battle_cnt_for_dungeon = 0 # 총 경기횟수 세는 변수(던전필드)
 
         # 클래스 값 넣어줄 리스트 mp / hp
         self.class_hp_mp_present_value_list = [
@@ -283,6 +285,9 @@ class WindowClass(QMainWindow, game):
         # font = QFont('Neo둥근모', 12)
         font_style = 'font-family: Neo둥근모;'
         self.setStyleSheet(font_style)
+
+        # 유저가 보스 만났을 때 보스 캐릭터 열림
+        self.user_meet_boss = False
 
         # 유저는 보스를 이길 때까지 던전에 입장하지 못함
         self.user_can_enter_dungeon = False
@@ -380,8 +385,53 @@ class WindowClass(QMainWindow, game):
 
 
         # 일단 임시로 옮겨놓음
-        # for i in range(1, 6):
-        #     getattr(self, f"Status{i}_Action1_Attack").clicked.connect(lambda : self.attack_function(i))
+        # 코드 간소화 (소연수정)
+
+        # attack_buttons = [
+        #     self.Status1_Action1_Attack,
+        #     self.Status2_Action1_Attack,
+        #     self.Status3_Action1_Attack,
+        #     self.Status4_Action1_Attack,
+        #     self.Status5_Action1_Attack
+        # ]
+        # item_buttons = [
+        #     self.Status1_Action3_Item,
+        #     self.Status2_Action3_Item,
+        #     self.Status3_Action3_Item,
+        #     self.Status4_Action3_Item,
+        #     self.Status5_Action3_Item
+        # ]
+        # run_buttons = [
+        #     self.Status1_Action4_Run,
+        #     self.Status2_Action4_Run,
+        #     self.Status3_Action4_Run,
+        #     self.Status4_Action4_Run,
+        #     self.Status5_Action4_Run
+        # ]
+        # monster_buttons = [
+        #     self.Monster_1_QButton,
+        #     self.Monster_2_QButton,
+        #     self.Monster_3_QButton,
+        #     self.Monster_4_QButton,
+        #     self.Monster_5_QButton,
+        #     self.Monster_6_QButton,
+        #     self.Monster_7_QButton,
+        #     self.Monster_8_QButton,
+        #     self.Monster_9_QButton,
+        #     self.Monster_10_QButton
+        # ]
+        #
+        # for index, button in enumerate(monster_buttons, start=1):
+        #     button.clicked.connect(lambda index=index: self.monster_got_damage(index))
+        #
+        # for index, button in enumerate(run_buttons, start=1):
+        #     button.clicked.connect(lambda index=index: self.Run_function(index))
+        #
+        # for index, button in enumerate(item_buttons, start=1):
+        #     button.clicked.connect(lambda index=index: self.item_function(index))
+        #
+        # for index, button in enumerate(attack_buttons, start=1):
+        #     button.clicked.connect(lambda x, index=index: self.attack_function(index))
 
         self.Status1_Action1_Attack.clicked.connect(lambda: self.attack_function(1))
         self.Status2_Action1_Attack.clicked.connect(lambda: self.attack_function(2))
@@ -402,9 +452,10 @@ class WindowClass(QMainWindow, game):
         self.Status5_Action4_Run.clicked.connect(lambda: self.Run_function(5))
 
 
-        # 몬스터 버튼 클릭하면 몬스터 공격 함수로 넘어감
+        #몬스터 버튼 클릭하면 몬스터 공격 함수로 넘어감
         # for j in range(1, 11):
         #     getattr(self, f"Monster_{j}_QButton").clicked.connect(lambda: self.monster_got_damage(j))
+
         self.Monster_1_QButton.clicked.connect(lambda x: self.monster_got_damage(1))
         self.Monster_2_QButton.clicked.connect(lambda x: self.monster_got_damage(2))
         self.Monster_3_QButton.clicked.connect(lambda x: self.monster_got_damage(3))
@@ -607,6 +658,8 @@ class WindowClass(QMainWindow, game):
         self.nomalfield_water_background = ["./image/배경/water_1.png", "./image/배경/water_2.png", "./image/배경/water_3.png"]
         self.nomalfield_backgroundBox = [self.nomalfield_fire_background, self.nomalfield_ice_background,
                                          self.nomalfield_forest_background, self.nomalfield_water_background]
+        self.battlefield_background = ["./image/배경/dungeon_1.png", "./image/배경/dungeon_2.png", "./image/배경/dungeon_3.png", "./image/배경/dungeon_4.png", "./image/배경/dungeon_5.png"]
+
         """불의 지역 몬스터들"""
         self.nomalfield_fire_monster1 = MonsterOption("불의 지역", "흔하게 생긴 불돼지", "./image/MonsterImage/fire_1.png", 1,
                                                       random.randrange(200, 1000), 50)
@@ -673,20 +726,20 @@ class WindowClass(QMainWindow, game):
         self.dugeonfield_1st_monster12 = MonsterOption("던전 6층", "베젤부부의 하수인", "./image/MonsterImage/dugeonmonster_12.png", 1,
                                                        random.randrange(200, 1000), 50)
         """던전 보스 몬스터"""
-        self.dugeonfield_Boss1 = MonsterOption("던전 1층", "이동려크", "./image/MonsterImage/dugeonBoss_1.png", 1,
-                                               random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss2 = MonsterOption("던전 2층", "조동혀니", "./image/MonsterImage/dugeonBoss_2.png", 1,
-                                               random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss3 = MonsterOption("던전 3층", "류홍보기", "./image/MonsterImage/dugeonBoss_3.png", 1,
-                                               random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss4 = MonsterOption("던전 4층", "코로나 공주", "./image/MonsterImage/dugeonBoss_4.png", 1,
-                                               random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss5 = MonsterOption("던전 5층", "이땅보키", "./image/MonsterImage/dugeonBoss_5.png", 1,
-                                               random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss6 = MonsterOption("던전 6층", "환생한 보키", "./image/MonsterImage/dugeonBoss_6.png", 1,
-                                               random.randrange(200, 1000), 50)
-        self.dugeonfield_Boss7 = MonsterOption("던전 7층", "로드 오브 보키", "./image/MonsterImage/dugeonBoss_7.png", 1,
-                                               random.randrange(200, 1000), 50)
+        self.dugeonfield_Boss1 = MonsterOption("던전 1층", "이동려크", "./image/MonsterImage/dugeonfield_Boss1.png", 1,
+                                               random.randrange(25000, 35000), 50)
+        self.dugeonfield_Boss2 = MonsterOption("던전 2층", "조동혀니", "./image/MonsterImage/dugeonfield_Boss2.png", 1,
+                                               random.randrange(45000, 55000), 50)
+        self.dugeonfield_Boss3 = MonsterOption("던전 3층", "류홍보기", "./image/MonsterImage/dugeonfield_Boss3.png", 1,
+                                               random.randrange(65000, 75000), 50)
+        self.dugeonfield_Boss4 = MonsterOption("던전 4층", "코로나 공주", "./image/MonsterImage/dugeonfield_Boss4.png", 1,
+                                               random.randrange(75000, 85000), 50)
+        self.dugeonfield_Boss5 = MonsterOption("던전 5층", "이땅보키", "./image/MonsterImage/dugeonfield_Boss5.png", 1,
+                                               random.randrange(85000, 599999), 50)
+        self.dugeonfield_Boss6 = MonsterOption("던전 6층", "환생한 보키", "./image/MonsterImage/dugeonfield_Boss6.png", 1,
+                                               random.randrange(999999, 9999999), 50)
+        self.dugeonfield_Boss7 = MonsterOption("던전 7층", "로드 오브 보키", "./image/MonsterImage/dugeonfield_Boss7.png", 1,
+                                               random.randrange(9999999, 99999990), 50)
 
         """상속받은 이미지와 이미지값을 담은 리스트들을 한곳에 담아주기"""
         self.firemonsterbox = [self.nomalfield_fire_monster1, self.nomalfield_fire_monster2,
@@ -711,7 +764,7 @@ class WindowClass(QMainWindow, game):
                                self.dugeonfield_1st_monster7, self.dugeonfield_1st_monster8,
                                self.dugeonfield_1st_monster9, self.dugeonfield_1st_monster10,
                                self.dugeonfield_1st_monster11, self.dugeonfield_1st_monster12]
-        self.dugeonBosbox = [self.dugeonfield_Boss1, self.dugeonfield_Boss2, self.dugeonfield_Boss3,
+        self.dugeonBossbox = [self.dugeonfield_Boss1, self.dugeonfield_Boss2, self.dugeonfield_Boss3,
                              self.dugeonfield_Boss4, self.dugeonfield_Boss5, self.dugeonfield_Boss6,
                              self.dugeonfield_Boss7]
         # 변경사항""""""""변경사항""""""""변경사항""""""""변경사항""""""""변경사항""""""""변경사항""""""""변경사항""""""""
@@ -795,20 +848,29 @@ class WindowClass(QMainWindow, game):
 
         # 강제승리버튼
         self.win_btn.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+
         self.win_btn.clicked.connect(self.force_win)
 
     def force_win(self):
         """강제승리버튼"""
-        for i in range(1, len(self.monster_hp_dict.keys())+1):
-           self.monster_hp_dict[i] = 0
-        print(self.monster_hp_dict)
-        self.go_to_normalfield()
+        if self.battle_type == '일반전투':
+            for i in range(1, len(self.monster_hp_dict.keys())+1):
+               self.monster_hp_dict[i] = 0
+            print(self.monster_hp_dict)
+            self.go_to_normalfield()
+        elif self.battle_type == '던전전투':
+            for i in range(1, len(self.dungeon_random_monster_hp.keys())+1):
+               self.dungeon_random_monster_hp[i] = 0
+            print(self.dungeon_random_monster_hp)
+            self.go_to_dungeonfield()
+            #여기에 던전으로 다시 돌아가는 함수로 이동하기
 
 
     def guardoption(self):
         """캐릭터 생성 및 hp/mp 저장"""
         self.class_1 = Status('전사', '미하일', 300, 0, self.guardLevel, "./image/캐릭터 및 수호대/class_1.png")
-        self.class_2 = Status('백법사', '루미너스', 200, 150, self.guardLevel, "../image/캐릭터 및 수호대/class_2.png")
+        self.class_2 = Status('백법사', '루미너스', 200, 150, self.guardLevel, "./image/캐릭터 및 수호대/class_2.png")
         self.class_3 = Status('흑법사', '알렉스', 200, 150, self.guardLevel, "./image/캐릭터 및 수호대/class_3.png")
         self.class_4 = Status('적법사', '샐러맨더', 150, 150, self.guardLevel, "./image/캐릭터 및 수호대/class_4.png")
         self.class_5 = Status('궁수', '메르데스', 150, 150, self.guardLevel, "./image/캐릭터 및 수호대/class_5.png")
@@ -900,6 +962,7 @@ class WindowClass(QMainWindow, game):
 
         # 던전 랜덤으로 가는 부분
         random_dungeon_num = random.randint(1, 4)
+        self.random_num_for_teleport = random_dungeon_num
         # 유령 위치 던전 내로 고정하기
         self.ghost_label.move(
             random.randint(self.map_size[random_dungeon_num][0], self.map_size[random_dungeon_num][1]),
@@ -909,14 +972,14 @@ class WindowClass(QMainWindow, game):
         print('던전번호는', random_dungeon_num)  # 확인용
 
         self.dungeon_number = random_dungeon_num # 던전 사이즈마다 다르게 이동
-        dungen_map_dict = {
+        self.dungen_map_dict = {
             1: ['./image/배경/던전_1.png', 592, 631],
             2: ['./image/배경/던전_2.png', 567, 644],
             3: ['./image/배경/던전_3.png', 558, 657],
             4: ['./image/배경/던전_4.png', 504, 674],
         }
-        self.dungeon_img_label.setPixmap(QPixmap(dungen_map_dict[random_dungeon_num][0]))
-        self.Character_QLabel_2.move(dungen_map_dict[random_dungeon_num][1], dungen_map_dict[random_dungeon_num][2])
+        self.dungeon_img_label.setPixmap(QPixmap(self.dungen_map_dict[random_dungeon_num][0]))
+        self.Character_QLabel_2.move(self.dungen_map_dict[random_dungeon_num][1], self.dungen_map_dict[random_dungeon_num][2])
 
         # 던전 입구 만들기
         self.Show_Dungeon_Entrance(random_dungeon_num)
@@ -1035,7 +1098,7 @@ class WindowClass(QMainWindow, game):
                 f'{self.class_mp_dict[i]}/{self.Statusclass[i - 1].get_maxmp()}')  # mp판에 변경된 값 넣어주기
 
     def checkCollision(self, obj1, obj2):
-        """겹치면 true반환"""
+        """겹치면 true반환(유령만나면/다른곳에도 재활용)"""
         x1, y1, w1, h1 = abs(obj1.x()), abs(obj1.y()), abs(obj1.width()), abs(obj1.height())
         x2, y2, w2, h2 = abs(obj2.x()), abs(obj2.y()), abs(obj2.width()), abs(obj2.height())
         if x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2:
@@ -1067,7 +1130,7 @@ class WindowClass(QMainWindow, game):
         msg_box.setWindowFlags(Qt.FramelessWindowHint)
         msg_box.setStyleSheet('background-color: rgb(242, 238, 203)')
         if ranodm_num == 3:
-            pass # 일단 패스 msg_box.setIconPixmap(QPixmap('./image/모야.jpg'))
+            pass # 일단 패스 msg_box.setIconPixmap(QPixmap('./image/모야.jpg')) #호현 머리자르는 사진
         msg_box.setText(f"쪽지에 작성된 내용은...\n{self.msg_sample_list[ranodm_num]}")
         msg_box.exec_()
         self.mark_label.hide()
@@ -1077,39 +1140,127 @@ class WindowClass(QMainWindow, game):
         # mark_label =
 
     def Add_Dungeon_monster_info(self):
-        """던전 몬스터들을 나오게 함"""
-        self.dungeon_random_monster_hp = {} #던전 일반몬스터 체력 담기
-        dungeon_monster_style = [] #던전 일반몬스터 스타일 담기
+        """던전 몬스터들을 나오게 함(일반몬스터와 로직 같음)"""
 
-        dungeon_monster_random_num = random.randint(1, 10) #던전몬스터 숫자
+        self.dungeon_random_monster_hp = {}  # 던전 몬스터 체력 담기
+        dungeon_monster_style = []  # 던전 몬스터 스타일 담기
 
-        for i in range(1, dungeon_monster_random_num+1): #던전 몬스터 스타일 담기
-            dungeon_monster_style.append(random.randint(1, 12))
-        print('던전몬스터스타일',dungeon_monster_style)
+        # 던전 전투 배경 담아주기
+        dungeon_background_random = random.randint(1, 5)
+        self.back_ground_label.setPixmap(
+            QtGui.QPixmap(self.battlefield_background[dungeon_background_random - 1]).scaled(QSize(1580, 830),
+                                                                                             aspectRatioMode=Qt.IgnoreAspectRatio))
 
-        for num in range(1, dungeon_monster_random_num + 1):
-            monster = self.dugeonfieldbox[dungeon_monster_style[num-1]-1]
-            print(monster)
-            getattr(self, f'Monster_{num}_Name').setText(monster.name)  # MonsterImage 이름
-            getattr(self, f'Monster_{num}_QLabel').setPixmap(QPixmap(monster.image))  # MonsterImage 이미지
-            getattr(self, f'Monster_{num}_QProgressBar').setMaximum(monster.hp)  # MonsterImage 체력
-            self.dungeon_random_monster_hp[num] = monster.hp  # MonsterImage 체력 더하기
-            getattr(self, f'Monster_{num}_QProgressBar').setValue(monster.hp)  # MonsterImage 체력
-            getattr(self, f'Monster_{num}_QButton').setEnabled(False)
-            getattr(self, f'Monster_{num}_Name').show()
-            getattr(self, f'Monster_{num}_QLabel').show()
-            getattr(self, f'Monster_{num}_QButton').show()
-            getattr(self, f'Monster_{num}_QProgressBar').show()
+        if self.user_meet_boss == True: #보스몬스터 나오게 하기
 
-        for num in range(dungeon_monster_random_num, 10 + 1):
-            getattr(self, f'Monster_{num}_Name').hide()
-            getattr(self, f'Monster_{num}_QLabel').hide()
-            getattr(self, f'Monster_{num}_QButton').hide()
-            getattr(self, f'Monster_{num}_QProgressBar').hide()
+            # 보스몬스터는 무조건 1번에 들어가게 하기
+            self.Monster_1_Name.setText(self.dugeonBossbox[self.dungeon_floor - 1].name)  # 보스 이름
+            self.Monster_1_QLabel.setPixmap(QPixmap(self.dugeonBossbox[self.dungeon_floor - 1].image))  # 보스몬스터 이미지
+            self.Monster_1_QProgressBar.setMaximum(self.dugeonBossbox[self.dungeon_floor - 1].hp)  # 보스몬스터 최대 hp 프로그래스바 1번에 담아주기
+            self.Monster_1_QProgressBar.setValue(self.dugeonBossbox[self.dungeon_floor - 1].hp)  # 보스몬스터 현재 hp 프로그래스바 1번에 담아주기
+            self.dungeon_random_monster_hp[1] = self.dugeonBossbox[
+                self.dungeon_floor - 1].hp  # 보스몬스터와 몬스터들 hp딕셔너리 1번에 보스몬스터 hp 담아주기
+            self.Monster_1_Name.show()  # 몬스터들 속성 보여주기 아래는 동일함
+            self.Monster_1_QLabel.show()
+            self.Monster_1_QButton.show()
+            self.Monster_1_QProgressBar.show()
 
+            #보스몬스터와 나오는 랜덤 몬스터 숫자
+            dungeon_monster_num = random.randint(0, 6)
+            print('보스몬스터와 함게 나오는 던전몬스터 등장 숫자',dungeon_monster_num)
+            for i in range(1, dungeon_monster_num+1):
+                dungeon_monster_style.append(random.randint(1, 12))
+
+            for num in range(2, dungeon_monster_num + 2):
+                monster = self.dugeonfieldbox[dungeon_monster_style[num-2]-1]
+                getattr(self, f'Monster_{num}_Name').setText(monster.name)  # MonsterImage 이름
+                getattr(self, f'Monster_{num}_QLabel').setPixmap(QPixmap(monster.image))  # MonsterImage 이미지
+                getattr(self, f'Monster_{num}_QProgressBar').setMaximum(monster.hp)  # MonsterImage 체력
+                self.dungeon_random_monster_hp[num] = monster.hp  # MonsterImage 체력 더하기
+                getattr(self, f'Monster_{num}_QProgressBar').setValue(monster.hp)  # MonsterImage 체력
+                getattr(self, f'Monster_{num}_QButton').setEnabled(False)
+                getattr(self, f'Monster_{num}_Name').show()
+                getattr(self, f'Monster_{num}_QLabel').show()
+                getattr(self, f'Monster_{num}_QButton').show()
+                getattr(self, f'Monster_{num}_QProgressBar').show()
+
+            for num in range(dungeon_monster_num+2, 10 + 1):
+                getattr(self, f'Monster_{num}_Name').hide()
+                getattr(self, f'Monster_{num}_QLabel').hide()
+                getattr(self, f'Monster_{num}_QButton').hide()
+                getattr(self, f'Monster_{num}_QProgressBar').hide()
+
+        else:
+            dungeon_monster_random_num = random.randint(1, 10) #던전몬스터 숫자
+            print('던전몬스터 등장 숫자: ',dungeon_monster_random_num)
+            for i in range(1, dungeon_monster_random_num+1): #던전 몬스터 스타일 담기
+                dungeon_monster_style.append(random.randint(1, 12))
+
+            for num in range(1, dungeon_monster_random_num + 1):
+                monster = self.dugeonfieldbox[dungeon_monster_style[num-1]-1]
+                getattr(self, f'Monster_{num}_Name').setText(monster.name)  # MonsterImage 이름
+                getattr(self, f'Monster_{num}_QLabel').setPixmap(QPixmap(monster.image))  # MonsterImage 이미지
+                getattr(self, f'Monster_{num}_QProgressBar').setMaximum(monster.hp)  # MonsterImage 체력
+                self.dungeon_random_monster_hp[num] = monster.hp  # MonsterImage 체력 더하기
+                getattr(self, f'Monster_{num}_QProgressBar').setValue(monster.hp)  # MonsterImage 체력
+                getattr(self, f'Monster_{num}_QButton').setEnabled(False)
+                getattr(self, f'Monster_{num}_Name').show()
+                getattr(self, f'Monster_{num}_QLabel').show()
+                getattr(self, f'Monster_{num}_QButton').show()
+                getattr(self, f'Monster_{num}_QProgressBar').show()
+
+            for num in range(dungeon_monster_random_num+1, 10 + 1):
+                getattr(self, f'Monster_{num}_Name').hide()
+                getattr(self, f'Monster_{num}_QLabel').hide()
+                getattr(self, f'Monster_{num}_QButton').hide()
+                getattr(self, f'Monster_{num}_QProgressBar').hide()
+
+        print('던전몬스터스타일', dungeon_monster_style)  # 확인용
         self.portal_hide(True)
 
+
+    # def Boss_Monster_info(self, num):
+    #     """보스 몬스터들을 나오게 함(일반몬스터와 로직 같음)"""
+    #
+    #     # 보스몬스터와 일반몬스터 hp 담길 딕셔너리
+    #     boss_monster_and_monsters_hp_dict = {}
+    #
+    #     # 보스몬스터는 무조건 1번에 들어가게 하기
+    #     self.Monster_1_Name.setTExt(self.dugeonBossbox[num-1].name) #보스 이름
+    #     self.Monster_1_QLabel.setPixmap(QPixmap(self.dugeonBossbox[num-1].image)) #보스몬스터 이미지
+    #     self.Monster_1_QProgressBar.setMaximum(self.dugeonBossbox[num-1].hp) #보스몬스터 최대 hp 프로그래스바 1번에 담아주기
+    #     self.Monster_1_QProgressBar.setValue(self.dugeonBossbox[num-1].hp) #보스몬스터 현재 hp 프로그래스바 1번에 담아주기
+    #     boss_monster_and_monsters_hp_dict[1] = self.dugeonBossbox[num-1].hp #보스몬스터와 몬스터들 hp딕셔너리 1번에 보스몬스터 hp 담아주기
+    #     self.Monster_1_Name.show() # 몬스터들 속성 보여주기 아래는 동일함
+    #     self.Monster_1_QLabel.show()
+    #     self.Monster_1_QButton.show()
+    #     self.Monster_1_QProgressBar.show()
+    #
+    #
+    #
+    #     for num in range(1, dungeon_monster_random_num + 1):
+    #         monster = self.dugeonfieldbox[dungeon_monster_style[num-1]-1]
+    #         getattr(self, f'Monster_{num}_Name').setText(monster.name)  # MonsterImage 이름
+    #         getattr(self, f'Monster_{num}_QLabel').setPixmap(QPixmap(monster.image))  # MonsterImage 이미지
+    #         getattr(self, f'Monster_{num}_QProgressBar').setMaximum(monster.hp)  # MonsterImage 체력
+    #         self.dungeon_random_monster_hp[num] = monster.hp  # MonsterImage 체력 더하기
+    #         getattr(self, f'Monster_{num}_QProgressBar').setValue(monster.hp)  # MonsterImage 체력
+    #         getattr(self, f'Monster_{num}_QButton').setEnabled(False)
+    #         getattr(self, f'Monster_{num}_Name').show()
+    #         getattr(self, f'Monster_{num}_QLabel').show()
+    #         getattr(self, f'Monster_{num}_QButton').show()
+    #         getattr(self, f'Monster_{num}_QProgressBar').show()
+    #
+    #     for num in range(dungeon_monster_random_num+1, 10 + 1):
+    #         getattr(self, f'Monster_{num}_Name').hide()
+    #         getattr(self, f'Monster_{num}_QLabel').hide()
+    #         getattr(self, f'Monster_{num}_QButton').hide()
+    #         getattr(self, f'Monster_{num}_QProgressBar').hide()
+
+
+
     def portal_hide(self, state):
+        """던전 입장할 때 없애줄 라벨들(보스몬스터, 포탈, 캐릭터 라벨)"""
         if state == True:
             self.boss_monster.hide()
             self.entrance.hide()
@@ -1166,29 +1317,34 @@ class WindowClass(QMainWindow, game):
 
     # 전투 시작
     # 유저 턴 시작
-    def User_Turn(self):
+    def User_Turn(self, ):
         """유저 턴이었을 때"""
-        ############################일반필드나가기 ####################################
-        if all(h == 0 for h in self.class_hp_dict.values()):
-            print('되나')
-            self.Log_textEdit.append('유저 체력이 부족하여 후퇴합니다...')
-            self.go_to_normalfield()  # 유저가 전부 죽으면 체력 회복
-            # 12341234
-            # 체력회복하고 레벨감소
+        if self.battle_type == '일반전투':
+            if self.go_to_normalfield(): #일반필드나가기
+                return
+            if self.user_turn >= 5:  # 만약 유저 턴이 5보다 크다면
+                self.user_turn = 1  # 1로 만들어준다.
+                print("여기서 오류가 나나요 여기는 유저턴임 몬스터가 유저 때리기 전임")
+                self.monster_attack_users()  # 이거 여기다 넣으니까 (동시 다발적으로 캐릭터가 죽으면 턴이 넘어가도 몬스터가 공격을안함) 이 현상이 해결됨..
 
-            self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
-            return
-        print('유저턴', self.user_turn)
-        ## 유저 턴 확인
+            else:
+                self.user_turn += 1  # 그렇지 않다면 턴 더해주기
+            print('현재 턴은', self.user_turn)  # 확인용
 
-        if self.user_turn >= 5:  # 만약 유저 턴이 5보다 크다면
-            self.user_turn = 1  # 1로 만들어준다.
-            print("여기서 오류가 나나요 여기는 유저턴임 몬스터가 유저 띠리기 전임")
-            self.monster_attack_users()  # 이거 여기다 넣으니까 (동시 다발적으로 캐릭터가 죽으면 턴이 넘어가도 몬스터가 공격을안함) 이 현상이 해결됨..
 
-        else:
-            self.user_turn += 1  # 그렇지 않다면 턴 더해주기
-        print('현재 턴은', self.user_turn)  # 확인용
+        ###################################################################
+        if self.battle_type == '던전전투':
+            if self.go_to_dungeonfield(): #던전필드로 나가기
+                return
+
+            if self.user_turn >= 5:  # 만약 유저 턴이 5보다 크다면
+                self.user_turn = 1  # 1로 만들어준다.
+                print("여기서 오류가 나나요 여기는 유저턴임 몬스터가 유저 때리기 전임")
+                self.monster_attack_users()  # 이거 여기다 넣으니까 (동시 다발적으로 캐릭터가 죽으면 턴이 넘어가도 몬스터가 공격을안함) 이 현상이 해결됨..
+            else:
+                self.user_turn += 1  # 그렇지 않다면 턴 더해주기
+            print('현재 턴은', self.user_turn)  # 확인용
+
 
         # 유저턴 hp 0 이상이면 활성화 / 아니면 다음 턴으로 넘어감
         selected_character_hp = self.class_hp_dict[self.user_turn]  # 선택된 캐릭터의 hp
@@ -1199,32 +1355,47 @@ class WindowClass(QMainWindow, game):
             self.User_Turn()  # 0보다 작으면 다시 User_Turn 돌아감 (재귀함수)
 
 
+
+
+
+
     def change_the_portal_location(self, index, num):
         """포탈 위치 랜덤 배정"""
-        self.battle_cnt += 1
+        if index == 1:
+            self.battle_cnt += 1
+        if index == 2:
+            self.battle_cnt_for_dungeon += 1
+
         if self.battle_cnt % num == 0 and index == 1: #노말필드일 경우
             self.Log_textEdit.append(f'전투가 {num}번 되었습니다. 포탈 위치를 변경합니다.')
-            print(f"############################전투가 {num}번 되었습니다. 포탈 위치를 변경합니다.")
+            print(f"############################일반필드전투가 {num}번 되었습니다. 포탈 위치를 변경합니다.")
             self.portal_sample.move(random.randint(0, 1580), random.randint(0, 760))  # 포탈 위치 랜덤으로 배정
 
-    def go_to_normalfield(self):
+        if self.battle_cnt_for_dungeon % num == 0 and index == 2:# 던전필드인 경우
+            self.Log_textEdit.append(f'전투가 {num}번 되었습니다. 포탈 위치를 변경합니다.')
+            print(f"############################던전필드전투가 {num}번 되었습니다. 포탈 위치를 변경합니다.")
+            random_x = random.randint(self.map_size[self.random_num_for_teleport][0],self.map_size[self.random_num_for_teleport][1])
+            random_y = random.randint(self.map_size[self.random_num_for_teleport][2],self.map_size[self.random_num_for_teleport][3])
+            self.entrance.move(random_x, random_y)
 
-        # 사용하지말아봐
+    def go_to_normalfield(self):
         # 만약 모든 유저 hp가 0이면 일반필드로 나가게 함
         if all(h == 0 for h in self.class_hp_dict.values()):
-            self.change_the_portal_location(1, 7)
+
             print("유저체력 부족해서 죽은 경우")
             self.Log_textEdit.append('유저 체력이 부족하여 후퇴합니다...한 발자국만 움직여 보자...')
             self.set_actions_enabled(5, False)  # 클래스들의 모든 버튼 비활성화 시켜줌 <= 지금 작동 안함 살려조ㅁ
             self.current_index = 0
             self.return_user_state() #유저들의 체력 초기화
+            self.change_the_portal_location(1, 10) # 미궁 랜덤 스팟
             self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
             self.portal_sample.show()
+            return True
 
 
         if all(v == 0 for v in self.monster_hp_dict.values()):
             self.guardLevel += 1
-            self.change_the_portal_location(1, 7)
+
             print("현재 레벨 %d(몬스터 처치한 경우)" % self.guardLevel)
             self.TopUI_Level_Label.setText("%s의 수호대 Level : %d" % ("땅", self.guardLevel))
             print("몬스터 체력이 0입니다.")
@@ -1233,6 +1404,7 @@ class WindowClass(QMainWindow, game):
             self.user_turn = 0
             self.set_actions_enabled(5, False) #클래스들의 모든 버튼 비활성화 시키기
             self.Character_QLabel.move(self.normal_previous_position.x(), self.normal_previous_position.y())
+            self.change_the_portal_location(1, 10)  # 미궁 랜덤 스팟
             self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
             print('몬스터 다 죽이고 나왔을 때 유저턴', self.user_turn)
             self.portal_sample.show()
@@ -1241,8 +1413,35 @@ class WindowClass(QMainWindow, game):
 
     def go_to_dungeonfield(self):
         """던전에서 싸우고 다시 던전으로 돌아가는 함수"""
-        ## 980625 수정해야됨 수정해야됨 수정해야됨 수정해야됨 기억해라 박소연
+        # 사용하지말아봐
+        # 만약 모든 유저 hp가 0이면 일반필드로 나가게 함
+        if all(h == 0 for h in self.class_hp_dict.values()):
 
+            print("유저체력 부족해서 죽은 경우")
+            self.Log_textEdit.append('유저 체력이 부족하여 후퇴합니다...한 발자국만 움직여 보자...')
+            self.set_actions_enabled(5, False)  # 클래스들의 모든 버튼 비활성화 시켜줌 <= 지금 작동 안함 살려조ㅁ
+            self.change_the_portal_location(2, 7) # 전투 7번만다 미궁 랜덤 스팟
+            self.return_user_state()  # 유저들의 체력 초기화
+            self.StackWidget_Field.setCurrentIndex(1)  # 던전필드로 이동
+            self.portal_hide(False) # 포탈, 캐릭터, 보스포탈 나오게 하기
+            self.user_meet_boss = False
+            return True
+
+        if all(v == 0 for v in self.dungeon_random_monster_hp.values()):
+            self.guardLevel += 1
+            print("현재 레벨 %d(몬스터 처치한 경우)" % self.guardLevel)
+            self.TopUI_Level_Label.setText("%s의 수호대 Level : %d" % ("땅", self.guardLevel))
+            print("몬스터 체력이 0입니다.")
+            self.Log_textEdit.append('몬스터를 모두 처치했습니다....')
+            self.user_turn = 0
+            self.set_actions_enabled(5, False)  # 클래스들의 모든 버튼 비활성화 시키기
+            self.StackWidget_Field.setCurrentIndex(1)  # 던전필드로 이동
+            print('몬스터 다 죽이고 나왔을 때 유저턴', self.user_turn)
+            self.portal_hide(False)  # 포탈, 캐릭터, 보스포탈 나오게 하기
+            self.change_the_portal_location(2, 7) # 전투 7번마다 랜덤 스팟되게 하기
+            self.user_meet_boss = False
+            return True
+        return False
 
     def skillopen(self, num):
         """스킬 함수(스킬 버튼 외 다른 버튼 비활성화, 몬스터 공격 버튼 활성화) # 일단 기존 함수 제외하고 쓰는중"""
@@ -1426,33 +1625,44 @@ class WindowClass(QMainWindow, game):
     def monster_got_damage(self, num):
 
         """몬스터 데미지 입는 함수"""
+
+        if self.battle_type == '일반전투':
+            monster_hp = self.monster_hp_dict
+        elif self.battle_type == '던전전투':
+            monster_hp = self.dungeon_random_monster_hp
+
+
         if self.attackType == 1:
             self.target = self.skillact()
 
             if self.target == 2:
-                for i in range(1, len(self.monster_hp_dict.keys()) + 1):
-                    self.monster_hp_dict[i] -= self.choice_btn
+                for i in range(1, len(monster_hp.keys()) + 1):
+                    monster_hp[i] -= self.choice_btn
             elif self.target == 1:
-                self.monster_hp_dict[num] -= self.choice_btn
+                    monster_hp[num] -= self.choice_btn
             elif self.target == 3:
                 self.Log_textEdit.append("아무일도 없었다..")
             self.Widget_Skill.close()
         elif self.attackType == 0:
-            self.monster_hp_dict[num] -= self.choice_btn  # 임시로 몬스터 체력에는 100씩 데미지 입힘
+            monster_hp[num] -= self.choice_btn  # 임시로 몬스터 체력에는 100씩 데미지 입힘
 
-        print(f'{num}번 몬스터의 맞은 후 체력: {self.monster_hp_dict[num]}')  # 확인용
+        print(f'{num}번 몬스터의 맞은 후 체력: {monster_hp[num]}')  # 확인용
 
-        if self.go_to_normalfield():
-            return
+        if self.battle_type == '일반전투':
+            if self.go_to_normalfield():
+                return
+        if self.battle_type == '던전전투':
+            if self.go_to_dungeonfield():
+                return
 
         # 체력 0인 얘들은 안보여주기
-        for m, n in self.monster_hp_dict.items():
+        for m, n in monster_hp.items():
             if n < 0:
                 print(f'{m}번 몬스터를 처치했습니다.')  # 콘솔 확인용
 
                 self.Log_textEdit.append(f'{m}번 몬스터를 처치했습니다.')
 
-                self.monster_hp_dict[m] = 0
+                monster_hp[m] = 0
 
                 # 죽은 몬스터 구성들은 숨겨주기
                 getattr(self, f'Monster_{m}_Name').hide()
@@ -1460,8 +1670,12 @@ class WindowClass(QMainWindow, game):
                 getattr(self, f'Monster_{m}_QButton').hide()
                 getattr(self, f'Monster_{m}_QProgressBar').hide()
 
-        if self.go_to_normalfield():
-            return
+        if self.battle_type == '일반전투':
+            if self.go_to_normalfield():
+                return
+        if self.battle_type == '던전전투':
+            if self.go_to_dungeonfield():
+                return
         # if all(v == 0 for v in self.monster_hp_dict.values()):
         #     self.guardLevel += 1  # 적을 모두처치하면 레벨업 +1
         #     print("현재 레벨 %d" % self.guardLevel)
@@ -1471,7 +1685,7 @@ class WindowClass(QMainWindow, game):
         #     self.StackWidget_Field.setCurrentIndex(0)  # 일반필드로 이동
 
         # 프로그래스바에 유저가 때린 몬스터 체력 넣어주기
-        getattr(self, f'Monster_{num}_QProgressBar').setValue(self.monster_hp_dict[num])  # 몬스터 체력
+        getattr(self, f'Monster_{num}_QProgressBar').setValue(monster_hp[num])  # 몬스터 체력
 
         # 몬스터 버튼 비활성화
         self.monster_btn_active(False)
@@ -1493,22 +1707,28 @@ class WindowClass(QMainWindow, game):
             ################################### 다음 턴으로 넘어가기 몬스터 턴에서 더해주기!!!!!!!!!!!! ########################################
             self.User_Turn()
 
+
+
+
     def monster_attack_users(self):
         """몬스터가 유저 랜덤으로 때리는 함수"""
         # 살아있는 몬스터가 돌아가면서 랜덤으로 유저 때림
         # 유저hp가 0이 되면 패스
         # 살아있는 몬스터 수 세기(죽으면 hide() 시켜줌)
 
+
+        if self.battle_type == '일반전투':
+            monster_hp = self.monster_hp_dict
+        elif self.battle_type == '던전전투':
+            monster_hp = self.dungeon_random_monster_hp
+
         self.alive_monster = []  # 살아있는 몬스터 리스트에 담아주기
-        for i, j in self.monster_hp_dict.items():  # 몬스터 체력 딕셔너리는 몬스터 호출 함수 Add_Monster_info 에 있음. 여기서 체력을 가져와줌
+        for i, j in monster_hp.items():  # 몬스터 체력 딕셔너리는 몬스터 호출 함수 Add_Monster_info 에 있음. 여기서 체력을 가져와줌
             print(i, j)  # 확인용
             if j > 0:  # 만약 몬스터 체력이 0 이상이면
                 self.alive_monster.append(i)  # 빈 리스트에 더해준다.
                 pass
-            elif j == 0:  # 만약 몬스터 체력이 0 이면
-                pass
-            else:  # 만약 몬스터 체력이 0 미만이면
-                print("패스")
+            elif j <= 0:  # 만약 몬스터 체력이 0 이면
                 pass
 
         print('살아있는 몬스터 리스트는', self.alive_monster)
@@ -1526,39 +1746,45 @@ class WindowClass(QMainWindow, game):
         print("attacked_class_list", attacked_class_list)
 
         # 클래스의 hp 깎아준다
-
         # 클래스 라벨들
-        class_label_list = [self.Class_1_QLabel, self.Class_2_QLabel, self.Class_3_QLabel, self.Class_4_QLabel,
-                            self.Class_5_QLabel]
+        class_label_list = [self.Class_1_QLabel, self.Class_2_QLabel, self.Class_3_QLabel, self.Class_4_QLabel, self.Class_5_QLabel]
 
-        class_hp_present_value_list = [  # 클래스 값 넣어줄 리스트
+        # 클래스 값 넣어줄 리스트
+        class_hp_present_value_list = [
             self.Status1_2_HpValue,
             self.Status2_2_HpValue,
             self.Status3_2_HpValue,
             self.Status4_2_HpValue,
             self.Status5_2_HpValue,
         ]
-        death_class = []
-        for m in range(1, len(self.alive_monster) + 1):
-            self.Log_textEdit.append(f"{m}번째 몬스터가 {attacked_class_list[m - 1]}번 클래스를 100만큼 때립니다...")
-            print(f"{m}번째 몬스터가 {attacked_class_list[m - 1]}번 클래스를 100만큼 때립니다...")
-            self.class_hp_dict[attacked_class_list[m - 1]] = self.class_hp_dict[attacked_class_list[m - 1]] - (
-                    100 - int(getattr(self, f'Class{attacked_class_list[m - 1]}_DetailsStatus_ShieldValue').text()))     # 임시로 100씩 때린다 <- 방어력을 넣어 공격력 감쇄 추가해봄
-            print(self.class_hp_dict)  # 확인용
 
-            for i in range(1, 6):
-                if self.class_hp_dict[i] <= 0:
-                    if attacked_class_list[m - 1] not in death_class:
-                        death_class.append(attacked_class_list[m - 1])
-                        self.class_hp_dict[attacked_class_list[m - 1]] = 0
-                        print('죽은 클래스는', death_class)
-                        self.Log_textEdit.append(f"{attacked_class_list[m - 1]}번 클래스가 사망했습니다.")
-                        print(f"{attacked_class_list[m - 1]}번 클래스가 사망했습니다.")
-                    else:
-                        self.class_hp_dict[attacked_class_list[m - 1]] = 0
+        death_class = []
+
+        if self.user_meet_boss == False: #보스를 만나지 않은 경우(일반몬스터)
+            for m in range(1, len(self.alive_monster) + 1):
+                self.Log_textEdit.append(f"{m}번째 몬스터가 {attacked_class_list[m - 1]}번 클래스를 100만큼 때립니다...")
+                print(f"{m}번째 몬스터가 {attacked_class_list[m - 1]}번 클래스를 100만큼 때립니다...")
+                self.class_hp_dict[attacked_class_list[m - 1]] = self.class_hp_dict[attacked_class_list[m - 1]] - (
+                        100 - int(getattr(self, f'Class{attacked_class_list[m - 1]}_DetailsStatus_ShieldValue').text()))     # 임시로 100씩 때린다 <- 방어력을 넣어 공격력 감쇄 추가해봄
+                print(self.class_hp_dict)  # 확인용
+
+                for i in range(1, 6):
+                    if self.class_hp_dict[i] <= 0:
+                        if attacked_class_list[m - 1] not in death_class:
+                            death_class.append(attacked_class_list[m - 1])
+                            self.class_hp_dict[attacked_class_list[m - 1]] = 0
+                            print('죽은 클래스는', death_class)
+                            self.Log_textEdit.append(f"{attacked_class_list[m - 1]}번 클래스가 사망했습니다.")
+                            print(f"{attacked_class_list[m - 1]}번 클래스가 사망했습니다.")
+                        else:
+                            self.class_hp_dict[attacked_class_list[m - 1]] = 0
+        else:
+            pass
+
+
         #비석
         for j in death_class:
-            class_label_list[j - 1].setPixmap(QtGui.QPixmap('비석.png'))
+            class_label_list[j - 1].setPixmap(QtGui.QPixmap('./image/비석.png'))
 
         for i in range(1, 6):
             class_hp_present_value_list[i - 1].setText(
@@ -1599,6 +1825,19 @@ class WindowClass(QMainWindow, game):
             getattr(self, f'Status{i}_Action3_Item').setEnabled(enabled)
             getattr(self, f'Status{i}_Action4_Run').setEnabled(enabled)
 
+    def teleport_in_dungeon(self):
+        """던전 내 캐릭터가 텔레포트 하는 함수"""
+        # TODO 기능 구현 후 적용하기(구현 완. m키로 단축기 설정)
+        random_x = random.randint(self.map_size[self.random_num_for_teleport][0], self.map_size[self.random_num_for_teleport][1])
+        random_y = random.randint(self.map_size[self.random_num_for_teleport][2], self.map_size[self.random_num_for_teleport][3])
+        self.Character_QLabel_2.move(random_x, random_y)
+
+    def map_hack(self):
+        """맵핵 구현 함수"""
+        map_show_timer = QTimer()
+
+
+
     def keyPressEvent(self, event):
 
         # 소연 keypressevent 함수 내 수정(current_index값 받아오기)===========================================================
@@ -1612,11 +1851,11 @@ class WindowClass(QMainWindow, game):
         }
 
         # 현재 스택위젯 값 가져오기
-        current_index = self.StackWidget_Field.currentIndex()
+        self.current_index = self.StackWidget_Field.currentIndex()
 
         ## 일반필드일 때
-        if current_index == 0:
-
+        if self.current_index == 0:
+            self.battle_type = '일반전투'
             # self.portal_sample.show()
             # 움직이는 {라벨} 현재 위치 정보 가져옴 <= 이전위치
             self.normal_previous_position = self.Character_QLabel.geometry()
@@ -1721,7 +1960,10 @@ class WindowClass(QMainWindow, game):
 
 
         ## 던전필드일때
-        elif current_index == 1:
+        elif self.current_index == 1:
+            if event.key() == Qt.Key_M:
+                self.teleport_in_dungeon()
+            self.battle_type = '던전전투'
             previous_position = self.Character_QLabel_2.geometry()  # 이전 위치
 
             if event.key() in directions:  # 방향키가 눌렸을 때
@@ -1740,17 +1982,31 @@ class WindowClass(QMainWindow, game):
                 f"x좌표: {self.Character_QLabel_2.pos().x()}, y좌표:{self.Character_QLabel_2.pos().y()}")
 
             # 980625소연수정필요
+            ### TODO 랜덤값에 따라 아이템 획득(미완), 던전몬스터들 나오게 하기(완), 1칸 이동
             random_num_for_user_next_action = random.randint(1, 3)
-            if random_num_for_user_next_action == 1:
-                self.Add_Dungeon_monster_info()
-                self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
-                self.win_btn.show()
+            if random_num_for_user_next_action == 1: #랜던값이 나오면
+                pass
+                # TODO 일단 던전 전투 부분 패스 나중에 추가
+                # self.Add_Dungeon_monster_info() #던전 몬스터 생성하고 hp 담아주고
+                # self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
+                # self.User_Turn()
+
+            elif random_num_for_user_next_action == 2:
+                self.Log_textEdit.append("1칸 이동하였습니다.")
+            else:
+                self.Log_textEdit.append("포션을 획득하셨습니다.")
+
+
 
             # 던전에서 MonsterImage 만났을 때 전투 이동
             if self.Character_QLabel_2.geometry().intersects(self.boss_monster.geometry()):
                 self.show_messagebox("보스몬스터를 만났습니다!\n전투에 진입합니다.")
                 # 전투로 스택위젯 이동 / 전투함수로 이동
                 self.user_can_enter_dungeon = True  # 전투에서 이기면 상태 True로 만들어주기
+                self.user_meet_boss = True
+                self.Add_Dungeon_monster_info() # 보스몬스터 등장
+                self.StackWidget_Field.setCurrentIndex(2)  # 전투필드로 이동
+                self.User_Turn()
 
             if self.reply_state == False and self.checkCollision(self.Character_QLabel_2, self.ghost_label):
                 self.mark_label.move(self.Character_QLabel_2.x() + 10, self.Character_QLabel_2.y())
